@@ -3,7 +3,7 @@ import 'package:green_kitchen_app/widgets/nav_bar.dart';
 
 
 class PostScreen extends StatefulWidget {
-  const PostScreen({Key? key}) : super(key: key);
+  const PostScreen({super.key});
 
   @override
   State<PostScreen> createState() => _PostScreenState();
@@ -171,7 +171,7 @@ class _PostScreenState extends State<PostScreen> {
               const SizedBox(height: 24),
               if (filteredPosts.isEmpty)
                 const Text('No posts found', style: TextStyle(color: Colors.grey)),
-              ...filteredPosts.map((post) => _PostCard(post: post)).toList(),
+              ...filteredPosts.map((post) => _PostCard(post: post)),
               const SizedBox(height: 32),
             ],
           ),

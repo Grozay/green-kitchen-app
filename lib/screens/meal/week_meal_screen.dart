@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 
 class WeekMealScreen extends StatefulWidget {
-  const WeekMealScreen({Key? key}) : super(key: key);
+  const WeekMealScreen({super.key});
 
   @override
   State<WeekMealScreen> createState() => _WeekMealScreenState();
@@ -221,7 +221,7 @@ class _WeekMealScreenState extends State<WeekMealScreen> with SingleTickerProvid
               const SizedBox(height: 16),
               
               // Tab View Content
-              Container(
+              SizedBox(
                 height: MediaQuery.of(context).size.height * 0.6,
                 child: TabBarView(
                   controller: _tabController,

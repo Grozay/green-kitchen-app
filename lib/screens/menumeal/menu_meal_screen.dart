@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 
 class MenuMealScreen extends StatefulWidget {
-  const MenuMealScreen({Key? key}) : super(key: key);
+  const MenuMealScreen({super.key});
 
   @override
   State<MenuMealScreen> createState() => _MenuMealScreenState();
@@ -147,7 +147,7 @@ class MealCard extends StatelessWidget {
   final double price;
 
   const MealCard({
-    Key? key,
+    super.key,
     required this.tag,
     required this.calories,
     required this.name,
@@ -155,7 +155,7 @@ class MealCard extends StatelessWidget {
     required this.carbs,
     required this.fat,
     required this.price,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +259,7 @@ class MealCard extends StatelessWidget {
           // Dotted line
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Container(
+            child: SizedBox(
               height: 1,
               child: CustomPaint(
                 painter: DottedLinePainter(),

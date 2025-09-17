@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 
 class CartScreen extends StatelessWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +240,7 @@ class _CartItem extends StatelessWidget {
   final bool isLowCalories;
 
   const _CartItem({
-    Key? key,
+    super.key,
     this.imageUrl,
     required this.title,
     required this.subtitle,
@@ -253,7 +253,7 @@ class _CartItem extends StatelessWidget {
     this.ingredients,
     required this.quantity,
     this.isLowCalories = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

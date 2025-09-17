@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:green_kitchen_app/provider/provider.dart';
 
 class NavBar extends StatefulWidget {
   final int cartCount;
@@ -7,11 +9,11 @@ class NavBar extends StatefulWidget {
   final Widget body;
 
   const NavBar({
-    Key? key,
+    super.key,
     this.cartCount = 0,
     this.onCartTap,
     required this.body,
-  }) : super(key: key);
+  });
 
   @override
   _NavBarState createState() => _NavBarState();
@@ -20,8 +22,44 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  Future<void> _handleLogout() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Show confirmation dialog
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout == true) {
+      await authProvider.logout();
+
+      if (mounted) {
+        // Navigate back to login screen
+        GoRouter.of(context).go('/');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.currentUser;
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF8F5E7),
@@ -40,7 +78,7 @@ class _NavBarState extends State<NavBar> {
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     CircleAvatar(
                       radius: 32,
                       backgroundColor: Colors.white,
@@ -48,13 +86,21 @@ class _NavBarState extends State<NavBar> {
                     ),
                     SizedBox(height: 12),
                     Text(
-                      'Green User',
+                      user?.fullName ?? user?.firstName ?? 'Green User',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
                     ),
+                    if (user?.email != null)
+                      Text(
+                        user!.email,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -98,6 +144,18 @@ class _NavBarState extends State<NavBar> {
                 Navigator.pop(context);
               },
             ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.red),
+              ),
+              onTap: () {
+                Navigator.pop(context); // Close drawer first
+                _handleLogout();
+              },
+            ),
           ],
         ),
       ),
@@ -132,7 +190,7 @@ class _NavBarState extends State<NavBar> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.shopping_cart, color: Colors.black87),
-                          onPressed: () {
+                          onPressed: widget.onCartTap ?? () {
                             GoRouter.of(context).go('/cart');
                           },
                         ),

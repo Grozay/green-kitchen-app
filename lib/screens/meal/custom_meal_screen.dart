@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 
 class CustomMealScreen extends StatefulWidget {
-  const CustomMealScreen({Key? key}) : super(key: key);
+  const CustomMealScreen({super.key});
 
   @override
   State<CustomMealScreen> createState() => _CustomMealScreenState();

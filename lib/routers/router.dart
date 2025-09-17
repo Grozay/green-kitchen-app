@@ -1,9 +1,11 @@
-import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
+import 'package:green_kitchen_app/screens/authScreen/email_verification_screen.dart';
 //routers
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:green_kitchen_app/screens/authScreen/loginScreen.dart';
-import 'package:green_kitchen_app/screens/authScreen/registerScreen.dart';
+import 'package:green_kitchen_app/screens/authScreen/login_screen.dart';
+import 'package:green_kitchen_app/screens/authScreen/register_screen.dart';
+import 'package:green_kitchen_app/screens/authScreen/phone_login_screen.dart';
+import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
 
 
 import 'package:green_kitchen_app/screens/menumeal/menu_meal_screen.dart';
@@ -28,6 +30,18 @@ final GoRouter router = GoRouter(
       path: '/register',
       builder: (BuildContext context, GoRouterState state) {
         return const RegisterScreen();
+      },
+    ),
+    GoRoute(
+      path: '/phone-login',
+      builder: (BuildContext context, GoRouterState state) {
+        return const PhoneLoginScreen();
+      },
+    ),
+    GoRoute(
+      path: '/email-verification',
+      builder: (BuildContext context, GoRouterState state) {
+        return const EmailVerificationScreen();
       },
     ),
     GoRoute(
