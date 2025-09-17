@@ -6,7 +6,7 @@ import '../apis/endpoint.dart';
 class MenuMealService {
   Future<List<MenuMeal>> getMenuMeals() async {
     try {
-      final response = await http.get(Uri.parse(menuMeals));
+      final response = await http.get(Uri.parse(ApiEndpoints.menuMeals));
       print('Status: ${response.statusCode}');
       print('Body: ${response.body}');
       if (response.statusCode == 200) {
@@ -22,7 +22,7 @@ class MenuMealService {
   }
 
   static Future<MenuMeal> getMenuMealBySlug(String slug) async {
-    final url = menuMealBySlug.replaceFirst(':slug', slug);
+    final url = ApiEndpoints.menuMealBySlug.replaceFirst(':slug', slug);
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       return MenuMeal.fromJson(json.decode(response.body));

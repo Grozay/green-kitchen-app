@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:green_kitchen_app/routers/router.dart';
-import 'provider/provider.dart';
+import 'package:green_kitchen_app/provider/provider.dart';
+import 'package:green_kitchen_app/provider/auth_provider.dart'; 
 
-void main() {
+void main() async {
   //custom lock screen orientation to portrait only
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(const MyApp());
+
+  // Initialize Firebase (without options - will use google-services.json)
+  await Firebase.initializeApp();
+
+  // Initialize AuthProvider
+  final authProvider = AuthProvider();
+  await authProvider.init();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authProvider),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -32,5 +50,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

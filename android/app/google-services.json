@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "708283778062",
+    "project_id": "green-kitchen-fb3b3",
+    "storage_bucket": "green-kitchen-fb3b3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708283778062:android:758e81e2ba07320fa5285f",
+        "android_client_info": {
+          "package_name": "com.example.green_kitchen_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708283778062-cle31dmpmmcbv5u1ffr9tkhob2trbgmp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.green_kitchen_app",
+            "certificate_hash": "7f89da7e580ba8c6c276016cc8c14f213a7da10d"
+          }
+        },
+        {
+          "client_id": "708283778062-kh19pp66hh3mk8ncgo4p5nm488le3ke2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH9RT4CovBoIDwfZjXkt3kQX-xnY93Sbs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708283778062-kh19pp66hh3mk8ncgo4p5nm488le3ke2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

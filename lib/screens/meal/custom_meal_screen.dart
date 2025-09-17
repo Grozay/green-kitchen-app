@@ -6,7 +6,7 @@ import 'package:green_kitchen_app/provider/provider.dart';
 import 'package:green_kitchen_app/models/ingredient.dart';
 
 class CustomMealScreen extends StatefulWidget {
-  const CustomMealScreen({Key? key}) : super(key: key);
+  const CustomMealScreen({super.key});
 
   @override
   State<CustomMealScreen> createState() => _CustomMealScreenState();
