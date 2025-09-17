@@ -17,13 +17,12 @@ class ApiEndpoints {
   static const String getProfile = '$baseUrls/user/profile';
   static const String updateProfile = '$baseUrls/user/profile';
 
-  
-
   //endpoint
   static const String baseUrl = 'http://192.168.1.23:8080';
 
-  static const String menuMeals = '$baseUrl/apis/v1/menu-meals/customers';
-  static const String menuMealBySlug = '$baseUrl/apis/v1/menu-meals/customers/slug/:slug';
+  // MenuMeal endpoints
+  var menuMeals = '$baseUrl/apis/v1/menu-meals/customers';
+  var menuMealBySlug = '$baseUrl/apis/v1/menu-meals/customers/slug/:slug';
 
   // Cart endpoints
   var getCartByCustomerId = '$baseUrl/apis/v1/cart/customers/:customerId';
@@ -35,7 +34,14 @@ class ApiEndpoints {
   var decreaseMealQuantityInCart =
       '$baseUrl/apis/v1/cart/customers/:customerId/cart-items/:cartItemId/decrease';
 
+  // Ingredient endpoints
+  var ingredients = '$baseUrl/apis/v1/ingredients';
+  // var ingredientById = '$baseUrl/apis/v1/ingredients/:id';
+
   // Timeout configurations
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 }
+
+// //endpoint
+// var baseUrl = 'http://192.168.1.172:8080';

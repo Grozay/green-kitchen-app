@@ -1,37 +1,43 @@
 class Ingredient {
   final int id;
   final String title;
-  final String description;
+  final String type; // 'protein', 'carbs', 'side', 'sauce'
+  final double calories;
   final double protein;
   final double carbs;
   final double fat;
+  final String description;
   final String image;
   final double price;
-  final String type; // 'protein', 'carbs', 'side', 'sauce'
+  final int stock;
 
   Ingredient({
     required this.id,
     required this.title,
-    required this.description,
+    required this.type,
+    required this.calories,
     required this.protein,
     required this.carbs,
     required this.fat,
+    required this.description,
     required this.image,
     required this.price,
-    required this.type,
+    required this.stock,
   });
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
     return Ingredient(
       id: json['id'],
-      title: json['title'] ?? json['name'] ?? '',
+      title: json['title'],
+      type: json['type'],
+      calories: json['calories'],
+      protein: json['protein'],
+      carbs: json['carbs'],
+      fat: json['fat'],
       description: json['description'],
-      protein: json['protein'] ?? 0.0,
-      carbs: json['carbs'] ?? 0.0,
-      fat: json['fat'] ?? 0.0,
-      image: json['image'] ?? '',
-      price: json['price'] ?? 0.0,
-      type: json['type'] ?? '',
+      image: json['image'],
+      price: json['price'],
+      stock: json['stock'],
     );
   }
 
@@ -39,17 +45,17 @@ class Ingredient {
     return {
       'id': id,
       'title': title,
-      'description': description,
+      'type': type,
+      'calories': calories,
       'protein': protein,
       'carbs': carbs,
       'fat': fat,
+      'description': description,
       'image': image,
       'price': price,
-      'type': type,
+      'stock': stock,
     };
   }
-
-  double get calories => (protein * 4) + (carbs * 4) + (fat * 9);
 }
 
 class IngredientWithQuantity {

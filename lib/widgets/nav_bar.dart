@@ -107,7 +107,7 @@ class _NavBarState extends State<NavBar> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home'),
+              title: const Text('Menu Meal'),
               onTap: () {
                 Navigator.pop(context);
                 GoRouter.of(context).go('/menumeal');

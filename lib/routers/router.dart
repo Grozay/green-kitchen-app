@@ -8,7 +8,7 @@ import 'package:green_kitchen_app/screens/authScreen/phone_login_screen.dart';
 import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_meal_screen.dart';
-import 'package:green_kitchen_app/screens/meal/week_meal_screen.dart';
+import 'package:green_kitchen_app/screens/week_meal/week_meal_screen.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_detail_screen.dart';
 import 'package:green_kitchen_app/screens/meal/custom_meal_screen.dart';
