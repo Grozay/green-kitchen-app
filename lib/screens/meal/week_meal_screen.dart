@@ -157,68 +157,68 @@ class _WeekMealScreenState extends State<WeekMealScreen> with SingleTickerProvid
               const SizedBox(height: 16),
               
               // Header meal types
-              Container(
-                decoration: BoxDecoration(
-                  color: Color(0xFF4B0036),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          children: [
-                            Icon(Icons.calendar_today, color: Colors.white, size: 18),
-                            SizedBox(width: 6),
-                            Text('NGÀY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          children: [
-                            Icon(Icons.wb_sunny, color: Color(0xFF1CC29F), size: 18),
-                            SizedBox(width: 6),
-                            Text('MEAL 1 (6:00 - 10:00)', style: TextStyle(color: Colors.white)),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          children: [
-                            Icon(Icons.lunch_dining, color: Color(0xFF1CC29F), size: 18),
-                            SizedBox(width: 6),
-                            Text('MEAL 2 (11:00 - 14:00)', style: TextStyle(color: Colors.white)),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          children: [
-                            Icon(Icons.set_meal, color: Color(0xFF1CC29F), size: 18),
-                            SizedBox(width: 6),
-                            Text('MEAL 3 (17:00 - 20:00)', style: TextStyle(color: Colors.white)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
+              // Container(
+              //   decoration: BoxDecoration(
+              //     color: Color(0xFF4B0036),
+              //     borderRadius: BorderRadius.circular(16),
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: Colors.black12,
+              //         blurRadius: 4,
+              //         offset: Offset(0, 2),
+              //       ),
+              //     ],
+              //   ),
+              //   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+              //   child: SingleChildScrollView(
+              //     scrollDirection: Axis.horizontal,
+              //     child: Row(
+              //       children: const [
+              //         Padding(
+              //           padding: EdgeInsets.symmetric(horizontal: 10),
+              //           child: Row(
+              //             children: [
+              //               Icon(Icons.calendar_today, color: Colors.white, size: 18),
+              //               SizedBox(width: 6),
+              //               Text('NGÀY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              //             ],
+              //           ),
+              //         ),
+              //         Padding(
+              //           padding: EdgeInsets.symmetric(horizontal: 10),
+              //           child: Row(
+              //             children: [
+              //               Icon(Icons.wb_sunny, color: Color(0xFF1CC29F), size: 18),
+              //               SizedBox(width: 6),
+              //               Text('MEAL 1 (6:00 - 10:00)', style: TextStyle(color: Colors.white)),
+              //             ],
+              //           ),
+              //         ),
+              //         Padding(
+              //           padding: EdgeInsets.symmetric(horizontal: 10),
+              //           child: Row(
+              //             children: [
+              //               Icon(Icons.lunch_dining, color: Color(0xFF1CC29F), size: 18),
+              //               SizedBox(width: 6),
+              //               Text('MEAL 2 (11:00 - 14:00)', style: TextStyle(color: Colors.white)),
+              //             ],
+              //           ),
+              //         ),
+              //         Padding(
+              //           padding: EdgeInsets.symmetric(horizontal: 10),
+              //           child: Row(
+              //             children: [
+              //               Icon(Icons.set_meal, color: Color(0xFF1CC29F), size: 18),
+              //               SizedBox(width: 6),
+              //               Text('MEAL 3 (17:00 - 20:00)', style: TextStyle(color: Colors.white)),
+              //             ],
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 16),
               
               // Tab View Content
               SizedBox(

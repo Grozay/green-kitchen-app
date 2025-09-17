@@ -38,7 +38,7 @@ dependencies:
   font_awesome_flutter: ^10.9.1
   
   # HTTP client for API calls
-  http: ^1.2.2
+  http: ^1.5.0
   
   # State management
   provider: ^6.1.2
@@ -52,6 +52,7 @@ dependencies:
   # Firebase
   firebase_core: ^4.1.0
   firebase_auth: ^6.0.2
+
 
 dev_dependencies:
   flutter_test:

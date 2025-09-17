@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:green_kitchen_app/provider/provider.dart';
+import 'package:green_kitchen_app/provider/auth_provider.dart';
 import 'package:green_kitchen_app/theme/app_colors.dart';
 
 class RegisterScreen extends StatefulWidget {

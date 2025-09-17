@@ -1,5 +1,5 @@
 import '../apis/endpoint.dart';
-import '../models/model.dart';
+import '../models/user.dart';
 import '../services/service.dart';
 import '../services/google_auth_service.dart';
 

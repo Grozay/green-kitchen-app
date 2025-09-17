@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../apis/endpoint.dart';
-import '../models/model.dart';
+import '../models/user.dart';
 
 // ApiService handles all HTTP requests
 class ApiService {
