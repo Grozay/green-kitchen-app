@@ -27,7 +27,6 @@ class MealCard extends StatelessWidget {
       onTap: onTap,
       child: ClipRect(
         child: Container(
-          height: 420,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -47,11 +46,9 @@ class MealCard extends StatelessWidget {
               Stack(
                 children: [
                   Container(
-                    height: 160,
+                    height: 230,
                     width: double.infinity,
-                    margin: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
                       image: DecorationImage(
                         image: NetworkImage(item.image),
                         fit: BoxFit.cover,
@@ -156,7 +153,7 @@ class MealCard extends StatelessWidget {
               const SizedBox(height: 4),
 
               // Spacer để push price xuống bottom
-              Spacer(),
+              // Spacer(),
 
               // Price and Cart Section
               Padding(

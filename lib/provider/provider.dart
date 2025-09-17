@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/cart.dart';
 import '../models/ingredient.dart';
 import '../services/cart_service.dart';
+import '../services/ingredient_service.dart';
 
 class CartProvider with ChangeNotifier {
   Cart? _cart;
@@ -158,7 +159,7 @@ class CartProvider with ChangeNotifier {
   }
 }
 
-class CustomMealProvider with ChangeNotifier {
+class CustomMealProvider extends ChangeNotifier {
   CustomMealSelection _selection = CustomMealSelection();
   List<Ingredient> _availableProteins = [];
   List<Ingredient> _availableCarbs = [];
@@ -185,143 +186,34 @@ class CustomMealProvider with ChangeNotifier {
 
   // Load available meal items (mock data for now)
   Future<void> loadAvailableItems() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
     try {
-      // Mock data - replace with API calls later
-      _availableProteins = [
-        Ingredient(
-          id: 1,
-          title: 'Chicken Breast',
-          description: 'Grilled chicken breast',
-          protein: 31,
-          carbs: 0,
-          fat: 3.6,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 8.99,
-          type: 'protein',
-        ),
-        Ingredient(
-          id: 2,
-          title: 'Salmon Fillet',
-          description: 'Fresh salmon fillet',
-          protein: 22,
-          carbs: 0,
-          fat: 13,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 12.99,
-          type: 'protein',
-        ),
-        Ingredient(
-          id: 3,
-          title: 'Organic Tofu',
-          description: 'Organic tofu cubes',
-          protein: 10,
-          carbs: 3.5,
-          fat: 5.3,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 6.99,
-          type: 'protein',
-        ),
-      ];
-
-      _availableCarbs = [
-        Ingredient(
-          id: 4,
-          title: 'Brown Rice',
-          description: 'Whole grain brown rice',
-          protein: 5,
-          carbs: 44,
-          fat: 1.8,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 3.99,
-          type: 'carbs',
-        ),
-        Ingredient(
-          id: 5,
-          title: 'Quinoa',
-          description: 'Organic quinoa',
-          protein: 8,
-          carbs: 39,
-          fat: 3.6,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 4.99,
-          type: 'carbs',
-        ),
-      ];
-
-      _availableSides = [
-        Ingredient(
-          id: 6,
-          title: 'Mixed Vegetables',
-          description: 'Seasonal mixed vegetables',
-          protein: 3,
-          carbs: 13,
-          fat: 0.3,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 4.99,
-          type: 'side',
-        ),
-        Ingredient(
-          id: 7,
-          title: 'Sweet Potato',
-          description: 'Baked sweet potato',
-          protein: 2,
-          carbs: 26,
-          fat: 0.1,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 3.49,
-          type: 'side',
-        ),
-      ];
-
-      _availableSauces = [
-        Ingredient(
-          id: 8,
-          title: 'Teriyaki Sauce',
-          description: 'Low-sodium teriyaki sauce',
-          protein: 1,
-          carbs: 9,
-          fat: 0.5,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 2.99,
-          type: 'sauce',
-        ),
-        Ingredient(
-          id: 9,
-          title: 'Pesto Sauce',
-          description: 'Basil pesto sauce',
-          protein: 2,
-          carbs: 1,
-          fat: 8,
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80',
-          price: 3.49,
-          type: 'sauce',
-        ),
-      ];
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isLoading = false;
+      final categorizedIngredients = await IngredientService.getIngredients();
+      
+      // Gán theo type
+      _availableProteins = categorizedIngredients['protein'] ?? [];
+      _availableCarbs = categorizedIngredients['carbs'] ?? [];
+      _availableSides = categorizedIngredients['side'] ?? [];
+      _availableSauces = categorizedIngredients['sauce'] ?? [];
+      
       notifyListeners();
+    } catch (e) {
+      print('Error loading ingredients: $e');
     }
   }
 
   // Select meal item
   void selectMealItem(Ingredient item) {
     switch (item.type) {
-      case 'protein':
+      case 'PROTEIN':
         _selection = _selection.copyWith(protein: IngredientWithQuantity(item: item, quantity: 1));
         break;
-      case 'carbs':
+      case 'CARBS':
         _selection = _selection.copyWith(carbs: IngredientWithQuantity(item: item, quantity: 1));
         break;
-      case 'side':
+      case 'SIDE':
         _selection = _selection.copyWith(side: IngredientWithQuantity(item: item, quantity: 1));
         break;
-      case 'sauce':
+      case 'SAUCE':
         _selection = _selection.copyWith(sauce: IngredientWithQuantity(item: item, quantity: 1));
         break;
     }
@@ -331,7 +223,7 @@ class CustomMealProvider with ChangeNotifier {
   // Increase quantity for a meal item
   void increaseQuantity(Ingredient item) {
     switch (item.type) {
-      case 'protein':
+      case 'PROTEIN':
         if (_selection.protein != null && _selection.protein!.item.id == item.id) {
           final newQuantity = _selection.protein!.quantity + 1;
           _selection = _selection.copyWith(
@@ -341,7 +233,7 @@ class CustomMealProvider with ChangeNotifier {
           _selection = _selection.copyWith(protein: IngredientWithQuantity(item: item, quantity: 1));
         }
         break;
-      case 'carbs':
+      case 'CARBS':
         if (_selection.carbs != null && _selection.carbs!.item.id == item.id) {
           final newQuantity = _selection.carbs!.quantity + 1;
           _selection = _selection.copyWith(
@@ -351,7 +243,7 @@ class CustomMealProvider with ChangeNotifier {
           _selection = _selection.copyWith(carbs: IngredientWithQuantity(item: item, quantity: 1));
         }
         break;
-      case 'side':
+      case 'SIDE':
         if (_selection.side != null && _selection.side!.item.id == item.id) {
           final newQuantity = _selection.side!.quantity + 1;
           _selection = _selection.copyWith(
@@ -361,7 +253,7 @@ class CustomMealProvider with ChangeNotifier {
           _selection = _selection.copyWith(side: IngredientWithQuantity(item: item, quantity: 1));
         }
         break;
-      case 'sauce':
+      case 'SAUCE':
         if (_selection.sauce != null && _selection.sauce!.item.id == item.id) {
           final newQuantity = _selection.sauce!.quantity + 1;
           _selection = _selection.copyWith(
@@ -378,7 +270,7 @@ class CustomMealProvider with ChangeNotifier {
   // Decrease quantity for a meal item
   void decreaseQuantity(Ingredient item) {
     switch (item.type) {
-      case 'protein':
+      case 'PROTEIN':
         if (_selection.protein != null && _selection.protein!.item.id == item.id && _selection.protein!.quantity > 0) {
           final newQuantity = _selection.protein!.quantity - 1;
           if (newQuantity <= 0) {
@@ -390,7 +282,7 @@ class CustomMealProvider with ChangeNotifier {
           }
         }
         break;
-      case 'carbs':
+      case 'CARBS':
         if (_selection.carbs != null && _selection.carbs!.item.id == item.id && _selection.carbs!.quantity > 0) {
           final newQuantity = _selection.carbs!.quantity - 1;
           if (newQuantity <= 0) {
@@ -402,7 +294,7 @@ class CustomMealProvider with ChangeNotifier {
           }
         }
         break;
-      case 'side':
+      case 'SIDE':
         if (_selection.side != null && _selection.side!.item.id == item.id && _selection.side!.quantity > 0) {
           final newQuantity = _selection.side!.quantity - 1;
           if (newQuantity <= 0) {
@@ -414,7 +306,7 @@ class CustomMealProvider with ChangeNotifier {
           }
         }
         break;
-      case 'sauce':
+      case 'SAUCE':
         if (_selection.sauce != null && _selection.sauce!.item.id == item.id && _selection.sauce!.quantity > 0) {
           final newQuantity = _selection.sauce!.quantity - 1;
           if (newQuantity <= 0) {
@@ -433,13 +325,13 @@ class CustomMealProvider with ChangeNotifier {
   // Get quantity for a specific item
   int getItemQuantity(Ingredient item) {
     switch (item.type) {
-      case 'protein':
+      case 'PROTEIN':
         return _selection.protein != null && _selection.protein!.item.id == item.id ? _selection.protein!.quantity : 0;
-      case 'carbs':
+      case 'CARBS':
         return _selection.carbs != null && _selection.carbs!.item.id == item.id ? _selection.carbs!.quantity : 0;
-      case 'side':
+      case 'SIDE':
         return _selection.side != null && _selection.side!.item.id == item.id ? _selection.side!.quantity : 0;
-      case 'sauce':
+      case 'SAUCE':
         return _selection.sauce != null && _selection.sauce!.item.id == item.id ? _selection.sauce!.quantity : 0;
       default:
         return 0;

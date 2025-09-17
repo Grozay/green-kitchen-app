@@ -25,18 +25,12 @@ class MenuList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 0.75,
-        ),
-        itemCount: 8,
-        itemBuilder: (context, index) {
+      return Wrap(
+        spacing: 8, // Khoảng cách ngang giữa item
+        runSpacing: 8, // Khoảng cách dọc giữa hàng
+        children: List.generate(8, (index) {
           return Container(
+            width: 180, // Chiều rộng cố định cho item (điều chỉnh theo nhu cầu)
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -75,35 +69,30 @@ class MenuList extends StatelessWidget {
               ],
             ),
           );
-        },
+        }),
       );
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.55, // Increased from 0.57 to 0.65 for more vertical space
-      ),
-      itemCount: meals.length,
-      itemBuilder: (context, index) {
-        final item = meals[index];
-        final typeBasedIndex = _getTypeBasedIndex(meals, index);
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: meals.map((item) {
+        final typeBasedIndex = _getTypeBasedIndex(meals, meals.indexOf(item));
         final quantity = quantities?[item.id];
 
-        return MealCard(
-          item: item,
-          typeBasedIndex: typeBasedIndex,
-          onAddToCart: onAddToCart != null ? () => onAddToCart!(item) : null,
-          onIncrease: onIncrease != null ? () => onIncrease!(item) : null,
-          onDecrease: onDecrease != null ? () => onDecrease!(item) : null,
-          quantity: quantity,
-          onTap: onTap != null ? () => onTap!(item) : null,
+        return Container(
+          width: MediaQuery.of(context).size.width / 2.16,
+          child: MealCard(
+            item: item,
+            typeBasedIndex: typeBasedIndex,
+            onAddToCart: onAddToCart != null ? () => onAddToCart!(item) : null,
+            onIncrease: onIncrease != null ? () => onIncrease!(item) : null,
+            onDecrease: onDecrease != null ? () => onDecrease!(item) : null,
+            quantity: quantity,
+            onTap: onTap != null ? () => onTap!(item) : null,
+          ),
         );
-      },
+      }).toList(),
     );
   }
 

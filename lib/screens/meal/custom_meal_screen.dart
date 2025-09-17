@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:green_kitchen_app/widgets/custom_meal/meal_part_selector.dart';
+import 'package:green_kitchen_app/widgets/custom_meal/nutrition_info.dart';
+import 'package:green_kitchen_app/widgets/custom_meal/tab_ingredient.dart';
 import 'package:provider/provider.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 import 'package:green_kitchen_app/widgets/custom_meal/meal_item_card.dart';
@@ -43,36 +46,8 @@ class _CustomMealScreenState extends State<CustomMealScreen>
             child: Column(
               children: [
                 const SizedBox(height: 24),
-
-                // Custom Tab Bar
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Color(0xFF7DD3C0),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    labelColor: Color(0xFF4B0036),
-                    unselectedLabelColor: Colors.white,
-                    labelStyle: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                    dividerColor: Colors.transparent,
-                    tabs: const [
-                      Tab(text: 'PROTEIN'),
-                      Tab(text: 'CARBS'),
-                      Tab(text: 'SIDE'),
-                      Tab(text: 'SAUCE'),
-                    ],
-                  ),
-                ),
+                // TabBar for meal parts
+                tab_ingredient(tabController: _tabController),
 
                 const SizedBox(height: 24),
 
@@ -88,6 +63,7 @@ class _CustomMealScreenState extends State<CustomMealScreen>
                         onIncreaseQuantity: (item) => customMealProvider.increaseQuantity(item),
                         onDecreaseQuantity: (item) => customMealProvider.decreaseQuantity(item),
                         getItemQuantity: (item) => customMealProvider.getItemQuantity(item),
+                        number: 1, // Protein là 1
                       ),
                       _MealPartSelector(
                         title: 'SELECT CARBS',
@@ -96,6 +72,7 @@ class _CustomMealScreenState extends State<CustomMealScreen>
                         onIncreaseQuantity: (item) => customMealProvider.increaseQuantity(item),
                         onDecreaseQuantity: (item) => customMealProvider.decreaseQuantity(item),
                         getItemQuantity: (item) => customMealProvider.getItemQuantity(item),
+                        number: 2, // Carbs là 2
                       ),
                       _MealPartSelector(
                         title: 'SELECT SIDE',
@@ -104,6 +81,7 @@ class _CustomMealScreenState extends State<CustomMealScreen>
                         onIncreaseQuantity: (item) => customMealProvider.increaseQuantity(item),
                         onDecreaseQuantity: (item) => customMealProvider.decreaseQuantity(item),
                         getItemQuantity: (item) => customMealProvider.getItemQuantity(item),
+                        number: 3, // Side là 3
                       ),
                       _MealPartSelector(
                         title: 'SELECT SAUCE',
@@ -112,6 +90,7 @@ class _CustomMealScreenState extends State<CustomMealScreen>
                         onIncreaseQuantity: (item) => customMealProvider.increaseQuantity(item),
                         onDecreaseQuantity: (item) => customMealProvider.decreaseQuantity(item),
                         getItemQuantity: (item) => customMealProvider.getItemQuantity(item),
+                        number: 4, // Sauce là 4
                       ),
                     ],
                   ),
@@ -284,6 +263,9 @@ class _CustomMealScreenState extends State<CustomMealScreen>
   }
 }
 
+
+
+
 class _MealPartSelector extends StatelessWidget {
   final String title;
   final List<Ingredient> items;
@@ -291,6 +273,7 @@ class _MealPartSelector extends StatelessWidget {
   final Function(Ingredient) onIncreaseQuantity;
   final Function(Ingredient) onDecreaseQuantity;
   final Function(Ingredient) getItemQuantity;
+  final int number;
 
   const _MealPartSelector({
     required this.title,
@@ -299,78 +282,16 @@ class _MealPartSelector extends StatelessWidget {
     required this.onIncreaseQuantity,
     required this.onDecreaseQuantity,
     required this.getItemQuantity,
+    required this.number,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Color(0xFFF5EFE7),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: Color(0xFF4B0036),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '1',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Color(0xFF4B0036),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.9,
-                ),
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  final quantity = getItemQuantity(item);
-                  return MealItemCard(
-                    item: item,
-                    quantity: quantity,
-                    onIncrease: () => onIncreaseQuantity(item),
-                    onDecrease: () => onDecreaseQuantity(item),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return meal_part_selector(title: title, items: items, getItemQuantity: getItemQuantity, onIncreaseQuantity: onIncreaseQuantity, onDecreaseQuantity: onDecreaseQuantity, number: number); // Truyền number
   }
 }
+
+
 
 class _NutritionInfo extends StatelessWidget {
   final String value;
@@ -379,26 +300,9 @@ class _NutritionInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Color(0xFF4B0036),
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.black54,
-            fontSize: 10,
-          ),
-        ),
-      ],
-    );
+    return nutrition_info(value: value, label: label);
   }
 }
+
+
+
