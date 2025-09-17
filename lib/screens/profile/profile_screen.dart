@@ -73,11 +73,11 @@ class ProfileScreen extends StatelessWidget {
                   title: 'Cart',
                 ),
                 
-                _buildMenuItem(
-                  icon: Icons.favorite_outline,
-                  color: Colors.pink,
-                  title: 'Favourite',
-                ),
+                // _buildMenuItem(
+                //   icon: Icons.favorite_outline,
+                //   color: Colors.pink,
+                //   title: 'Favourite',
+                // ),
                 
                 _buildMenuItem(
                   icon: Icons.notifications_outlined,
@@ -99,17 +99,17 @@ class ProfileScreen extends StatelessWidget {
                   title: 'FAQs',
                 ),
                 
-                _buildMenuItem(
-                  icon: Icons.star_outline,
-                  color: Colors.teal,
-                  title: 'User Reviews',
-                ),
+                // _buildMenuItem(
+                //   icon: Icons.star_outline,
+                //   color: Colors.teal,
+                //   title: 'User Reviews',
+                // ),
                 
-                _buildMenuItem(
-                  icon: Icons.settings_outlined,
-                  color: Colors.purple,
-                  title: 'Settings',
-                ),
+                // _buildMenuItem(
+                //   icon: Icons.settings_outlined,
+                //   color: Colors.purple,
+                //   title: 'Settings',
+                // ),
                 
                 const SizedBox(height: 16),
                 

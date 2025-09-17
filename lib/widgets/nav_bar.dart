@@ -91,13 +91,13 @@ class _NavBarState extends State<NavBar> {
                 GoRouter.of(context).go('/weekmeal');
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
+            // ListTile(
+            //   leading: const Icon(Icons.settings),
+            //   title: const Text('Settings'),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //   },
+            // ),
           ],
         ),
       ),
