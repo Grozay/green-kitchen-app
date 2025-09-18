@@ -4,6 +4,7 @@ class CartItem {
   final String menuMealTitle;
   final String? menuMealImage;
   final double unitPrice;
+  final String? menuMealDescription;
   final int quantity;
   final double totalPrice;
   final double calories;
@@ -18,6 +19,7 @@ class CartItem {
     required this.menuMealTitle,
     this.menuMealImage,
     required this.unitPrice,
+    this.menuMealDescription,
     required this.quantity,
     required this.totalPrice,
     required this.calories,

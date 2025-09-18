@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/menu_meal.dart';
+import '../../theme/app_colors.dart';
 
 class MealCard extends StatelessWidget {
   final MenuMeal item;
@@ -28,56 +29,60 @@ class MealCard extends StatelessWidget {
       child: ClipRect(
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0),
-                spreadRadius: 1,
-                blurRadius: 8,
-                offset: Offset(0, 2),
-              ),
-            ],
+            color: AppColors.inputFill,
+            borderRadius: BorderRadius.circular(16)
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Image and Tag Section
-              Stack(
-                children: [
-                  Container(
-                    height: 230,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(item.image),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 16,
-                    left: 16,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
+              Center(
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 170,
+                      height: 170,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(12),
+                        color: const Color(0xFFE8B678),
+                        shape: BoxShape.circle,
                       ),
-                      child: Text(
-                        '${item.type}$typeBasedIndex',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4B0036),
+                      child: ClipOval(
+                        child: Image.network(
+                          item.image,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(
+                                Icons.fastfood,
+                                color: Colors.white,
+                                size: 18,
+                              ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    Positioned(
+                      top: 16,
+                      left: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.inputFill.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${item.type}$typeBasedIndex',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               // Calories Section
@@ -89,14 +94,14 @@ class MealCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Color(0xFF4B0036), width: 1),
+                    border: Border.all(color: AppColors.textPrimary, width: 1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '${item.calories.toInt()} CALORIES',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: Color(0xFF4B0036),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -108,13 +113,13 @@ class MealCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     minHeight: 40,
                   ), // Reserve space for up to 2 lines of title
                   child: Text(
                     item.title,
-                    style: const TextStyle(
-                      color: Color(0xFF4B0036),
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
@@ -130,7 +135,7 @@ class MealCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: CustomPaint(
-                  size: Size(double.infinity, 1),
+                  size: const Size(double.infinity, 1),
                   painter: DottedLinePainter(),
                 ),
               ),
@@ -152,78 +157,23 @@ class MealCard extends StatelessWidget {
 
               const SizedBox(height: 4),
 
-              // Spacer để push price xuống bottom
-              // Spacer(),
-
               // Price and Cart Section
-              Padding(
+                Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12, bottom: 6),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      '${item.price.toStringAsFixed(0)} VND',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4B0036),
-                      ),
+                  Text(
+                    '${item.price.toStringAsFixed(0)} VND',
+                    style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                     ),
-                    // Cart buttons
-                    if (quantity != null && quantity! > 0)
-                      // Show quantity controls if item is in cart
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove, size: 16),
-                              onPressed: onDecrease,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                '$quantity',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.add, size: 16),
-                              onPressed: onIncrease,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ],
-                        ),
-                      )
-                    else
-                      // Show add to cart button if item is not in cart
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFF6B35),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.add, size: 16, color: Colors.white),
-                          onPressed: onAddToCart,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ),
+                  ),
                   ],
                 ),
-              ),
+                ),
 
               const SizedBox(height: 4),
             ],
@@ -238,13 +188,19 @@ class MealCard extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF4B0036),
+            color: AppColors.textPrimary,
           ),
         ),
-        Text(label, style: const TextStyle(fontSize: 8, color: Colors.grey)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 8,
+            color: Colors.grey,
+          ),
+        ),
       ],
     );
   }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:green_kitchen_app/widgets/cart/cart_item.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../provider/provider.dart';
+import '../../provider/cart_provider.dart';
 import '../../models/cart.dart';
 import '../../constants/app_constants.dart';
 
@@ -21,7 +22,7 @@ class _CartScreenState extends State<CartScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cartProvider = Provider.of<CartProvider>(context, listen: false);
       // Using hardcoded customer ID for development/testing
-      cartProvider.loadCart(CURRENT_CUSTOMER_ID);
+      cartProvider.initializeCart(CURRENT_CUSTOMER_ID);
     });
   }
 
@@ -84,7 +85,7 @@ class _CartScreenState extends State<CartScreen> {
                           IconButton(
                             onPressed: () {
                               cartProvider.clearError();
-                              cartProvider.loadCart(CURRENT_CUSTOMER_ID); // Reload cart
+                              // cartProvider.loadCart(CURRENT_CUSTOMER_ID); // Reload cart
                             },
                             icon: const Icon(Icons.refresh, color: Colors.red),
                           ),
@@ -99,11 +100,18 @@ class _CartScreenState extends State<CartScreen> {
                         padding: EdgeInsets.all(32.0),
                         child: Column(
                           children: [
-                            Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
+                            Icon(
+                              Icons.shopping_cart_outlined,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
                             SizedBox(height: 16),
                             Text(
                               'Giỏ hàng trống',
-                              style: TextStyle(fontSize: 18, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -117,15 +125,26 @@ class _CartScreenState extends State<CartScreen> {
 
                   // Cart items
                   if (!isLoading && cart != null && cart.cartItems.isNotEmpty)
-                    ...cart.cartItems.map((cartItem) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _CartItemWidget(
-                        cartItem: cartItem,
-                        onIncrease: () => cartProvider.increaseQuantity(CURRENT_CUSTOMER_ID, cartItem.id),
-                        onDecrease: () => cartProvider.decreaseQuantity(CURRENT_CUSTOMER_ID, cartItem.id),
-                        onRemove: () => cartProvider.removeFromCart(CURRENT_CUSTOMER_ID, cartItem.id),
+                    ...cart.cartItems.map(
+                      (cartItem) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _CartItemWidget(
+                          cartItem: cartItem,
+                          onIncrease: () => cartProvider.increaseQuantity(
+                            CURRENT_CUSTOMER_ID,
+                            cartItem.id,
+                          ),
+                          onDecrease: () => cartProvider.decreaseQuantity(
+                            CURRENT_CUSTOMER_ID,
+                            cartItem.id,
+                          ),
+                          onRemove: () => cartProvider.removeFromCart(
+                            CURRENT_CUSTOMER_ID,
+                            cartItem.id,
+                          ),
+                        ),
                       ),
-                    )),
+                    ),
 
                   const SizedBox(height: 24),
 
@@ -247,7 +266,9 @@ class _CartScreenState extends State<CartScreen> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFFFF6B35),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -299,172 +320,11 @@ class _CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image or placeholder
-          cartItem.menuMealImage == null || cartItem.menuMealImage!.isEmpty
-              ? CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.grey[400],
-                  child: Text(
-                    cartItem.menuMealTitle.isNotEmpty ? cartItem.menuMealTitle[0].toUpperCase() : 'M',
-                    style: const TextStyle(fontSize: 32, color: Colors.white),
-                  ),
-                )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(40),
-                  child: Image.network(
-                    cartItem.menuMealImage!,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.grey[400],
-                        child: Text(
-                          cartItem.menuMealTitle.isNotEmpty ? cartItem.menuMealTitle[0].toUpperCase() : 'M',
-                          style: const TextStyle(fontSize: 32, color: Colors.white),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  cartItem.menuMealTitle,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Text(
-                      '${cartItem.unitPrice.toStringAsFixed(0)} VNĐ',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '${cartItem.calories.toStringAsFixed(0)} Calories',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text('${cartItem.protein.toStringAsFixed(1)}g Protein'),
-                    ),
-                    Expanded(
-                      child: Text('${cartItem.carbs.toStringAsFixed(1)}g Carbs'),
-                    ),
-                    Expanded(
-                      child: Text('${cartItem.fat.toStringAsFixed(1)}g Fat'),
-                    ),
-                  ],
-                ),
-                if (cartItem.ingredients.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 4,
-                    runSpacing: 4,
-                    children: cartItem.ingredients.map((ingredient) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        ingredient,
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    )).toList(),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          // Quantity and delete
-          Column(
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    onPressed: cartItem.quantity > 1 ? onDecrease : null,
-                    color: cartItem.quantity > 1 ? Colors.black : Colors.grey,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '${cartItem.quantity}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: onIncrease,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Xác nhận xóa'),
-                            content: Text('Bạn có chắc muốn xóa "${cartItem.menuMealTitle}" khỏi giỏ hàng?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('Hủy'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  onRemove();
-                                },
-                                child: const Text(
-                                  'Xóa',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
+    return cart_item(
+      cartItem: cartItem,
+      onDecrease: onDecrease,
+      onIncrease: onIncrease,
+      onRemove: onRemove,
     );
   }
 }

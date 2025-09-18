@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
+import 'package:green_kitchen_app/provider/cart_provider.dart';
+import 'package:green_kitchen_app/constants/app_constants.dart';
 
 class NavBar extends StatefulWidget {
   final int cartCount;
@@ -21,6 +23,19 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final customerId = authProvider.currentUser?.id ?? CURRENT_CUSTOMER_ID;
+      if (customerId != null) {
+        cartProvider.initializeCart(customerId as int);
+      }
+    });
+  }
 
   Future<void> _handleLogout() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -186,35 +201,40 @@ class _NavBarState extends State<NavBar> {
                         ),
                       ),
                     ),
-                    Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.shopping_cart, color: Colors.black87),
-                          onPressed: widget.onCartTap ?? () {
-                            GoRouter.of(context).go('/cart');
-                          },
-                        ),
-                        if (widget.cartCount > 0)
-                          Positioned(
-                            right: 6,
-                            top: 6,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF1CC29F),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Text(
-                                '${widget.cartCount}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
+                    // Sử dụng Consumer để badge tự động cập nhật khi cartProvider thay đổi
+                    Consumer<CartProvider>(
+                      builder: (context, cartProvider, child) {
+                        return Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.shopping_cart, color: Colors.black87),
+                              onPressed: widget.onCartTap ?? () {
+                                GoRouter.of(context).go('/cart');
+                              },
+                            ),
+                            if (cartProvider.cartItemCount > 0)
+                              Positioned(
+                                right: 6,
+                                top: 6,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF1CC29F),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    '${cartProvider.cartItemCount}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                      ],
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
