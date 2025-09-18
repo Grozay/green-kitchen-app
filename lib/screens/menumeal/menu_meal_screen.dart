@@ -82,6 +82,7 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
     return Consumer<CartProvider>(
       builder: (context, cartProvider, child) {
         return NavBar(
+          currentIndex: 0,
           cartCount: cartProvider.cartItemCount,
           body: Container(
             color: AppColors.background,

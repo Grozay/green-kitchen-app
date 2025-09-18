@@ -26,6 +26,7 @@ class _WeekMealScreenState extends State<WeekMealScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return NavBar(
+      currentIndex: 3,
       cartCount: 3,
       body: SingleChildScrollView(
         child: Padding(
