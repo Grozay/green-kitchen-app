@@ -51,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = authProvider.currentUser;
 
     return NavBar(
+      currentIndex: 4,
       cartCount: 3,
       body: Container(
         color: Color(0xFFF5F5F5),

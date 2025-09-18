@@ -41,6 +41,7 @@ class _CustomMealScreenState extends State<CustomMealScreen>
     return Consumer<CustomMealProvider>(
       builder: (context, customMealProvider, child) {
         return NavBar(
+          currentIndex: 2,
           body: Container(
             color: Color(0xFFF5EFE7),
             child: Column(
