@@ -5,7 +5,7 @@ import 'package:green_kitchen_app/widgets/custom_meal/tab_ingredient.dart';
 import 'package:provider/provider.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 import 'package:green_kitchen_app/widgets/custom_meal/meal_item_card.dart';
-import 'package:green_kitchen_app/provider/provider.dart';
+import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/models/ingredient.dart';
 
 class CustomMealScreen extends StatefulWidget {

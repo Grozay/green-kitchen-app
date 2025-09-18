@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:green_kitchen_app/constants/app_constants.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 import 'package:green_kitchen_app/models/menu_meal.dart';
 import 'package:green_kitchen_app/services/menu_meal_service.dart';
+import 'package:provider/provider.dart';
+import '../../provider/cart_provider.dart';
+import '../../services/cart_service.dart';
 
 class MenuDetailScreen extends StatefulWidget {
   final String slug;
@@ -27,7 +31,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
 
   void _loadMenuMeal() async {
     try {
-      final meal = await MenuMealService.getMenuMealBySlug(widget.slug);
+      final meal = await MenuMealService().getMenuMealBySlug(widget.slug);
       setState(() {
         menuMeal = meal;
       });
@@ -43,7 +47,10 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
     try {
       final allMeals = await MenuMealService().getMenuMeals();
       setState(() {
-        suggestedMeals = allMeals.where((meal) => meal.slug != widget.slug).take(5).toList();
+        suggestedMeals = allMeals
+            .where((meal) => meal.slug != widget.slug)
+            .take(5)
+            .toList();
         loading = false;
       });
     } catch (e) {
@@ -55,230 +62,268 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return NavBar(
-        cartCount: 3,
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    return Consumer<CartProvider>(
+      builder: (context, cartProvider, child) {
+        if (loading) {
+          return NavBar(
+            cartCount: cartProvider.cartItemCount,
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    if (menuMeal == null) {
-      return NavBar(
-        cartCount: 3,
-        body: Center(child: Text('Meal not found')),
-      );
-    }
+        if (menuMeal == null) {
+          return NavBar(
+            cartCount: cartProvider.cartItemCount,
+            body: Center(child: Text('Meal not found')),
+          );
+        }
 
-    return NavBar(
-      cartCount: 3,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image
-              Container(
-                height: 380,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  image: DecorationImage(
-                    image: NetworkImage(menuMeal!.image),
-                    fit: BoxFit.cover,
+        return NavBar(
+          cartCount: cartProvider.cartItemCount,
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Sửa Row: Thêm icon cart bên cạnh nút back
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.arrow_back, color: Color(0xFF4B0036)),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Title
-              Text(
-                menuMeal!.title,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF4B0036),
-                ),
-              ),
-              const SizedBox(height: 8),
-              // Description
-              Text(
-                menuMeal!.description,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Nutritional Info
-              Text(
-                'Nutritional Information',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF4B0036),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNutrient('Calories', '${menuMeal!.calories.toInt()}'),
-                  _buildNutrient('Protein', '${menuMeal!.protein.toInt()}g'),
-                  _buildNutrient('Carbs', '${menuMeal!.carbs.toInt()}g'),
-                  _buildNutrient('Fat', '${menuMeal!.fat.toInt()}g'),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Price and Add to Cart
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                  const SizedBox(height: 16),
+                  // Image
+                  Container(
+                    height: 380,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      image: DecorationImage(
+                        image: NetworkImage(menuMeal!.image),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Title
                   Text(
-                    'Price: ${menuMeal!.price.toStringAsFixed(0)} VND',
+                    menuMeal!.title,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF4B0036),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _showQuantityBottomSheet(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4B0036),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 8),
+                  // Description
+                  Text(
+                    menuMeal!.description,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  // Nutritional Info
+                  Text(
+                    'Nutritional Information',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF4B0036),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildNutrient(
+                        'Calories',
+                        '${menuMeal!.calories.toInt()}',
                       ),
-                    ),
-                    child: const Text(
-                      'Add to Cart',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                      _buildNutrient(
+                        'Protein',
+                        '${menuMeal!.protein.toInt()}g',
+                      ),
+                      _buildNutrient('Carbs', '${menuMeal!.carbs.toInt()}g'),
+                      _buildNutrient('Fat', '${menuMeal!.fat.toInt()}g'),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Rating
-              Row(
-                children: [
+                  const SizedBox(height: 16),
+                  // Price and Add to Cart
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Price: ${menuMeal!.price.toStringAsFixed(0)} VND',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF4B0036),
+                        ),
+                      ),
+                      // Kiểm tra stock: Nếu stock = 0, hiển thị text thay vì button
+                      if (menuMeal!.stock == 0)
+                        const Text(
+                          'Out of Stock',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      else
+                        ElevatedButton(
+                          onPressed: () {
+                            _showQuantityBottomSheet(context, cartProvider);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF4B0036),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Add to Cart',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Rating
+                  Row(
+                    children: [
+                      const Text(
+                        'Rating: ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF4B0036),
+                        ),
+                      ),
+                      ...List.generate(5, (index) {
+                        return Icon(
+                          index < 4 ? Icons.star : Icons.star_border,
+                          color: Colors.amber,
+                          size: 20,
+                        );
+                      }),
+                      const SizedBox(width: 8),
+                      const Text(
+                        '4.5 (120 reviews)',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Suggested Products
                   const Text(
-                    'Rating: ',
+                    'Suggested Products',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF4B0036),
                     ),
                   ),
-                  ...List.generate(5, (index) {
-                    return Icon(
-                      index < 4 ? Icons.star : Icons.star_border,
-                      color: Colors.amber,
-                      size: 20,
-                    );
-                  }),
-                  const SizedBox(width: 8),
-                  const Text(
-                    '4.5 (120 reviews)',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              // Suggested Products
-              const Text(
-                'Suggested Products',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF4B0036),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: suggestedMeals.length,
-                  itemBuilder: (context, index) {
-                    final suggestedMeal = suggestedMeals[index];
-                    return GestureDetector(
-                      onTap: () {
-                        context.go('/menumeal/${suggestedMeal.slug}');
-                      },
-                      child: Container(
-                        width: 150,
-                        margin: const EdgeInsets.only(right: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                                image: DecorationImage(
-                                  image: NetworkImage(suggestedMeal.image),
-                                  fit: BoxFit.cover,
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 200,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: suggestedMeals.length,
+                      itemBuilder: (context, index) {
+                        final suggestedMeal = suggestedMeals[index];
+                        return GestureDetector(
+                          onTap: () {
+                            context.go('/menumeal/${suggestedMeal.slug}');
+                          },
+                          child: Container(
+                            width: 150,
+                            margin: const EdgeInsets.only(right: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
                                 ),
-                              ),
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    suggestedMeal.title,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF4B0036),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(12),
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${suggestedMeal.price.toStringAsFixed(0)} VND',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
+                                    image: DecorationImage(
+                                      image: NetworkImage(suggestedMeal.image),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        suggestedMeal.title,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF4B0036),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${suggestedMeal.price.toStringAsFixed(0)} VND',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  void _showQuantityBottomSheet(BuildContext context) {
+  void _showQuantityBottomSheet(
+    BuildContext context,
+    CartProvider cartProvider,
+  ) {
     int selectedQuantity = quantity;
 
     showModalBottomSheet(
@@ -305,10 +350,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                   const SizedBox(height: 8),
                   Text(
                     'Available Stock: ${menuMeal!.stock}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -342,16 +384,58 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () {
-                      // Add to cart logic with selectedQuantity
+                    onPressed: () async {
+                      // Kiểm tra stock trước khi add cart
+                      if (selectedQuantity > menuMeal!.stock) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Cannot add more than available stock (${menuMeal!.stock})',
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return; // Không add nếu vượt stock
+                      }
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Added $selectedQuantity to cart')),
-                      );
+                      try {
+                        await cartProvider.addMealToCart(
+                          CURRENT_CUSTOMER_ID, // Giả định có constant này
+                          menuMealId: menuMeal!.id,
+                          quantity: selectedQuantity,
+                          unitPrice: menuMeal!.price,
+                          title: menuMeal!.title,
+                          description: menuMeal!.description,
+                          image: menuMeal!.image,
+                          calories: menuMeal!.calories.toInt(),
+                          protein: menuMeal!.protein,
+                          carbs: menuMeal!.carbs,
+                          fat: menuMeal!.fat,
+                        );
+                        // await cartProvider.loadCart(CURRENT_CUSTOMER_ID);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Added $selectedQuantity ${menuMeal!.title} to cart',
+                            ),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to add to cart: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF4B0036),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -381,13 +465,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
             color: Color(0xFF4B0036),
           ),
         ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
-        ),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
       ],
     );
   }

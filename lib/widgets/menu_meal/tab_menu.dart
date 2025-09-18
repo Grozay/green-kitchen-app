@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
 
 class tab_menu extends StatelessWidget {
   const tab_menu({
@@ -14,7 +15,7 @@ class tab_menu extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Color(0xFF7DD3C0),
+          color: AppColors.secondary,
           borderRadius: BorderRadius.circular(25),
         ),
         child: TabBar(
@@ -25,10 +26,10 @@ class tab_menu extends StatelessWidget {
           ),
           indicatorColor: Colors.transparent,
           indicatorSize: TabBarIndicatorSize.tab,
-          labelColor: Color(0xFF4B0036),
+          labelColor: AppColors.textPrimary,
           unselectedLabelColor: Colors.white,
           labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-          unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+          unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           dividerColor: Colors.transparent,
           dividerHeight: 0,
           tabs: [

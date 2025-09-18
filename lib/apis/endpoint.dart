@@ -1,7 +1,7 @@
 // API Endpoints Configuration
 class ApiEndpoints {
   // Base URL - Update this to your actual backend URL
-  static const String baseUrls = 'http://10.0.2.2:8080/apis/v1';
+  static const String baseUrls = 'http://192.168.1.23:8080/apis/v1';
 
   // Authentication endpoints
   static const String login = '$baseUrls/auth/login';
@@ -18,25 +18,23 @@ class ApiEndpoints {
   static const String updateProfile = '$baseUrls/user/profile';
 
   //endpoint
-  static const String baseUrl = 'http://192.168.1.23:8080';
+  // static const String baseUrl = 'http://192.168.1.23:8080';
 
   // MenuMeal endpoints
-  var menuMeals = '$baseUrl/apis/v1/menu-meals/customers';
-  var menuMealBySlug = '$baseUrl/apis/v1/menu-meals/customers/slug/:slug';
-
-  // Cart endpoints
-  var getCartByCustomerId = '$baseUrl/apis/v1/cart/customers/:customerId';
-  var addMealToCart = '$baseUrl/apis/v1/cart/customers/:customerId/meals';
-  var removeMealFromCart =
-      '$baseUrl/apis/v1/cart/customers/:customerId/cart-items/:cartItemId';
-  var increaseMealQuantityInCart =
-      '$baseUrl/apis/v1/cart/customers/:customerId/cart-items/:cartItemId/increase';
-  var decreaseMealQuantityInCart =
-      '$baseUrl/apis/v1/cart/customers/:customerId/cart-items/:cartItemId/decrease';
+  var menuMeals = '$baseUrls/menu-meals/customers';
+  var menuMealBySlug = '$baseUrls/menu-meals/customers/slug/:slug';
 
   // Ingredient endpoints
-  var ingredients = '$baseUrl/apis/v1/ingredients';
-  // var ingredientById = '$baseUrl/apis/v1/ingredients/:id';
+  var ingredients = '$baseUrls/ingredients';
+  // var ingredientById = '$baseUrl/ingredients/:id';
+
+  //cart
+  var getCartByCustomerId = '$baseUrls/carts/customer/:customerId';
+  var addMealToCart = '$baseUrls/carts/customer/items/:customerId';
+  var removeMealFromCart = '$baseUrls/carts/customer/:customerId/items/:cartItemId';
+  var increaseMealQuantityInCart = '$baseUrls/carts/customer/:customerId/items/:cartItemId/increase';
+  var decreaseMealQuantityInCart = '$baseUrls/carts/customer/:customerId/items/:cartItemId/decrease';
+
 
   // Timeout configurations
   static const Duration connectionTimeout = Duration(seconds: 30);
