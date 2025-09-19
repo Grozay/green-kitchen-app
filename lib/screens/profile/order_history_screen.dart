@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../theme/app_colors.dart';
@@ -32,143 +33,163 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     final displayedOrders = orders.take(_displayedOrdersCount).toList();
     final hasMoreOrders = _displayedOrdersCount < orders.length;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header với icon và text nổi bật
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Go Back',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/profile'),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header với icon và text nổi bật
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.receipt_long,
+                    color: AppColors.primary,
+                    size: 28,
+                  ),
                 ),
-                child: Icon(
-                  Icons.receipt_long,
-                  color: AppColors.primary,
-                  size: 28,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Order History',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Your recent meal orders',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            if (orders.isEmpty)
+              Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Icon(
+                      Icons.receipt_long,
+                      size: 64,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(height: 16),
                     Text(
-                      'Order History',
+                      'No orders yet',
                       style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        fontSize: 18,
+                        color: AppColors.textSecondary,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     Text(
-                      'Your recent meal orders',
+                      'Your order history will appear here',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
+              )
+            else ...[
+              // Hiển thị orders
+              ...displayedOrders.map(
+                (order) => _buildOrderCard(order, context),
               ),
-            ],
-          ),
-          const SizedBox(height: 24),
 
-          if (orders.isEmpty)
-            Center(
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.receipt_long,
-                    size: 64,
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No orders yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: AppColors.textSecondary,
+              // Nút xem thêm
+              if (hasMoreOrders) ...[
+                const SizedBox(height: 16),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _loadMoreOrders,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Xem thêm $_loadMoreCount đơn hàng',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.expand_more, size: 20),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Your order history will appear here',
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    'Đang hiển thị ${displayedOrders.length}/${orders.length} đơn hàng',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,
                     ),
                   ),
-                ],
-              ),
-            )
-          else ...[
-            // Hiển thị orders
-            ...displayedOrders.map((order) => _buildOrderCard(order, context)),
-
-            // Nút xem thêm
-            if (hasMoreOrders) ...[
-              const SizedBox(height: 16),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _loadMoreOrders,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                ),
+              ] else if (orders.length > 2) ...[
+                const SizedBox(height: 16),
+                Center(
+                  child: Text(
+                    'Đã hiển thị tất cả ${orders.length} đơn hàng',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                      fontStyle: FontStyle.italic,
                     ),
-                    elevation: 2,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Xem thêm $_loadMoreCount đơn hàng',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.expand_more, size: 20),
-                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  'Đang hiển thị ${displayedOrders.length}/${orders.length} đơn hàng',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            ] else if (orders.length > 2) ...[
-              const SizedBox(height: 16),
-              Center(
-                child: Text(
-                  'Đã hiển thị tất cả ${orders.length} đơn hàng',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
+              ],
             ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -192,7 +213,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     final ward = order['ward'] ?? '';
     final district = order['district'] ?? '';
     final city = order['city'] ?? '';
-    final fullAddress = [street, ward, district, city].where((s) => s.isNotEmpty).join(', ');
+    final fullAddress = [
+      street,
+      ward,
+      district,
+      city,
+    ].where((s) => s.isNotEmpty).join(', ');
 
     // Recipient information
     final recipientName = order['recipientName'] ?? 'N/A';
@@ -214,7 +240,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     if (createdAt != 'N/A' && createdAt.toString().contains('T')) {
       try {
         final dateTime = DateTime.parse(createdAt);
-        displayDate = '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+        displayDate =
+            '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
       } catch (e) {
         // Keep original date if parsing fails
       }
@@ -223,9 +250,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -259,7 +284,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: _getStatusColor(status).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -275,9 +303,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     ),
                     const SizedBox(height: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                        color: _getPaymentStatusColor(paymentStatus).withValues(alpha: 0.1),
+                        color: _getPaymentStatusColor(
+                          paymentStatus,
+                        ).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -299,7 +332,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             // Date and Delivery Time
             Row(
               children: [
-                Icon(Icons.access_time, size: 16, color: AppColors.textSecondary),
+                Icon(
+                  Icons.access_time,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   'Ordered: $displayDate',
@@ -314,7 +351,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.delivery_dining, size: 16, color: AppColors.textSecondary),
+                  Icon(
+                    Icons.delivery_dining,
+                    size: 16,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     'Delivery: ${_formatDateTime(deliveryTime)}',
@@ -334,7 +375,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.location_on, size: 16, color: AppColors.textSecondary),
+                  Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Column(
@@ -395,9 +440,20 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               child: Column(
                 children: [
                   _buildPriceRow('Subtotal', subtotal),
-                  if (shippingFee > 0) _buildPriceRow('Shipping Fee', shippingFee),
-                  if (membershipDiscount > 0) _buildPriceRow('Membership Discount', -membershipDiscount, isDiscount: true),
-                  if (couponDiscount > 0) _buildPriceRow('Coupon Discount', -couponDiscount, isDiscount: true),
+                  if (shippingFee > 0)
+                    _buildPriceRow('Shipping Fee', shippingFee),
+                  if (membershipDiscount > 0)
+                    _buildPriceRow(
+                      'Membership Discount',
+                      -membershipDiscount,
+                      isDiscount: true,
+                    ),
+                  if (couponDiscount > 0)
+                    _buildPriceRow(
+                      'Coupon Discount',
+                      -couponDiscount,
+                      isDiscount: true,
+                    ),
                   const Divider(),
                   _buildPriceRow('Total Amount', totalAmount, isTotal: true),
                   if (pointEarn > 0) ...[
@@ -579,7 +635,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
-  Widget _buildPriceRow(String label, double amount, {bool isDiscount = false, bool isTotal = false}) {
+  Widget _buildPriceRow(
+    String label,
+    double amount, {
+    bool isDiscount = false,
+    bool isTotal = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -598,7 +659,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             style: TextStyle(
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-              color: isDiscount ? Colors.red : (isTotal ? AppColors.primary : AppColors.textPrimary),
+              color: isDiscount
+                  ? Colors.red
+                  : (isTotal ? AppColors.primary : AppColors.textPrimary),
             ),
           ),
         ],

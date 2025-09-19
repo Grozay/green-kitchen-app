@@ -10,6 +10,8 @@ import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
 import 'package:green_kitchen_app/screens/profile/tabs/faq_tab.dart';
 import 'package:green_kitchen_app/screens/profile/tabs/location_tab.dart';
 import 'package:green_kitchen_app/screens/profile/tabs/feedback_tab.dart';
+import 'package:green_kitchen_app/screens/profile/membership_screen.dart';
+import 'package:green_kitchen_app/screens/profile/order_history_screen.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_meal_screen.dart';
 import 'package:green_kitchen_app/screens/week_meal/week_meal_screen.dart';
@@ -87,9 +89,52 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
+      path: '/ai-chat',
+      builder: (BuildContext context, GoRouterState state) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: const Text(
+              'AI Chat',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => context.go('/'),
+            ),
+          ),
+          body: const Center(
+            child: Text('AI Chat Screen - Coming Soon!'),
+          ),
+        );
+      },
+    ),
+    GoRoute(
       path: '/profile',
       builder: (BuildContext context, GoRouterState state) {
         return const ProfileScreen();
+      },
+    ),
+    GoRoute(
+      path: '/profile/accountinfo',
+      builder: (BuildContext context, GoRouterState state) {
+        return const ProfileScreen();
+      },
+    ),
+    GoRoute(
+      path: '/profile/membership',
+      builder: (BuildContext context, GoRouterState state) {
+        return const MembershipScreen();
+      },
+    ),
+    GoRoute(
+      path: '/profile/orderhistory',
+      builder: (BuildContext context, GoRouterState state) {
+        return const OrderHistoryScreen();
       },
     ),
     GoRoute(

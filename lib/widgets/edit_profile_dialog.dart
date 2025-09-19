@@ -28,34 +28,34 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
     final customerDetails = authProvider.customerDetails;
     final user = authProvider.currentUser;
 
-    // Initialize controllers with current data
-    _emailController = TextEditingController(text: customerDetails?['email'] ?? user?.email ?? '');
-    _firstNameController = TextEditingController(text: customerDetails?['firstName'] ?? '');
-    _lastNameController = TextEditingController(text: customerDetails?['lastName'] ?? '');
-    _phoneController = TextEditingController(text: customerDetails?['phone'] ?? user?.phone ?? '');
-    _birthDateController = TextEditingController(text: _formatBirthDate(customerDetails?['birthDate']));
-    _selectedGender = customerDetails?['gender'];
+    // Initialize controllers with current data - handle null safely
+    _emailController = TextEditingController(text: customerDetails?['email']?.toString() ?? user?.email ?? '');
+    _firstNameController = TextEditingController(text: customerDetails?['firstName']?.toString() ?? '');
+    _lastNameController = TextEditingController(text: customerDetails?['lastName']?.toString() ?? '');
+    _phoneController = TextEditingController(text: customerDetails?['phone']?.toString() ?? user?.phone ?? '');
+    _birthDateController = TextEditingController(text: _formatBirthDate(customerDetails?['birthDate']?.toString()));
+    _selectedGender = customerDetails?['gender']?.toString();
 
     // Determine login type to disable fields
     _determineLoginType(customerDetails);
   }
 
   void _determineLoginType(Map<String, dynamic>? customerDetails) {
-    if (customerDetails != null) {
-      final oauthProvider = customerDetails['oauthProvider'];
-      if (oauthProvider != null && oauthProvider.toString().isNotEmpty) {
-        // If OAuth provider exists, it's OAuth login
-        _isEmailLogin = true; // OAuth typically uses email
-      } else {
-        // Check if user has email or phone as primary login
-        final email = customerDetails['email'];
-        final phone = customerDetails['phone'];
-        if (email != null && email.toString().isNotEmpty) {
-          _isEmailLogin = true;
-        }
-        if (phone != null && phone.toString().isNotEmpty) {
-          _isPhoneLogin = true;
-        }
+    if (customerDetails == null) return;
+
+    final oauthProvider = customerDetails['oauthProvider']?.toString();
+    if (oauthProvider != null && oauthProvider.isNotEmpty) {
+      // If OAuth provider exists, it's OAuth login
+      _isEmailLogin = true; // OAuth typically uses email
+    } else {
+      // Check if user has email or phone as primary login
+      final email = customerDetails['email']?.toString();
+      final phone = customerDetails['phone']?.toString();
+      if (email != null && email.isNotEmpty) {
+        _isEmailLogin = true;
+      }
+      if (phone != null && phone.isNotEmpty) {
+        _isPhoneLogin = true;
       }
     }
   }
@@ -95,29 +95,37 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
     final updateData = <String, dynamic>{};
 
     // Only include fields that are not disabled and have changed
-    if (!_isEmailLogin && _emailController.text.trim().isNotEmpty) {
-      updateData['email'] = _emailController.text.trim();
+    final emailText = _emailController.text.trim();
+    final firstNameText = _firstNameController.text.trim();
+    final lastNameText = _lastNameController.text.trim();
+    final phoneText = _phoneController.text.trim();
+    final birthDateText = _birthDateController.text.trim();
+
+    if (!_isEmailLogin && emailText.isNotEmpty) {
+      updateData['email'] = emailText;
     }
-    if (_firstNameController.text.trim().isNotEmpty) {
-      updateData['firstName'] = _firstNameController.text.trim();
+    if (firstNameText.isNotEmpty) {
+      updateData['firstName'] = firstNameText;
     }
-    if (_lastNameController.text.trim().isNotEmpty) {
-      updateData['lastName'] = _lastNameController.text.trim();
+    if (lastNameText.isNotEmpty) {
+      updateData['lastName'] = lastNameText;
     }
-    if (!_isPhoneLogin && _phoneController.text.trim().isNotEmpty) {
-      updateData['phone'] = _phoneController.text.trim();
+    if (!_isPhoneLogin && phoneText.isNotEmpty) {
+      updateData['phone'] = phoneText;
     }
     if (_selectedGender != null && _selectedGender!.isNotEmpty) {
       updateData['gender'] = _selectedGender;
     }
-    if (_birthDateController.text.trim().isNotEmpty) {
-      updateData['birthDate'] = _birthDateController.text.trim();
+    if (birthDateText.isNotEmpty) {
+      updateData['birthDate'] = birthDateText;
     }
 
     if (updateData.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No changes to save')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No changes to save')),
+        );
+      }
       return;
     }
 
@@ -138,22 +146,28 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
       }
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully')),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(authProvider.errorMessage ?? 'Failed to update profile')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(authProvider.errorMessage ?? 'Failed to update profile')),
+          );
+        }
       }
     } catch (e) {
       // Hide loading
       if (mounted) {
         Navigator.of(context).pop(); // Close loading dialog
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -302,7 +316,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                           items: const [
                             DropdownMenuItem(value: 'MALE', child: Text('Male')),
                             DropdownMenuItem(value: 'FEMALE', child: Text('Female')),
-                            DropdownMenuItem(value: 'OTHER', child: Text('Other')),
+                            DropdownMenuItem(value: 'UNDEFINED', child: Text('Undefined')),
                           ],
                           onChanged: (value) {
                             setState(() {
