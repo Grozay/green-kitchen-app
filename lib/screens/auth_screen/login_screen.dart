@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
+import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -42,14 +43,27 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
     final success = await authProvider.login(email, password);
 
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
-      );
-      // Navigate to home screen
-      context.go('/');
+    if (success) {
+      // Sync cart after successful login
+      final customerId =
+          int.tryParse(
+            authProvider.customerDetails?['id']?.toString() ?? '0',
+          ) ??
+          0;
+      if (customerId != 0) {
+        await cartProvider.syncCartAfterLogin(customerId);
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+        // Navigate to home screen
+        context.go('/');
+      }
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(authProvider.errorMessage ?? 'Login failed')),
@@ -62,14 +76,16 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await authProvider.googleSignIn();
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Google login successful!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Google login successful!')));
       // Navigate to home screen
       context.go('/');
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Google login failed')),
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? 'Google login failed'),
+        ),
       );
     }
   }
@@ -121,7 +137,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     child: const Center(
-                      child: Icon(Icons.restaurant_menu, color: Colors.white, size: 56),
+                      child: Icon(
+                        Icons.restaurant_menu,
+                        color: Colors.white,
+                        size: 56,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -155,7 +175,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: AppColors.inputBorder),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 16,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -171,9 +194,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: AppColors.inputBorder),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 16,
+                      ),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
                         onPressed: () {
                           setState(() {
                             _obscurePassword = !_obscurePassword;
@@ -189,7 +219,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         // TODO: Implement forgot password
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Forgot password feature coming soon!')),
+                          const SnackBar(
+                            content: Text(
+                              'Forgot password feature coming soon!',
+                            ),
+                          ),
                         );
                         context.go('/custommeal');
                       },
@@ -221,12 +255,17 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : const Text(
                               'Continue',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                     ),
                   ),
@@ -272,7 +311,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 24,
                       ),
                       label: const Text('Continue with Google'),
-                      onPressed: authProvider.isLoading ? null : _handleGoogleLogin,
+                      onPressed: authProvider.isLoading
+                          ? null
+                          : _handleGoogleLogin,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: BorderSide(color: AppColors.primary),

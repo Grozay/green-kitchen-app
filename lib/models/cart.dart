@@ -1,4 +1,3 @@
-import 'package:green_kitchen_app/models/enum.dart';
 import 'package:green_kitchen_app/models/menu_meal.dart';
 
 class CartItem {
@@ -8,7 +7,7 @@ class CartItem {
   final MenuMeal? menuMeal;
   final CustomMeal? customMeal;
   final WeekMeal? weekMeal;
-  final OrderItemType itemType;
+  final String itemType;
   final int quantity;
   final double unitPrice;
   final double totalPrice;
@@ -49,7 +48,7 @@ class CartItem {
         menuMeal: json['menuMeal'] != null ? MenuMeal.fromJson(json['menuMeal']) : null,
         customMeal: json['customMeal'] != null ? CustomMeal.fromJson(json['customMeal']) : null,
         weekMeal: json['weekMeal'] != null ? WeekMeal.fromJson(json['weekMeal']) : null,
-        itemType: json['itemType'] != null ? OrderItemType.values.firstWhere((e) => e.name == json['itemType']) : OrderItemType.MENU_MEAL, // Thêm null check
+        itemType: json['itemType'] != null ? json['itemType'] : '', // Thêm null check
         quantity: json['quantity'] ?? 0,
         unitPrice: (json['unitPrice'] as num?)?.toDouble() ?? 0.0,
         totalPrice: (json['totalPrice'] as num?)?.toDouble() ?? 0.0,
@@ -75,7 +74,7 @@ class CartItem {
       'menuMeal': menuMeal?.toJson(),
       'customMeal': customMeal?.toJson(),
       'weekMeal': weekMeal?.toJson(),
-      'itemType': itemType.name, // Serialize enum
+      'itemType': itemType, // Serialize enum
       'quantity': quantity,
       'unitPrice': unitPrice,
       'totalPrice': totalPrice,
@@ -260,7 +259,7 @@ class CustomMeal {
 class CustomMealDetailResponse {
   final int id;
   final String title;
-  final IngredientType type; // Thay String bằng IngredientType
+  final String type; // Thay String bằng IngredientType
   final double calories;
   final double protein;
   final double carbs;
@@ -286,7 +285,7 @@ class CustomMealDetailResponse {
     return CustomMealDetailResponse(
       id: json['id'],
       title: json['title'],
-      type: IngredientType.values.firstWhere((e) => e.name == json['type']), // Parse enum
+      type: json['type'], // Parse enum
       calories: (json['calories'] as num).toDouble(),
       protein: (json['protein'] as num).toDouble(),
       carbs: (json['carbs'] as num).toDouble(),
@@ -301,7 +300,7 @@ class CustomMealDetailResponse {
     return {
       'id': id,
       'title': title,
-      'type': type.name, // Serialize enum
+      'type': type, // Serialize enum
       'calories': calories,
       'protein': protein,
       'carbs': carbs,
