@@ -73,7 +73,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
         const SnackBar(content: Text('Phone login successful!')),
       );
       // Navigate to home screen
-      context.go('/menumeal');
+      context.go('/');
     }
   }
 
@@ -92,10 +92,19 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Phone Login'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/login'),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () => context.go('/'),
+        ),
+        title: const Text(
+          'Back to Home',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       body: SafeArea(
@@ -283,7 +292,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
 
                   // Back to Login Button
                   TextButton(
-                    onPressed: () => context.go('/login'),
+                    onPressed: () => context.go('/auth/login'),
                     child: const Text(
                       'Back to Login',
                       style: TextStyle(

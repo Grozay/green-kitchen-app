@@ -1,19 +1,21 @@
-class ApiError {
+class ApiError implements Exception {
+  final int statusCode;
   final String message;
-  final int? statusCode;
-  final String? errorCode;
+  final dynamic data;
 
   ApiError({
+    required this.statusCode,
     required this.message,
-    this.statusCode,
-    this.errorCode,
+    this.data,
   });
 
-  factory ApiError.fromJson(Map<String, dynamic> json) {
-    return ApiError(
-      message: json['message'] ?? 'Unknown error occurred',
-      statusCode: json['statusCode'],
-      errorCode: json['errorCode'],
-    );
+  @override
+  String toString() {
+    return 'ApiError(statusCode: $statusCode, message: $message, data: $data)';
   }
+
+  // Thêm getter để dễ dàng check
+  bool get isNotFound => statusCode == 404;
+  bool get isSuccessful => statusCode >= 200 && statusCode < 300;
+  bool get isNoContent => statusCode == 204;
 }

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:green_kitchen_app/provider/cart_provider_v2.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 import 'package:green_kitchen_app/models/menu_meal.dart';
 import 'package:green_kitchen_app/services/menu_meal_service.dart';
 import 'package:green_kitchen_app/widgets/menu_meal/menu_list.dart';
 import 'package:green_kitchen_app/widgets/menu_meal/tab_menu.dart';
 import 'package:provider/provider.dart';
-import '../../provider/cart_provider.dart';
-import '../../constants/app_constants.dart';
+// import '../../provider/cart_provider.dart';
+// import '../../constants/app_constants.dart';
 import '../../theme/app_colors.dart';
 
 class MenuMealScreen extends StatefulWidget {
-  const MenuMealScreen({Key? key}) : super(key: key);
+  const MenuMealScreen({super.key});
 
   @override
   State<MenuMealScreen> createState() => _MenuMealScreenState();
@@ -79,7 +80,7 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CartProvider>(
+    return Consumer<CartProviderV2>(
       builder: (context, cartProvider, child) {
         return NavBar(
           currentIndex: 0,

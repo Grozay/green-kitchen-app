@@ -2,6 +2,8 @@ import '../apis/endpoint.dart';
 import '../models/user.dart';
 import '../services/service.dart';
 import '../services/google_auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 // AuthService handles authentication logic
 class AuthService {
@@ -183,9 +185,37 @@ class AuthService {
   // Get current user profile
   Future<User?> getCurrentUser() async {
     try {
-      final response = await _apiService.get(ApiEndpoints.getProfile);
-      return User.fromJson(response['user']);
+      // Get current user from stored data first
+      final prefs = await SharedPreferences.getInstance();
+      final storedUserData = prefs.getString('current_user');
+
+      if (storedUserData != null) {
+        final storedUser = User.fromJson(json.decode(storedUserData));
+
+        // If user has email, fetch fresh customer data from backend
+        if (storedUser.email.isNotEmpty) {
+          try {
+            final customerResponse = await _apiService.get(ApiEndpoints.getProfile(storedUser.email));
+
+            if (customerResponse is Map<String, dynamic>) {
+              // Update stored user with fresh data
+              final updatedUser = User.fromJson(customerResponse);
+              await prefs.setString('current_user', json.encode(updatedUser.toJson()));
+              return updatedUser;
+            }
+          } catch (e) {
+            print('Error fetching fresh customer data: $e');
+            // Return stored user as fallback
+            return storedUser;
+          }
+        }
+
+        return storedUser;
+      }
+
+      return null;
     } catch (e) {
+      print('Error getting current user: $e');
       return null;
     }
   }

@@ -9,11 +9,11 @@ class MenuList extends StatelessWidget {
   final ValueChanged<MenuMeal>? onTap;
 
   const MenuList({
-    Key? key,
+    super.key,
     required this.meals,
     this.loading = false,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +87,7 @@ class MenuList extends StatelessWidget {
           runSpacing: 8,
           children: meals.map((item) {
             final typeBasedIndex = _getTypeBasedIndex(meals, meals.indexOf(item));
-            return Container(
+            return SizedBox(
               width: itemWidth,
               child: MealCard(
                 item: item,

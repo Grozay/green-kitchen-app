@@ -12,7 +12,7 @@ class MealCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const MealCard({
-    Key? key,
+    super.key,
     required this.item,
     required this.typeBasedIndex,
     this.onAddToCart,
@@ -20,7 +20,7 @@ class MealCard extends StatelessWidget {
     this.onDecrease,
     this.quantity,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +164,7 @@ class MealCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                   Text(
-                    '${item.price.toStringAsFixed(0)} VND',
+                    '${item.price?.toStringAsFixed(0)} VND',
                     style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

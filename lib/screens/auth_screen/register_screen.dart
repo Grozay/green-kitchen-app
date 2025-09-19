@@ -4,30 +4,40 @@ import 'package:provider/provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
 import 'package:green_kitchen_app/theme/app_colors.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleRegister() async {
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
+    if (firstName.isEmpty || lastName.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
@@ -41,35 +51,32 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.login(email, password);
-
-    if (success && mounted) {
+    if (password.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
+        const SnackBar(content: Text('Password must be at least 6 characters')),
       );
-      // Navigate to home screen
-      context.go('/menumeal');
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Login failed')),
-      );
+      return;
     }
-  }
 
-  Future<void> _handleGoogleLogin() async {
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.googleSignIn();
+    final success = await authProvider.register(email, password, firstName: firstName, lastName: lastName);
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Google login successful!')),
+        const SnackBar(content: Text('Registration successful! Please check your email to verify your account.')),
       );
-      // Navigate to home screen
-      context.go('/menumeal');
+      // Navigate to email verification screen with email parameter
+      context.go('/auth/email-verification', extra: email);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Google login failed')),
+        SnackBar(content: Text(authProvider.errorMessage ?? 'Registration failed')),
       );
     }
   }
@@ -80,11 +87,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () {
+            context.go('/');
+          },
+        ),
+        title: const Text(
+          'Back to Home',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Icon(Icons.restaurant_menu, color: Colors.white, size: 56),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 18),
                   const Text(
                     'Green Kitchen',
                     style: TextStyle(
@@ -117,14 +142,44 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Welcome back',
+                    'Create Account',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 20,
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
+                  // First Name
+                  TextField(
+                    controller: _firstNameController,
+                    decoration: InputDecoration(
+                      hintText: 'First Name',
+                      filled: true,
+                      fillColor: AppColors.inputFill,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.inputBorder),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Last Name
+                  TextField(
+                    controller: _lastNameController,
+                    decoration: InputDecoration(
+                      hintText: 'Last Name',
+                      filled: true,
+                      fillColor: AppColors.inputFill,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.inputBorder),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   // Email
                   TextField(
                     controller: _emailController,
@@ -164,6 +219,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  // Confirm Password
+                  TextField(
+                    controller: _confirmPasswordController,
+                    obscureText: _obscureConfirmPassword,
+                    decoration: InputDecoration(
+                      hintText: 'Confirm Password',
+                      filled: true,
+                      fillColor: AppColors.inputFill,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.inputBorder),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerRight,
@@ -173,7 +252,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Forgot password feature coming soon!')),
                         );
-                        context.go('/custommeal');
                       },
                       child: const Text(
                         'Forgot your password?',
@@ -185,11 +263,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Continue button
+                  // Register button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: authProvider.isLoading ? null : _handleLogin,
+                      onPressed: authProvider.isLoading ? null : _handleRegister,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
@@ -207,23 +285,23 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             )
                           : const Text(
-                              'Continue',
+                              'Register',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Don't have an account? Register
+                  // Already have an account? Login
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Don't have an account?"),
+                      const Text('Already have an account?'),
                       TextButton(
                         onPressed: () {
-                          context.go('/register');
+                          context.go('/auth/login');
                         },
                         child: const Text(
-                          'Register',
+                          'Login',
                           style: TextStyle(
                             color: AppColors.primary,
                             fontSize: 14,
@@ -232,58 +310,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: const [
-                      Expanded(child: Divider()),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text('or continue with'),
-                      ),
-                      Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  // Google login
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: Image.network(
-                        'https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png',
-                        width: 24,
-                        height: 24,
-                      ),
-                      label: const Text('Continue with Google'),
-                      onPressed: authProvider.isLoading ? null : _handleGoogleLogin,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Phone login
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.phone, color: AppColors.primary),
-                      label: const Text('Continue with Phone'),
-                      onPressed: () {
-                        context.go('/phone-login');
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
                 ],
               ),
             ),

@@ -68,7 +68,8 @@ class ApiService {
       try {
         return json.decode(responseBody);
       } catch (e) {
-        throw ApiError(message: 'Invalid JSON response');
+        // If JSON parsing fails, return the plain text response
+        return responseBody;
       }
     } else {
       try {
@@ -142,22 +143,25 @@ class ApiService {
     }
   }
 
-  // DELETE request
-  Future<dynamic> delete(String url, {bool includeAuth = true}) async {
+  // DELETE request - Add API response with text no JSON
+  Future<dynamic> delete(String url) async {
     try {
-      final response = await _client
-          .delete(
-            Uri.parse(url),
-            headers: _getHeaders(includeAuth: includeAuth),
-          )
-          .timeout(ApiEndpoints.connectionTimeout);
+      final response = await http.delete(Uri.parse(url), headers: _getHeaders());
 
-      return _handleResponse(response);
-    } catch (e) {
-      if (e is ApiError) {
-        rethrow;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (response.body.isEmpty) {
+          return null;
+        }
+        try {
+          return jsonDecode(response.body);
+        } catch (e) {
+          return response.body;
+        }
+      } else {
+        throw ApiError(statusCode: response.statusCode, message: response.body);
       }
-      throw ApiError(message: 'Network error: ${e.toString()}');
+    } catch (e) {
+      rethrow;
     }
   }
 

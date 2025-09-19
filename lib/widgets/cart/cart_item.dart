@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:green_kitchen_app/models/cart.dart';
 
-class cart_item extends StatelessWidget {
-  const cart_item({
+class CartItemWidget extends StatelessWidget {
+  const CartItemWidget({
     super.key,
     required this.cartItem,
     required this.onDecrease,
@@ -37,14 +37,13 @@ class cart_item extends StatelessWidget {
           // Image ở trên cùng
           Center(
             child:
-                cartItem.menuMealImage == null ||
-                    cartItem.menuMealImage!.isEmpty
+                cartItem.image.isEmpty
                 ? CircleAvatar(
                     radius: 40,
                     backgroundColor: Colors.grey[400],
                     child: Text(
-                      cartItem.menuMealTitle.isNotEmpty
-                          ? cartItem.menuMealTitle[0].toUpperCase()
+                      cartItem.title.isNotEmpty // Thay menuMealTitle bằng title
+                          ? cartItem.title[0].toUpperCase()
                           : 'M',
                       style: const TextStyle(fontSize: 32, color: Colors.white),
                     ),
@@ -52,7 +51,7 @@ class cart_item extends StatelessWidget {
                 : ClipRRect(
                     borderRadius: BorderRadius.circular(40),
                     child: Image.network(
-                      cartItem.menuMealImage!,
+                      cartItem.image, // Thay menuMealImage bằng image
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,
@@ -61,8 +60,8 @@ class cart_item extends StatelessWidget {
                           radius: 40,
                           backgroundColor: Colors.grey[400],
                           child: Text(
-                            cartItem.menuMealTitle.isNotEmpty
-                                ? cartItem.menuMealTitle[0].toUpperCase()
+                            cartItem.title.isNotEmpty // Thay menuMealTitle bằng title
+                                ? cartItem.title[0].toUpperCase()
                                 : 'M',
                             style: const TextStyle(
                               fontSize: 32,
@@ -77,7 +76,7 @@ class cart_item extends StatelessWidget {
           const SizedBox(height: 12),
           // Title bên dưới
           Text(
-            cartItem.menuMealTitle,
+            cartItem.title, // Thay menuMealTitle bằng title
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
           const SizedBox(height: 8),
@@ -98,12 +97,12 @@ class cart_item extends StatelessWidget {
               Expanded(child: Text('${cartItem.fat.toStringAsFixed(1)}g Fat')),
             ],
           ),
-          if (cartItem.ingredients.isNotEmpty) ...[
+          if (cartItem.menuMeal?.menuIngredients.isNotEmpty ?? false) ...[
             const SizedBox(height: 8),
             Wrap(
               spacing: 4,
               runSpacing: 4,
-              children: cartItem.ingredients
+              children: (cartItem.menuMeal?.menuIngredients ?? [])
                   .map(
                     (ingredient) => Container(
                       padding: const EdgeInsets.symmetric(
@@ -139,6 +138,7 @@ class cart_item extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.remove),
                     onPressed: () {
+                      print('Decrease pressed for item ${cartItem.id}, quantity: ${cartItem.quantity}');
                       if (cartItem.quantity > 1) {
                         onDecrease();
                       } else {
@@ -149,7 +149,7 @@ class cart_item extends StatelessWidget {
                             return AlertDialog(
                               title: const Text('Confirm Deletion'),
                               content: Text(
-                                'Do you want to remove "${cartItem.menuMealTitle}" from the cart?',
+                                'Do you want to remove "${cartItem.title}" from the cart?',
                               ),
                               actions: [
                                 TextButton(
@@ -206,7 +206,7 @@ class cart_item extends StatelessWidget {
                       return AlertDialog(
                         title: const Text('Confirm Deletion'),
                         content: Text(
-                          'Do you want to remove "${cartItem.menuMealTitle}" from the cart?',
+                          'Do you want to remove "${cartItem.title}" from the cart?', // Thay menuMealTitle bằng title
                         ),
                         actions: [
                           TextButton(

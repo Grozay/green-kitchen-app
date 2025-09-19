@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:green_kitchen_app/provider/cart_provider_v2.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:green_kitchen_app/routers/router.dart';
-import 'package:green_kitchen_app/provider/cart_provider.dart';
+// import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
 
 void main() async {
   //custom lock screen orientation to portrait only
   WidgetsFlutterBinding.ensureInitialized();
+  
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -20,16 +22,20 @@ void main() async {
   // Initialize AuthProvider
   final authProvider = AuthProvider();
   await authProvider.init();
+  
+  // Load user data if already logged in
+  await authProvider.loadUserData();
 
-  // Initialize cart
-  final cartProvider = CartProvider();
-  await cartProvider.initialize();
+  // Initialize CartProviderV2
+  final cartProviderV2 = CartProviderV2();
+  await cartProviderV2.initialize();
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
-        ChangeNotifierProvider.value(value: cartProvider),
+        // ChangeNotifierProvider.value(value: cartProvider),
+        ChangeNotifierProvider.value(value: cartProviderV2),
       ],
       child: const MyApp(),
     ),
@@ -44,8 +50,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => CustomMealProvider()),
+        // ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => CartProviderV2()),
+        // ChangeNotifierProvider(create: (_) => CustomMealProvider()),
+
       ],
       child: MaterialApp.router(title: 'Green Kitchen', routerConfig: router),
     );
