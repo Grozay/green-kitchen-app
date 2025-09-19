@@ -73,27 +73,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SnackBar(content: Text('Registration successful! Please check your email to verify your account.')),
       );
       // Navigate to email verification screen with email parameter
-      context.go('/email-verification', extra: email);
+      context.go('/auth/email-verification', extra: email);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(authProvider.errorMessage ?? 'Registration failed')),
-      );
-    }
-  }
-
-  Future<void> _handleGoogleRegister() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.googleSignIn();
-
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Google registration successful!')),
-      );
-      // Navigate to home screen
-      context.go('/menumeal');
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Google registration failed')),
       );
     }
   }
@@ -104,11 +87,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () {
+            context.go('/');
+          },
+        ),
+        title: const Text(
+          'Back to Home',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -130,7 +131,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Icon(Icons.restaurant_menu, color: Colors.white, size: 56),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 18),
                   const Text(
                     'Green Kitchen',
                     style: TextStyle(
@@ -148,7 +149,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   // First Name
                   TextField(
                     controller: _firstNameController,
@@ -297,7 +298,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const Text('Already have an account?'),
                       TextButton(
                         onPressed: () {
-                          context.go('/');
+                          context.go('/auth/login');
                         },
                         child: const Text(
                           'Login',
@@ -309,61 +310,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: const [
-                      Expanded(child: Divider()),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text('or continue with'),
-                      ),
-                      Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  // Google register
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: Image.network(
-                        'https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png',
-                        width: 24,
-                        height: 24,
-                      ),
-                      label: const Text('Continue with Google'),
-                      onPressed: authProvider.isLoading ? null : _handleGoogleRegister,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Phone register
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.phone, color: AppColors.primary),
-                      label: const Text('Continue with Phone'),
-                      onPressed: () {
-                        // TODO: Implement phone register
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Phone registration coming soon!')),
-                        );
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
                 ],
               ),
             ),

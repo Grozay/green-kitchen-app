@@ -12,7 +12,7 @@ class MenuList extends StatelessWidget {
   final ValueChanged<MenuMeal>? onTap;
 
   const MenuList({
-    Key? key,
+    super.key,
     required this.meals,
     this.loading = false,
     this.onAddToCart,
@@ -20,7 +20,7 @@ class MenuList extends StatelessWidget {
     this.onDecrease,
     this.quantities,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -8,12 +8,12 @@ class MealItemCard extends StatelessWidget {
   final VoidCallback onDecrease;
 
   const MealItemCard({
-    Key? key,
+    super.key,
     required this.item,
     required this.quantity,
     required this.onIncrease,
     required this.onDecrease,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

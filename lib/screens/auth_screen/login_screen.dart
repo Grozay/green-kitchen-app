@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SnackBar(content: Text('Login successful!')),
       );
       // Navigate to home screen
-      context.go('/menumeal');
+      context.go('/');
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(authProvider.errorMessage ?? 'Login failed')),
@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SnackBar(content: Text('Google login successful!')),
       );
       // Navigate to home screen
-      context.go('/menumeal');
+      context.go('/');
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(authProvider.errorMessage ?? 'Google login failed')),
@@ -80,6 +80,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () {
+            context.go('/');
+          },
+        ),
+        title: const Text(
+          'Back to Home',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -219,7 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text("Don't have an account?"),
                       TextButton(
                         onPressed: () {
-                          context.go('/register');
+                          context.go('/auth/register');
                         },
                         child: const Text(
                           'Register',
@@ -271,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       icon: const Icon(Icons.phone, color: AppColors.primary),
                       label: const Text('Continue with Phone'),
                       onPressed: () {
-                        context.go('/phone-login');
+                        context.go('/auth/phone-login');
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -282,7 +300,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
                 ],
               ),
             ),

@@ -11,7 +11,7 @@ class MealCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const MealCard({
-    Key? key,
+    super.key,
     required this.item,
     required this.typeBasedIndex,
     this.onAddToCart,
@@ -19,7 +19,7 @@ class MealCard extends StatelessWidget {
     this.onDecrease,
     this.quantity,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

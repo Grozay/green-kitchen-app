@@ -17,7 +17,7 @@ class MenuMealService {
       }
     } catch (e) {
       print('Error: $e');
-      throw e;
+      rethrow;
     }
   }
 

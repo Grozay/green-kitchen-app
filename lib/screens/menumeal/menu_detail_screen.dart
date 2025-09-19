@@ -7,7 +7,7 @@ import 'package:green_kitchen_app/services/menu_meal_service.dart';
 class MenuDetailScreen extends StatefulWidget {
   final String slug;
 
-  const MenuDetailScreen({Key? key, required this.slug}) : super(key: key);
+  const MenuDetailScreen({super.key, required this.slug});
 
   @override
   State<MenuDetailScreen> createState() => _MenuDetailScreenState();
