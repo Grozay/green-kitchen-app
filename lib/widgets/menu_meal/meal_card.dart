@@ -164,7 +164,7 @@ class MealCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                   Text(
-                    '${item.price.toStringAsFixed(0)} VND',
+                    '${item.price?.toStringAsFixed(0)} VND',
                     style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

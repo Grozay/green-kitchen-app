@@ -1,7 +1,7 @@
 // API Endpoints Configuration
 class ApiEndpoints {
   // Base URL - Update this to your actual backend URL
-  static const String baseUrls = 'http://192.168.1.23:8080/apis/v1';
+  static const String baseUrls = 'http://192.168.1.123:8080/apis/v1';
 
   // Authentication endpoints
   static const String login = '$baseUrls/auth/login';
@@ -31,10 +31,18 @@ class ApiEndpoints {
   //cart
   var getCartByCustomerId = '$baseUrls/carts/customer/:customerId';
   var addMealToCart = '$baseUrls/carts/customer/items/:customerId';
-  var removeMealFromCart = '$baseUrls/carts/customer/:customerId/items/:cartItemId';
-  var increaseMealQuantityInCart = '$baseUrls/carts/customer/:customerId/items/:cartItemId/increase';
-  var decreaseMealQuantityInCart = '$baseUrls/carts/customer/:customerId/items/:cartItemId/decrease';
+  var removeMealFromCart =
+      '$baseUrls/carts/customer/:customerId/items/:cartItemId';
+  var increaseMealQuantityInCart =
+      '$baseUrls/carts/customer/:customerId/items/:cartItemId/increase';
+  var decreaseMealQuantityInCart =
+      '$baseUrls/carts/customer/:customerId/items/:cartItemId/decrease';
 
+  // Week Meal Plan endpoints
+  var getWeekMealPlan = '$baseUrls/week-meals';
+  var getByIdWeekMeal = '$baseUrls/week-meals/:id';
+  var getWeekMealDays = '$baseUrls/week-meals/:weekMealId/days';
+  var getWeekMealDayById = '$baseUrls/week-meals/:weekMealId/days/:dayId';
 
   // Timeout configurations
   static const Duration connectionTimeout = Duration(seconds: 30);

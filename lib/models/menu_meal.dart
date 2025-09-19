@@ -7,7 +7,7 @@ class MenuMeal {
   final double carbs;
   final double fat;
   final String image;
-  final double price;
+  final double? price;  // Made nullable to handle null in JSON
   final String slug;
   final int stock;
   final String type;
@@ -41,7 +41,7 @@ class MenuMeal {
       carbs: json['carbs'],
       fat: json['fat'],
       image: json['image'],
-      price: json['price'],
+      price: json['price'] as double?,  // Handle null
       slug: json['slug'],
       stock: json['stock'],
       type: json['type'],

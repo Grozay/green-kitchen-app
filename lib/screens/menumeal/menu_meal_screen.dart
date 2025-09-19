@@ -7,8 +7,8 @@ import 'package:green_kitchen_app/services/menu_meal_service.dart';
 import 'package:green_kitchen_app/widgets/menu_meal/menu_list.dart';
 import 'package:green_kitchen_app/widgets/menu_meal/tab_menu.dart';
 import 'package:provider/provider.dart';
-import '../../provider/cart_provider.dart';
-import '../../constants/app_constants.dart';
+// import '../../provider/cart_provider.dart';
+// import '../../constants/app_constants.dart';
 import '../../theme/app_colors.dart';
 
 class MenuMealScreen extends StatefulWidget {

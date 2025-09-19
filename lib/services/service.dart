@@ -160,7 +160,6 @@ class ApiService {
         throw ApiError(statusCode: response.statusCode, message: response.body);
       }
     } catch (e) {
-      print('DEBUG: ApiService.delete - Exception: $e');
       rethrow;
     }
   }
