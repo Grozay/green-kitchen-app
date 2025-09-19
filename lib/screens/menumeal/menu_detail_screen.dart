@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:green_kitchen_app/constants/app_constants.dart'; // Import cho CURRENT_CUSTOMER_ID
+import 'package:green_kitchen_app/constants/constants.dart';
 import 'package:green_kitchen_app/models/menu_meal.dart';
 import 'package:green_kitchen_app/services/menu_meal_service.dart';
 import 'package:provider/provider.dart';
-import '../../provider/cart_provider_v2.dart'; // Thay CartProvider bằng CartProviderV2
-import '../../provider/auth_provider.dart'; // Import để lấy customerId nếu cần
+import '../../provider/cart_provider_v2.dart';
+import '../../provider/auth_provider.dart';
 import '../../theme/app_colors.dart';
 
 class MenuDetailScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
     // Thêm fetch cart
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cartProvider = Provider.of<CartProviderV2>(context, listen: false);
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      // final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final customerId = CURRENT_CUSTOMER_ID; // Lấy từ authProvider nếu có
       cartProvider.fetchCart(customerId);
     });
@@ -339,7 +340,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                           ),
                           IconButton(
                             onPressed: () {
-                              if (quantity < (menuMeal!.stock ?? 0)) { // Thêm ?? 0 để handle null
+                              if (quantity < (menuMeal!.stock)) { // Thêm ?? 0 để handle null
                                 setState(() {
                                   quantity++;
                                 });
@@ -366,7 +367,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                           ),
                         ),
                         Text(
-                          '${(menuMeal!.price * quantity).toStringAsFixed(0)}đ',
+                          '${(menuMeal!.price! * quantity).toStringAsFixed(0)}đ',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -401,22 +402,16 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                         )
                       : ElevatedButton(
                           onPressed: () async {
-                            if (menuMeal!.id == null) { // Thêm check nếu id null
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: Invalid meal ID')),
-                              );
-                              return;
-                            }
                             final itemData = {
                               'isCustom': false,
                               'menuMealId': menuMeal!.id, // Giờ safe vì check null
                               'quantity': quantity,
                               'unitPrice': menuMeal!.price,
-                              'totalPrice': menuMeal!.price * quantity,
+                              'totalPrice': menuMeal!.price! * quantity,
                               'title': menuMeal!.title,
                               'description': menuMeal!.description,
                               'image': menuMeal!.image,
-                              'itemType': 'MENU_MEAL',
+                              'itemType': ORDER_TYPE_MENU_MEAL,
                               'calories': menuMeal!.calories,
                               'protein': menuMeal!.protein,
                               'carbs': menuMeal!.carbs,

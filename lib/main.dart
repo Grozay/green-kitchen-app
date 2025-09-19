@@ -4,7 +4,7 @@ import 'package:green_kitchen_app/provider/cart_provider_v2.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:green_kitchen_app/routers/router.dart';
-import 'package:green_kitchen_app/provider/cart_provider.dart';
+// import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
 
 void main() async {
@@ -22,9 +22,6 @@ void main() async {
   final authProvider = AuthProvider();
   await authProvider.init();
 
-  // Initialize cart
-  // final cartProvider = CartProvider();
-  // await cartProvider.initialize();
   // Initialize CartProviderV2
   final cartProviderV2 = CartProviderV2();
   await cartProviderV2.initialize();
