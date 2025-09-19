@@ -34,41 +34,23 @@ class CartService {
     }
   }
 
-  // Add meal to cart
-  Future<Cart> addMealToCart(int customerId, Map<String, dynamic> data) async {
-    try {
-      final endpoints = ApiEndpoints();
-      final url = endpoints.addMealToCart.replaceFirst(
-        ':customerId',
-        customerId.toString(),
-      );
-      final response = await _apiService.post(url, body: data);
-      return Cart.fromJson(response);
-    } catch (e) {
-      if (e is ApiError) {
-        throw Exception('Failed to add meal to cart: ${e.message}');
-      }
-      throw Exception('Failed to add meal to cart: ${e.toString()}');
-    }
-  }
-
-  // Increase quantity
+  // Increase quantity - Sửa để fetch lại full cart sau khi update
   Future<Cart> increaseQuantity(int customerId, int cartItemId) async {
     try {
       final endpoints = ApiEndpoints();
-      final url = endpoints.increaseMealQuantityInCart
+      final updateUrl = endpoints.increaseMealQuantityInCart
           .replaceFirst(':customerId', customerId.toString())
           .replaceFirst(':cartItemId', cartItemId.toString());
 
-      print('DEBUG: Increase quantity URL: $url'); // Debug log
+      print('DEBUG: Increase quantity URL: $updateUrl');
 
-      final response = await _apiService.post(url); // Thay đổi từ put sang post
+      // Gọi API increase (chỉ để update)
+      await _apiService.post(updateUrl);
 
-      print('DEBUG: Increase quantity response: $response'); // Debug log
-
-      return Cart.fromJson(response);
+      // Sau đó fetch lại full cart
+      return await getCartByCustomerId(customerId);
     } catch (e) {
-      print('DEBUG: Increase quantity error: $e'); // Debug log
+      print('DEBUG: Increase quantity error: $e');
       if (e is ApiError) {
         throw Exception('Failed to increase quantity: ${e.message}');
       }
@@ -76,23 +58,23 @@ class CartService {
     }
   }
 
-  // Decrease quantity
+  // Decrease quantity - Sửa để fetch lại full cart sau khi update
   Future<Cart> decreaseQuantity(int customerId, int cartItemId) async {
     try {
       final endpoints = ApiEndpoints();
-      final url = endpoints.decreaseMealQuantityInCart
+      final updateUrl = endpoints.decreaseMealQuantityInCart
           .replaceFirst(':customerId', customerId.toString())
           .replaceFirst(':cartItemId', cartItemId.toString());
 
-      print('DEBUG: Decrease quantity URL: $url'); // Debug log
+      print('DEBUG: Decrease quantity URL: $updateUrl');
 
-      final response = await _apiService.post(url); // Thay đổi từ put sang post
+      // Gọi API decrease (chỉ để update)
+      await _apiService.post(updateUrl);
 
-      print('DEBUG: Decrease quantity response: $response'); // Debug log
-
-      return Cart.fromJson(response);
+      // Sau đó fetch lại full cart
+      return await getCartByCustomerId(customerId);
     } catch (e) {
-      print('DEBUG: Decrease quantity error: $e'); // Debug log
+      print('DEBUG: Decrease quantity error: $e');
       if (e is ApiError) {
         throw Exception('Failed to decrease quantity: ${e.message}');
       }
@@ -100,20 +82,65 @@ class CartService {
     }
   }
 
-  // Remove from cart
   Future<Cart> removeFromCart(int customerId, int cartItemId) async {
     try {
       final endpoints = ApiEndpoints();
       final url = endpoints.removeMealFromCart
           .replaceFirst(':customerId', customerId.toString())
           .replaceFirst(':cartItemId', cartItemId.toString());
-      final response = await _apiService.delete(url);
-      return Cart.fromJson(response);
+      
+      print('DEBUG: Remove from cart URL: $url');
+      
+      await _apiService.delete(url);
+      
+      return await getCartByCustomerId(customerId);
     } catch (e) {
       if (e is ApiError) {
-        throw Exception('Failed to remove from cart: ${e.message}');
+        if (e.statusCode >= 200 && e.statusCode < 300 || e.statusCode == 404) {
+          try {
+            return await getCartByCustomerId(customerId);
+          } catch (fetchError) {
+            return Cart(
+              id: 0,
+              customerId: customerId,
+              cartItems: [],
+              totalAmount: 0.0,
+              totalItems: 0,
+              totalQuantity: 0,
+            );
+          }
+        }
+        
+        throw Exception('Failed to remove from cart: ${e.toString()}');
       }
+      
       throw Exception('Failed to remove from cart: ${e.toString()}');
+    }
+  }
+
+  // Add meal to cart - Sửa để fetch lại full cart sau khi add
+  Future<Cart> addMealToCart(int customerId, Map<String, dynamic> data) async {
+    try {
+      final endpoints = ApiEndpoints();
+      final url = endpoints.addMealToCart.replaceFirst(
+        ':customerId',
+        customerId.toString(),
+      );
+      
+      print('DEBUG: Add to cart URL: $url');
+      print('DEBUG: Add to cart data: $data');
+      
+      // Gọi API add (chỉ để thêm)
+      await _apiService.post(url, body: data);
+      
+      // Sau đó fetch lại full cart
+      return await getCartByCustomerId(customerId);
+    } catch (e) {
+      print('DEBUG: Add to cart error: $e');
+      if (e is ApiError) {
+        throw Exception('Failed to add meal to cart: ${e.message}');
+      }
+      throw Exception('Failed to add meal to cart: ${e.toString()}');
     }
   }
 
