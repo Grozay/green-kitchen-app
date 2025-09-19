@@ -110,6 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.location_on_outlined,
                   color: Colors.purple,
                   title: 'Addresses',
+                  onTap: () => context.go('/profile/location'),
                 ),
 
                 _buildMenuItem(
@@ -142,12 +143,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.help_outline,
                   color: Colors.orange,
                   title: 'FAQs',
+                  onTap: () => context.go('/profile/faq'),
                 ),
 
                 _buildMenuItem(
                   icon: Icons.star_outline,
                   color: Colors.teal,
                   title: 'User Reviews',
+                  onTap: () => context.go('/profile/feedback'),
                 ),
 
                 _buildMenuItem(

@@ -1,7 +1,7 @@
 // API Endpoints Configuration
 class ApiEndpoints {
   // Base URL - Update this to your actual backend URL
-  static const String baseUrls = 'http://192.168.1.23:8080/apis/v1';
+  static const String baseUrls = 'http://172.16.2.9:8080/apis/v1';
 
   // Authentication endpoints
   static const String login = '$baseUrls/auth/login';
@@ -12,7 +12,7 @@ class ApiEndpoints {
   static const String googleLogin = '$baseUrls/auth/google-login';
   static const String googleLoginMobile = '$baseUrls/auth/google-login-mobile';
   static const String phoneLogin = '$baseUrls/auth/phone-login';
-
+  
   // User endpoints
   static const String getProfile = '$baseUrls/user/profile';
   static const String updateProfile = '$baseUrls/user/profile';
@@ -28,6 +28,9 @@ class ApiEndpoints {
   var ingredients = '$baseUrls/ingredients';
   // var ingredientById = '$baseUrl/ingredients/:id';
 
+  // Store endpoints
+  var stores = '$baseUrls/stores';
+
   //cart
   var getCartByCustomerId = '$baseUrls/carts/customer/:customerId';
   var addMealToCart = '$baseUrls/carts/customer/items/:customerId';
@@ -39,6 +42,9 @@ class ApiEndpoints {
   // Timeout configurations
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
+
+  //profile
+  
 }
 
 // //endpoint

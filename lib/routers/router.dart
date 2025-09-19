@@ -6,6 +6,9 @@ import 'package:green_kitchen_app/screens/authScreen/login_screen.dart';
 import 'package:green_kitchen_app/screens/authScreen/register_screen.dart';
 import 'package:green_kitchen_app/screens/authScreen/phone_login_screen.dart';
 import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
+import 'package:green_kitchen_app/screens/profile/tabs/faq_tab.dart';
+import 'package:green_kitchen_app/screens/profile/tabs/location_tab.dart';
+import 'package:green_kitchen_app/screens/profile/tabs/feedback_tab.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_meal_screen.dart';
 import 'package:green_kitchen_app/screens/week_meal/week_meal_screen.dart';
@@ -81,6 +84,24 @@ final GoRouter router = GoRouter(
       path: '/profile',
       builder: (BuildContext context, GoRouterState state) {
         return const ProfileScreen();
+      },
+    ),
+    GoRoute(
+      path: '/profile/faq',
+      builder: (BuildContext context, GoRouterState state) {
+        return const FaqTab();
+      },
+    ),
+    GoRoute(
+      path: '/profile/location',
+      builder: (BuildContext context, GoRouterState state) {
+        return const LocationTab();
+      },
+    ),
+    GoRoute(
+      path: '/profile/feedback',
+      builder: (BuildContext context, GoRouterState state) {
+        return const FeedbackTab();
       },
     ),
     GoRoute(
