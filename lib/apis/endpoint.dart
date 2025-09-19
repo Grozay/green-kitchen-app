@@ -1,8 +1,9 @@
 // API Endpoints Configuration
 class ApiEndpoints {
   // Base URL - Update this to your actual backend URL
-  static const String baseUrls = 'http://192.168.1.23:8080/apis/v1';
-  static const String baseUrl = 'http://10.0.2.2:8080/apis/v1';
+  static const String baseUrlss = 'http://172.16.2.9:8080/apis/v1'; //Trung
+  static const String baseUrls = 'http://192.168.1.23:8080/apis/v1'; //Quyen
+  static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
 
 
   // Authentication endpoints
@@ -33,6 +34,9 @@ class ApiEndpoints {
   var ingredients = '$baseUrls/ingredients';
   // var ingredientById = '$baseUrl/ingredients/:id';
 
+  // Store endpoints
+  var stores = '$baseUrls/stores';
+
   //cart
   var getCartByCustomerId = '$baseUrls/carts/customer/:customerId';
   var addMealToCart = '$baseUrls/carts/customer/items/:customerId';
@@ -52,6 +56,9 @@ class ApiEndpoints {
   // Timeout configurations
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
+
+  //profile
+  
 }
 
 // //endpoint
