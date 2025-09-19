@@ -1,8 +1,11 @@
 // API Endpoints Configuration
 class ApiEndpoints {
   // Base URL - Update this to your actual backend URL
-  static const String baseUrlss = 'http://172.16.2.9:8080/apis/v1'; //Trung
-  static const String baseUrls = 'http://192.168.1.23:8080/apis/v1'; //Quyen
+
+  // static const String baseUrl = 'http://172.16.2.9:8080/apis/v1'; //Trung
+
+  // static const String baseUrl = 'http://192.168.1.23:8080/apis/v1'; //Quyen
+
   static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
 
 
@@ -27,31 +30,31 @@ class ApiEndpoints {
   // static const String baseUrl = 'http://192.168.1.23:8080';
 
   // MenuMeal endpoints
-  var menuMeals = '$baseUrls/menu-meals/customers';
-  var menuMealBySlug = '$baseUrls/menu-meals/customers/slug/:slug';
+  var menuMeals = '$baseUrl/menu-meals/customers';
+  var menuMealBySlug = '$baseUrl/menu-meals/customers/slug/:slug';
 
   // Ingredient endpoints
-  var ingredients = '$baseUrls/ingredients';
+  var ingredients = '$baseUrl/ingredients';
   // var ingredientById = '$baseUrl/ingredients/:id';
 
   // Store endpoints
-  var stores = '$baseUrls/stores';
+  var stores = '$baseUrl/stores';
 
   //cart
-  var getCartByCustomerId = '$baseUrls/carts/customer/:customerId';
-  var addMealToCart = '$baseUrls/carts/customer/items/:customerId';
+  var getCartByCustomerId = '$baseUrl/carts/customer/:customerId';
+  var addMealToCart = '$baseUrl/carts/customer/items/:customerId';
   var removeMealFromCart =
-      '$baseUrls/carts/customer/:customerId/items/:cartItemId';
+      '$baseUrl/carts/customer/:customerId/items/:cartItemId';
   var increaseMealQuantityInCart =
-      '$baseUrls/carts/customer/:customerId/items/:cartItemId/increase';
+      '$baseUrl/carts/customer/:customerId/items/:cartItemId/increase';
   var decreaseMealQuantityInCart =
-      '$baseUrls/carts/customer/:customerId/items/:cartItemId/decrease';
+      '$baseUrl/carts/customer/:customerId/items/:cartItemId/decrease';
 
   // Week Meal Plan endpoints
-  var getWeekMealPlan = '$baseUrls/week-meals';
-  var getByIdWeekMeal = '$baseUrls/week-meals/:id';
-  var getWeekMealDays = '$baseUrls/week-meals/:weekMealId/days';
-  var getWeekMealDayById = '$baseUrls/week-meals/:weekMealId/days/:dayId';
+  var getWeekMealPlan = '$baseUrl/week-meals';
+  var getByIdWeekMeal = '$baseUrl/week-meals/:id';
+  var getWeekMealDays = '$baseUrl/week-meals/:weekMealId/days';
+  var getWeekMealDayById = '$baseUrl/week-meals/:weekMealId/days/:dayId';
 
   // Timeout configurations
   static const Duration connectionTimeout = Duration(seconds: 30);
