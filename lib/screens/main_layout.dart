@@ -6,7 +6,6 @@ import '../theme/app_colors.dart';
 import 'home_screen/home_screen.dart';
 import 'menu_screen/menu_screen.dart';
 import 'tracking_screen/tracking_screen.dart';
-import 'profile/profile_screen.dart';
 import 'more_screen/more_screen.dart';
 import '../provider/auth_provider.dart';
 
@@ -30,15 +29,10 @@ class _MainLayoutState extends State<MainLayout> {
   }
 
   void _onItemTapped(int index, BuildContext context) {
-    // Check if user is trying to access profile without authentication
+    
     if (index == 3) {
-      // Profile tab index
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      if (!authProvider.isAuthenticated) {
-        // Navigate to login screen
-        context.go('/auth/login');
-        return;
-      }
+      context.go('/ai-chat');
+      return;
     }
 
     setState(() {
@@ -54,8 +48,6 @@ class _MainLayoutState extends State<MainLayout> {
         return const MenuScreen();
       case 2:
         return const TrackingScreen();
-      case 3:
-        return const ProfileScreen();
       case 4:
         return const MoreScreen();
       default:
@@ -114,39 +106,47 @@ class _MainLayoutState extends State<MainLayout> {
                 ],
               ),
               child: AppBar(
-                title: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.restaurant,
-                        color: Colors.white,
-                        size: 24,
-                      ),
+                leading: Container(
+                  margin: const EdgeInsets.only(left: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 24,
                     ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'GREEN KITCHEN',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        letterSpacing: 0.5,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black26,
-                            offset: Offset(0, 1),
-                            blurRadius: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    onPressed: () {
+                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                      if (!authProvider.isAuthenticated) {
+                        context.go('/auth/login');
+                        return;
+                      }
+                      context.go('/profile');
+                    },
+                    tooltip: 'Go to Profile',
+                  ),
                 ),
+                title: const Text(
+                  'GREEN KITCHEN',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    letterSpacing: 0.5,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black26,
+                        offset: Offset(0, 1),
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                centerTitle: true,
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 actions: [
@@ -206,59 +206,6 @@ class _MainLayoutState extends State<MainLayout> {
             ),
           ),
           body: _getCurrentScreen(),
-          floatingActionButton: Container(
-            height: 60,
-            width: 60,
-            margin: const EdgeInsets.only(bottom: 10),
-            child: FloatingActionButton(
-              onPressed: () {
-                // TODO: Navigate to AI chat screen when created
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text(
-                      '🤖 AI Chat feature coming soon!',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    backgroundColor: AppColors.primary,
-                    duration: const Duration(seconds: 2),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                );
-              },
-              backgroundColor: Colors.transparent,
-              elevation: 8,
-              child: Container(
-                height: 60,
-                width: 60,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primary,
-                      AppColors.primary.withValues(alpha: 0.8),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.chat_bubble_outline,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-            ),
-          ),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -299,9 +246,9 @@ class _MainLayoutState extends State<MainLayout> {
                   label: 'Tracking',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.person_outline),
-                  activeIcon: Icon(Icons.person),
-                  label: 'Profile',
+                  icon: Icon(Icons.chat_bubble_outline),
+                  activeIcon: Icon(Icons.chat_bubble),
+                  label: 'AI Chat',
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.more_horiz_outlined),
