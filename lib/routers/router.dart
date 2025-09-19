@@ -86,7 +86,8 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/custommeal',
       builder: (BuildContext context, GoRouterState state) {
-        return const CustomMealScreen();
+        // return const CustomMealScreen();
+        return const WeekMealScreen();
       },
     ),
     // GoRoute(

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+// import 'package:green_kitchen_app/models/cartItem.dart'; // Bỏ import này
+import 'package:green_kitchen_app/provider/cart_provider_v2.dart'; // Giữ import CartProviderV2
 import 'package:green_kitchen_app/widgets/cart/cart_item.dart';
-import 'package:green_kitchen_app/widgets/nav_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../provider/cart_provider.dart';
-import '../../models/cart.dart';
+import '../../models/cart.dart'; // Thay cartv2.dart bằng cart.dart
 import '../../constants/app_constants.dart';
+import '../../theme/app_colors.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -20,284 +21,248 @@ class _CartScreenState extends State<CartScreen> {
     super.initState();
     // Load cart data when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cartProvider = Provider.of<CartProvider>(context, listen: false);
-      // Using hardcoded customer ID for development/testing
-      cartProvider.initializeCart(CURRENT_CUSTOMER_ID);
+      final cartProvider = Provider.of<CartProviderV2>(context, listen: false); // Giữ CartProviderV2
+      cartProvider.fetchCart(CURRENT_CUSTOMER_ID); // Giữ nguyên
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CartProvider>(
+    return Consumer<CartProviderV2>( // Giữ nguyên
       builder: (context, cartProvider, child) {
-        final cart = cartProvider.cart;
+        final cart = cartProvider.cart; // Giờ là Cart từ cart.dart
         final isLoading = cartProvider.isLoading;
         final error = cartProvider.error;
 
-        return NavBar(
-          cartCount: cartProvider.cartItemCount,
-          onCartTap: () {},
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            backgroundColor: AppColors.background,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+              onPressed: () {
+                GoRouter.of(context).pop();
+              },
+            ),
+            title: Text(
+              'Cart (${cartProvider.cartItemCount})',
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+              ),
+            ),
+            centerTitle: false,
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Scrollable content
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Loading indicator
+                          if (isLoading)
+                            const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.secondary,
+                              ),
+                            ),
+
+                          // Error message
+                          if (error != null)
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.backgroundAlt,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.primary),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.error_outline, color: AppColors.primary),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Error: $error',
+                                      style: TextStyle(color: AppColors.primary),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      cartProvider.clearError();
+                                      cartProvider.fetchCart(CURRENT_CUSTOMER_ID); // Giữ nguyên
+                                    },
+                                    icon: Icon(Icons.refresh, color: AppColors.primary),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          // Empty cart message
+                          if (!isLoading && cart != null && cart.cartItems.isEmpty)
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(32.0),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.shopping_cart_outlined,
+                                      size: 64,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Your cart is empty',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Add some products to your cart',
+                                      style: TextStyle(color: AppColors.textSecondary),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        context.go('/menumeal');
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.secondary,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'View Menu',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                          // Cart items
+                          if (!isLoading && cart != null && cart.cartItems.isNotEmpty)
+                            ...cart.cartItems.map(
+                              (cartItem) => Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: _CartItemWidget(
+                                  cartItem: cartItem,
+                                  onIncrease: () => cartProvider.increaseQuantity(
+                                    CURRENT_CUSTOMER_ID,
+                                    cartItem.id,
+                                  ),
+                                  onDecrease: () => cartProvider.decreaseQuantity(
+                                    CURRENT_CUSTOMER_ID,
+                                    cartItem.id,
+                                  ),
+                                  onRemove: () => cartProvider.removeFromCart(
+                                    CURRENT_CUSTOMER_ID,
+                                    cartItem.id,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                          const SizedBox(height: 100), // Space for fixed bottom section
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Fixed bottom section
+          bottomNavigationBar: (!isLoading && cart != null && cart.cartItems.isNotEmpty)
+              ? Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.shadow,
+                        blurRadius: 8,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.shopping_cart, color: Color(0xFF4B0036)),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Giỏ mua hàng (${cartProvider.cartItemCount} sản phẩm)',
-                        style: const TextStyle(
-                          color: Color(0xFF4B0036),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                      // Total Section
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${cartProvider.cartItemCount} Meals',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            '${cartProvider.totalAmount.toStringAsFixed(0)}đ',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Place Order Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            GoRouter.of(context).push('/payment');
+                          },
+                          child: const Text(
+                            'Confirm and Pay',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-
-                  // Loading indicator
-                  if (isLoading)
-                    const Center(child: CircularProgressIndicator()),
-
-                  // Error message
-                  if (error != null)
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red.shade200),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.error_outline, color: Colors.red),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Lỗi: $error',
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              cartProvider.clearError();
-                              // cartProvider.loadCart(CURRENT_CUSTOMER_ID); // Reload cart
-                            },
-                            icon: const Icon(Icons.refresh, color: Colors.red),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  // Empty cart message
-                  if (!isLoading && cart != null && cart.cartItems.isEmpty)
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32.0),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.shopping_cart_outlined,
-                              size: 64,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              'Giỏ hàng trống',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Hãy thêm sản phẩm vào giỏ hàng của bạn',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  // Cart items
-                  if (!isLoading && cart != null && cart.cartItems.isNotEmpty)
-                    ...cart.cartItems.map(
-                      (cartItem) => Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: _CartItemWidget(
-                          cartItem: cartItem,
-                          onIncrease: () => cartProvider.increaseQuantity(
-                            CURRENT_CUSTOMER_ID,
-                            cartItem.id,
-                          ),
-                          onDecrease: () => cartProvider.decreaseQuantity(
-                            CURRENT_CUSTOMER_ID,
-                            cartItem.id,
-                          ),
-                          onRemove: () => cartProvider.removeFromCart(
-                            CURRENT_CUSTOMER_ID,
-                            cartItem.id,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  const SizedBox(height: 24),
-
-                  // Summary Section
-                  if (!isLoading && cart != null && cart.cartItems.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Delivery Address
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'DELIVERY ADDRESS',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '2118 Thornridge Cir, Syracuse',
-                                    style: TextStyle(
-                                      color: Colors.black87,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'EDIT',
-                                  style: TextStyle(
-                                    color: Color(0xFFFF6B35),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Total Section
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'TOTAL:',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '${cartProvider.totalAmount.toStringAsFixed(0)} VNĐ',
-                                    style: TextStyle(
-                                      color: Colors.black87,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  TextButton(
-                                    onPressed: () {},
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'Breakdown',
-                                          style: TextStyle(
-                                            color: Color(0xFFFF6B35),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: Color(0xFFFF6B35),
-                                          size: 12,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Place Order Button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFFFF6B35),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 0,
-                              ),
-                              onPressed: () {
-                                // Navigate to payment screen using go_router
-                                context.go('/payment');
-                              },
-                              child: Text(
-                                'PLACE ORDER',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ),
+                )
+              : null,
         );
       },
     );
@@ -305,7 +270,7 @@ class _CartScreenState extends State<CartScreen> {
 }
 
 class _CartItemWidget extends StatelessWidget {
-  final CartItem cartItem;
+  final CartItem cartItem; // Giờ là CartItem từ cart.dart
   final VoidCallback onIncrease;
   final VoidCallback onDecrease;
   final VoidCallback onRemove;
@@ -320,10 +285,10 @@ class _CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return cart_item(
+    return CartItemWidget( // Thay cart_item thành CartItemWidget
       cartItem: cartItem,
-      onDecrease: onDecrease,
       onIncrease: onIncrease,
+      onDecrease: onDecrease,
       onRemove: onRemove,
     );
   }
