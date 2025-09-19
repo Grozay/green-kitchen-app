@@ -1,21 +1,26 @@
 // API Endpoints Configuration
 class ApiEndpoints {
   // Base URL - Update this to your actual backend URL
-  static const String baseUrls = 'http://192.168.1.123:8080/apis/v1';
+  static const String baseUrls = 'http://192.168.1.23:8080/apis/v1';
+  static const String baseUrl = 'http://10.0.2.2:8080/apis/v1';
+
 
   // Authentication endpoints
-  static const String login = '$baseUrls/auth/login';
-  static const String register = '$baseUrls/auth/register';
-  static const String mobileRegister = '$baseUrls/auth/mobile-register';
-  static const String verifyOtp = '$baseUrls/auth/verifyOtpCode';
-  static const String logout = '$baseUrls/auth/logout';
-  static const String googleLogin = '$baseUrls/auth/google-login';
-  static const String googleLoginMobile = '$baseUrls/auth/google-login-mobile';
-  static const String phoneLogin = '$baseUrls/auth/phone-login';
+  static const String login = '$baseUrl/auth/login';
+  static const String register = '$baseUrl/auth/register';
+  static const String mobileRegister = '$baseUrl/auth/mobile-register';
+  static const String verifyOtp = '$baseUrl/auth/verifyOtpCode';
+  static const String logout = '$baseUrl/auth/logout';
+  static const String googleLogin = '$baseUrl/auth/google-login';
+  static const String googleLoginMobile = '$baseUrl/auth/google-login-mobile';
+  static const String phoneLogin = '$baseUrl/auth/phone-login';
 
   // User endpoints
-  static const String getProfile = '$baseUrls/user/profile';
-  static const String updateProfile = '$baseUrls/user/profile';
+  static String getProfile(String email) => '$baseUrl/customers/email/$email';
+  static const String updateProfile = '$baseUrl/customers/update';
+  static const String changePassword = '$baseUrl/customers/updatePassword';
+
+  static String trackOrder(String orderCode) => '$baseUrl/orders/search/$orderCode';
 
   //endpoint
   // static const String baseUrl = 'http://192.168.1.23:8080';

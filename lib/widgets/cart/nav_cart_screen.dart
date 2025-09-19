@@ -7,11 +7,11 @@ class NavCartScreen extends StatelessWidget {
   final VoidCallback? onCartTap;
 
   const NavCartScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.body,
     this.onCartTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

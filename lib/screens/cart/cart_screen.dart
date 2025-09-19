@@ -9,7 +9,7 @@ import '../../constants/app_constants.dart';
 import '../../theme/app_colors.dart';
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  const CartScreen({super.key});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -276,12 +276,11 @@ class _CartItemWidget extends StatelessWidget {
   final VoidCallback onRemove;
 
   const _CartItemWidget({
-    Key? key,
     required this.cartItem,
     required this.onIncrease,
     required this.onDecrease,
     required this.onRemove,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

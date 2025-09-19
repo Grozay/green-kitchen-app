@@ -300,12 +300,8 @@ class CartProviderV2 with ChangeNotifier {
         customerId,
         itemData,
       );
-      if (updatedCart != null) {
-        _cart = updatedCart;
-      } else {
-        print('Updated cart is null after add'); // Debug
-      }
-      await _saveCartToLocal();
+      _cart = updatedCart;
+          await _saveCartToLocal();
     } catch (e) {
       _error = e.toString();
     } finally {

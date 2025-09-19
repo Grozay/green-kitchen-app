@@ -2,18 +2,27 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
 import '../services/phone_auth_service.dart';
+import '../services/service.dart';
+import '../apis/endpoint.dart';
 
 // AuthProvider manages authentication state
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
   final PhoneAuthService _phoneAuthService = PhoneAuthService();
+  final ApiService _apiService = ApiService();
 
   User? _currentUser;
+  Map<String, dynamic>? _customerDetails;
+  Map<String, dynamic>? _membershipInfo;
+  List<Map<String, dynamic>> _orderHistory = [];
   bool _isLoading = false;
   String? _errorMessage;
 
   // Getters
   User? get currentUser => _currentUser;
+  Map<String, dynamic>? get customerDetails => _customerDetails;
+  Map<String, dynamic>? get membershipInfo => _membershipInfo;
+  List<Map<String, dynamic>> get orderHistory => _orderHistory;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _currentUser != null;
@@ -51,6 +60,8 @@ class AuthProvider with ChangeNotifier {
 
       if (response.success) {
         _currentUser = response.user;
+        // Fetch customer details from backend
+        await _fetchCustomerDetails(email);
         notifyListeners();
         return true;
       } else {
@@ -123,6 +134,10 @@ class AuthProvider with ChangeNotifier {
 
       if (response.success) {
         _currentUser = response.user;
+        // Fetch customer details from backend if user has email
+        if (_currentUser?.email != null && _currentUser!.email.isNotEmpty) {
+          await _fetchCustomerDetails(_currentUser!.email);
+        }
         notifyListeners();
         return true;
       } else {
@@ -190,6 +205,12 @@ class AuthProvider with ChangeNotifier {
             fullName: 'Phone User',
           );
         }
+
+        // Fetch customer details if user has email
+        if (_currentUser?.email != null && _currentUser!.email.isNotEmpty) {
+          await _fetchCustomerDetails(_currentUser!.email);
+        }
+
         notifyListeners();
         return true;
       } else {
@@ -221,15 +242,122 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Update user profile
-  void updateUser(User updatedUser) {
-    _currentUser = updatedUser;
-    notifyListeners();
+  // Update customer profile
+  Future<bool> updateProfile(Map<String, dynamic> updateData) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      if (_customerDetails == null) {
+        _setError('Customer details not available');
+        return false;
+      }
+
+      // Ensure email is included in the update data for backend to find the customer
+      if (_customerDetails!['email'] != null && !updateData.containsKey('email')) {
+        updateData['email'] = _customerDetails!['email'];
+      }
+
+      final response = await _apiService.put(
+        ApiEndpoints.updateProfile,
+        body: updateData,
+      );
+
+      if (response is String && response.contains('successfully')) {
+        // Update local customer details with new data
+        _customerDetails = {..._customerDetails!, ...updateData};
+        
+        // Update current user if name fields are updated
+        if (updateData.containsKey('firstName') || updateData.containsKey('lastName')) {
+          final firstName = updateData['firstName'] ?? _customerDetails!['firstName'] ?? '';
+          final lastName = updateData['lastName'] ?? _customerDetails!['lastName'] ?? '';
+          final fullName = '$firstName $lastName'.trim();
+          
+          if (_currentUser != null) {
+            _currentUser = User(
+              id: _currentUser!.id,
+              email: updateData['email'] ?? _currentUser!.email,
+              phone: updateData['phone'] ?? _currentUser!.phone,
+              fullName: fullName.isNotEmpty ? fullName : _currentUser!.fullName,
+            );
+          }
+        }
+
+        notifyListeners();
+        return true;
+      } else {
+        _setError('Failed to update profile');
+        return false;
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        _setError(e.message);
+      } else {
+        _setError('Failed to update profile: ${e.toString()}');
+      }
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  // Clear error message
-  void clearError() {
+  // Change user password
+  Future<bool> changePassword(String oldPassword, String newPassword) async {
+    _setLoading(true);
     _clearError();
+
+    try {
+      if (_customerDetails == null || _customerDetails!['email'] == null) {
+        _setError('User information not available');
+        return false;
+      }
+
+      final email = _customerDetails!['email'];
+      final requestData = {
+        'email': email,
+        'oldPassword': oldPassword,
+        'newPassword': newPassword,
+      };
+
+      final response = await _apiService.put(
+        ApiEndpoints.changePassword,
+        body: requestData,
+      );
+
+      if (response is String && response.contains('successfully')) {
+        notifyListeners();
+        return true;
+      } else {
+        _setError('Failed to change password');
+        return false;
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        _setError(e.message);
+      } else {
+        _setError('Failed to change password: ${e.toString()}');
+      }
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Load user data on app start
+  Future<void> loadUserData() async {
+    try {
+      final user = await _authService.getCurrentUser();
+      if (user != null) {
+        _currentUser = user;
+        // Fetch customer details if user has email
+        if (_currentUser?.email != null && _currentUser!.email.isNotEmpty) {
+          await _fetchCustomerDetails(_currentUser!.email);
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
   }
 
   // Private helper methods
@@ -246,5 +374,111 @@ class AuthProvider with ChangeNotifier {
   void _clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  // Refresh customer details (call this when entering profile screen)
+  Future<void> refreshCustomerDetails() async {
+    if (_currentUser?.email != null && _currentUser!.email.isNotEmpty) {
+      await _fetchCustomerDetails(_currentUser!.email);
+      notifyListeners();
+    } else {
+      print('⚠️ Cannot refresh customer details: no email available');
+    }
+  }
+
+  // Fetch customer details from backend
+  Future<void> _fetchCustomerDetails(String email) async {
+    try {
+
+      // Call actual API to get customer details
+      final customerResponse = await _apiService.get(ApiEndpoints.getProfile(email));
+
+      if (customerResponse is Map<String, dynamic>) {
+        // Store the actual customer data from API
+        _customerDetails = customerResponse;
+
+        // Extract membership info if available
+        _membershipInfo = {
+          'level': customerResponse['membershipLevel'] ?? 'Bronze',
+          'points': customerResponse['loyaltyPoints'] ?? 0,
+          'benefits': [
+            'Earn points on every order',
+            'Exclusive promotions and discounts',
+            'Priority customer support',
+            'Free delivery on orders over \$50',
+            'Birthday special offers'
+          ]
+        };
+
+        // For now, keep mock order history until we have real order API
+        _orderHistory = [
+          {
+            'id': 'ORD-001',
+            'date': '2024-01-15',
+            'status': 'Delivered',
+            'total': 45.99,
+            'items': ['Grilled Chicken Salad', 'Protein Shake']
+          },
+          {
+            'id': 'ORD-002',
+            'date': '2024-01-10',
+            'status': 'Delivered',
+            'total': 32.50,
+            'items': ['Salmon Bowl', 'Green Smoothie']
+          }
+        ];
+      } else {
+        print('❌ Customer response is not a Map: $customerResponse');
+        // Fallback to mock data
+        _customerDetails = {
+          'id': 'CUST-${email.hashCode}',
+          'email': email,
+          'membershipLevel': 'Bronze',
+          'loyaltyPoints': 150,
+          'createdAt': '2024-01-01',
+          'status': 'Active'
+        };
+
+        _membershipInfo = {
+          'level': 'Bronze',
+          'points': 150,
+          'benefits': [
+            'Earn points on every order',
+            'Exclusive promotions and discounts',
+            'Priority customer support'
+          ]
+        };
+
+        _orderHistory = [];
+      }
+    } catch (e) {
+      print('❌ Error type: ${e.runtimeType}');
+      if (e is ApiError) {
+        print('❌ API Error message: ${e.message}');
+        print('❌ API Error status code: ${e.statusCode}');
+      }
+
+      // Fallback to mock data on error
+      _customerDetails = {
+        'id': 'CUST-${email.hashCode}',
+        'email': email,
+        'membershipLevel': 'Bronze',
+        'loyaltyPoints': 150,
+        'createdAt': '2024-01-01',
+        'status': 'Active'
+      };
+
+      _membershipInfo = {
+        'level': 'Bronze',
+        'points': 150,
+        'benefits': [
+          'Earn points on every order',
+          'Exclusive promotions and discounts',
+          'Priority customer support'
+        ]
+      };
+
+      _orderHistory = [];
+    }
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:green_kitchen_app/models/ingredient.dart';
-import 'dart:math';
 
 class MealItemCard extends StatefulWidget {
   final Ingredient item;
@@ -9,12 +8,12 @@ class MealItemCard extends StatefulWidget {
   final VoidCallback onDecrease;
 
   const MealItemCard({
-    Key? key,
+    super.key,
     required this.item,
     required this.quantity,
     required this.onIncrease,
     required this.onDecrease,
-  }) : super(key: key);
+  });
 
   @override
   State<MealItemCard> createState() => _MealItemCardState();

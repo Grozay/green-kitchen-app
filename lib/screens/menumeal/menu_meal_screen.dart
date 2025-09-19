@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 
 class MenuMealScreen extends StatefulWidget {
-  const MenuMealScreen({Key? key}) : super(key: key);
+  const MenuMealScreen({super.key});
 
   @override
   State<MenuMealScreen> createState() => _MenuMealScreenState();

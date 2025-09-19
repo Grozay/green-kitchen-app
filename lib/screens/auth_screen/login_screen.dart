@@ -4,40 +4,30 @@ import 'package:provider/provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
 import 'package:green_kitchen_app/theme/app_colors.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleRegister() async {
-    final firstName = _firstNameController.text.trim();
-    final lastName = _lastNameController.text.trim();
+  Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (firstName.isEmpty || lastName.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
@@ -51,49 +41,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    if (password.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must be at least 6 characters')),
-      );
-      return;
-    }
-
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
-
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.register(email, password, firstName: firstName, lastName: lastName);
+    final success = await authProvider.login(email, password);
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful! Please check your email to verify your account.')),
+        const SnackBar(content: Text('Login successful!')),
       );
-      // Navigate to email verification screen with email parameter
-      context.go('/email-verification', extra: email);
+      // Navigate to home screen
+      context.go('/');
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Registration failed')),
+        SnackBar(content: Text(authProvider.errorMessage ?? 'Login failed')),
       );
     }
   }
 
-  Future<void> _handleGoogleRegister() async {
+  Future<void> _handleGoogleLogin() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final success = await authProvider.googleSignIn();
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Google registration successful!')),
+        const SnackBar(content: Text('Google login successful!')),
       );
       // Navigate to home screen
-      context.go('/menumeal');
+      context.go('/');
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Google registration failed')),
+        SnackBar(content: Text(authProvider.errorMessage ?? 'Google login failed')),
       );
     }
   }
@@ -104,6 +80,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () {
+            context.go('/');
+          },
+        ),
+        title: const Text(
+          'Back to Home',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -141,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Create Account',
+                    'Welcome back',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 20,
@@ -149,36 +143,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // First Name
-                  TextField(
-                    controller: _firstNameController,
-                    decoration: InputDecoration(
-                      hintText: 'First Name',
-                      filled: true,
-                      fillColor: AppColors.inputFill,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.inputBorder),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Last Name
-                  TextField(
-                    controller: _lastNameController,
-                    decoration: InputDecoration(
-                      hintText: 'Last Name',
-                      filled: true,
-                      fillColor: AppColors.inputFill,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.inputBorder),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   // Email
                   TextField(
                     controller: _emailController,
@@ -218,30 +182,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // Confirm Password
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    decoration: InputDecoration(
-                      hintText: 'Confirm Password',
-                      filled: true,
-                      fillColor: AppColors.inputFill,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.inputBorder),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility),
-                        onPressed: () {
-                          setState(() {
-                            _obscureConfirmPassword = !_obscureConfirmPassword;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerRight,
@@ -251,6 +191,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Forgot password feature coming soon!')),
                         );
+                        context.go('/custommeal');
                       },
                       child: const Text(
                         'Forgot your password?',
@@ -262,11 +203,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Register button
+                  // Continue button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: authProvider.isLoading ? null : _handleRegister,
+                      onPressed: authProvider.isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
@@ -284,23 +225,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             )
                           : const Text(
-                              'Register',
+                              'Continue',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Already have an account? Login
+                  // Don't have an account? Register
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Already have an account?'),
+                      const Text("Don't have an account?"),
                       TextButton(
                         onPressed: () {
-                          context.go('/');
+                          context.go('/auth/register');
                         },
                         child: const Text(
-                          'Login',
+                          'Register',
                           style: TextStyle(
                             color: AppColors.primary,
                             fontSize: 14,
@@ -321,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  // Google register
+                  // Google login
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
@@ -331,7 +272,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         height: 24,
                       ),
                       label: const Text('Continue with Google'),
-                      onPressed: authProvider.isLoading ? null : _handleGoogleRegister,
+                      onPressed: authProvider.isLoading ? null : _handleGoogleLogin,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: BorderSide(color: AppColors.primary),
@@ -342,17 +283,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Phone register
+                  // Phone login
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.phone, color: AppColors.primary),
                       label: const Text('Continue with Phone'),
                       onPressed: () {
-                        // TODO: Implement phone register
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Phone registration coming soon!')),
-                        );
+                        context.go('/auth/phone-login');
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -363,7 +301,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
                 ],
               ),
             ),

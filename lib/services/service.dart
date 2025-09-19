@@ -68,7 +68,8 @@ class ApiService {
       try {
         return json.decode(responseBody);
       } catch (e) {
-        throw ApiError(message: 'Invalid JSON response');
+        // If JSON parsing fails, return the plain text response
+        return responseBody;
       }
     } else {
       try {

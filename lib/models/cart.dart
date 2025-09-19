@@ -63,7 +63,7 @@ class CartItem {
       );
     } catch (e) {
       print('Error parsing CartItem: $e');
-      throw e; // Hoặc return default CartItem
+      rethrow; // Hoặc return default CartItem
     }
   }
 
@@ -475,7 +475,7 @@ class Cart {
       );
     } catch (e) {
       print('Error parsing Cart: $e');
-      throw e; // Hoặc return default Cart
+      rethrow; // Hoặc return default Cart
     }
   }
 

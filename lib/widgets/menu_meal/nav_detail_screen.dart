@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/theme/app_colors.dart';
 
 class NavDetailScreen extends StatelessWidget {
@@ -10,11 +7,11 @@ class NavDetailScreen extends StatelessWidget {
   final VoidCallback? onCartTap;
 
   const NavDetailScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.body,
     this.onCartTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

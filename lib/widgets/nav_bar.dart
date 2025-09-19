@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:green_kitchen_app/provider/cart_provider_v2.dart';
 import 'package:provider/provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
-import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/constants/app_constants.dart';
 import 'package:green_kitchen_app/theme/app_colors.dart';
 
@@ -33,10 +32,8 @@ class _NavBarState extends State<NavBar> {
       final cartProvider = Provider.of<CartProviderV2>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final customerId = authProvider.currentUser?.id ?? CURRENT_CUSTOMER_ID;
-      if (customerId != null) {
-        // cartProvider.initializeCart(customerId as int);
-      }
-    });
+      // cartProvider.initializeCart(customerId as int);
+        });
   }
 
   void _onBottomNavTap(int index) {

@@ -37,8 +37,7 @@ class CartItemWidget extends StatelessWidget {
           // Image ở trên cùng
           Center(
             child:
-                cartItem.image == null || // Thay menuMealImage bằng image
-                    cartItem.image!.isEmpty
+                cartItem.image.isEmpty
                 ? CircleAvatar(
                     radius: 40,
                     backgroundColor: Colors.grey[400],
@@ -52,7 +51,7 @@ class CartItemWidget extends StatelessWidget {
                 : ClipRRect(
                     borderRadius: BorderRadius.circular(40),
                     child: Image.network(
-                      cartItem.image!, // Thay menuMealImage bằng image
+                      cartItem.image, // Thay menuMealImage bằng image
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,
@@ -103,7 +102,7 @@ class CartItemWidget extends StatelessWidget {
             Wrap(
               spacing: 4,
               runSpacing: 4,
-              children: ((cartItem.menuMeal?.menuIngredients as List<String>?) ?? [])
+              children: (cartItem.menuMeal?.menuIngredients ?? [])
                   .map(
                     (ingredient) => Container(
                       padding: const EdgeInsets.symmetric(

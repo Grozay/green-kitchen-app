@@ -10,6 +10,7 @@ import 'package:green_kitchen_app/provider/auth_provider.dart';
 void main() async {
   //custom lock screen orientation to portrait only
   WidgetsFlutterBinding.ensureInitialized();
+  
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -21,6 +22,9 @@ void main() async {
   // Initialize AuthProvider
   final authProvider = AuthProvider();
   await authProvider.init();
+  
+  // Load user data if already logged in
+  await authProvider.loadUserData();
 
   // Initialize CartProviderV2
   final cartProviderV2 = CartProviderV2();
