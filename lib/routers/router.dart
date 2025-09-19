@@ -9,10 +9,9 @@ import 'package:green_kitchen_app/screens/main_layout.dart';
 import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_meal_screen.dart';
-import 'package:green_kitchen_app/screens/meal/week_meal_screen.dart';
+import 'package:green_kitchen_app/screens/week_meal/week_meal_screen.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_detail_screen.dart';
-import 'package:green_kitchen_app/screens/meal/custom_meal_screen.dart';
 
 import 'package:green_kitchen_app/screens/cart/cart_screen.dart';
 import 'package:green_kitchen_app/screens/post/post_screen.dart';
@@ -93,7 +92,8 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/custommeal',
       builder: (BuildContext context, GoRouterState state) {
-        return const CustomMealScreen();
+        // return const CustomMealScreen();
+        return const MenuMealScreen();
       },
     ),
     // GoRoute(

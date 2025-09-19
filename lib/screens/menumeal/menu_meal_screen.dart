@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:green_kitchen_app/provider/cart_provider_v2.dart';
 import 'package:green_kitchen_app/widgets/nav_bar.dart';
 import 'package:green_kitchen_app/models/menu_meal.dart';
 import 'package:green_kitchen_app/services/menu_meal_service.dart';
 import 'package:green_kitchen_app/widgets/menu_meal/menu_list.dart';
 import 'package:green_kitchen_app/widgets/menu_meal/tab_menu.dart';
 import 'package:provider/provider.dart';
-import '../../provider/provider.dart';
-import '../../constants/app_constants.dart';
+// import '../../provider/cart_provider.dart';
+// import '../../constants/app_constants.dart';
+import '../../theme/app_colors.dart';
 
 class MenuMealScreen extends StatefulWidget {
   const MenuMealScreen({super.key});
@@ -59,6 +61,7 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
   void _loadMeals() async {
     try {
       final meals = await MenuMealService().getMenuMeals();
+      print(meals);
       setState(() {
         allMeals = meals;
         _filterMeals();
@@ -77,16 +80,17 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CartProvider>(
+    return Consumer<CartProviderV2>(
       builder: (context, cartProvider, child) {
         return NavBar(
+          currentIndex: 0,
           cartCount: cartProvider.cartItemCount,
           body: Container(
-            color: Color(0xFFF5F5F5),
+            color: AppColors.background,
             child: CustomScrollView(
               slivers: [
                 SliverPersistentHeader(
-                  pinned: true, // Giữ cố định khi cuộn
+                  pinned: true,
                   delegate: _TabMenuDelegate(tabController: _tabController),
                 ),
                 SliverToBoxAdapter(
@@ -99,21 +103,16 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
                         Text(
                           '$selectedFilter PROTEIN',
                           style: const TextStyle(
-                            color: Color(0xFF4B0036),
+                            color: AppColors.textPrimary,
                             fontWeight: FontWeight.bold,
                             fontSize: 28,
                             letterSpacing: 1,
                           ),
                         ),
                         const SizedBox(height: 24),
-                        // Meal List with cart functionality
                         MenuList(
                           meals: filteredMeals,
                           loading: loading,
-                          quantities: _getMealQuantities(cartProvider),
-                          onAddToCart: (meal) => _addToCart(context, cartProvider, meal),
-                          onIncrease: (meal) => _increaseQuantity(context, cartProvider, meal),
-                          onDecrease: (meal) => _decreaseQuantity(context, cartProvider, meal),
                           onTap: (meal) {
                             context.go('/menumeal/${meal.slug}');
                           },
@@ -130,52 +129,6 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
       },
     );
   }
-
-  Map<int, int> _getMealQuantities(CartProvider cartProvider) {
-    final quantities = <int, int>{};
-    if (cartProvider.cart != null) {
-      for (final cartItem in cartProvider.cart!.cartItems) {
-        quantities[cartItem.menuMealId] = cartItem.quantity;
-      }
-    }
-    return quantities;
-  }
-
-  void _addToCart(BuildContext context, CartProvider cartProvider, MenuMeal meal) {
-    cartProvider.addMealToCart(CURRENT_CUSTOMER_ID, menuMealId: meal.id, quantity: 1);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${meal.title} đã được thêm vào giỏ hàng'),
-        duration: const Duration(seconds: 2),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
-  void _increaseQuantity(BuildContext context, CartProvider cartProvider, MenuMeal meal) {
-    final cartItem = cartProvider.getCartItemByMenuMealId(meal.id);
-    if (cartItem != null) {
-      cartProvider.increaseQuantity(CURRENT_CUSTOMER_ID, cartItem.id);
-    }
-  }
-
-  void _decreaseQuantity(BuildContext context, CartProvider cartProvider, MenuMeal meal) {
-    final cartItem = cartProvider.getCartItemByMenuMealId(meal.id);
-    if (cartItem != null) {
-      if (cartItem.quantity > 1) {
-        cartProvider.decreaseQuantity(CURRENT_CUSTOMER_ID, cartItem.id);
-      } else {
-        cartProvider.removeFromCart(CURRENT_CUSTOMER_ID, cartItem.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${meal.title} đã được xóa khỏi giỏ hàng'),
-            duration: const Duration(seconds: 2),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    }
-  }
 }
 
 // Thêm class delegate cho SliverPersistentHeader
@@ -187,7 +140,7 @@ class _TabMenuDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Color(0xFFF5F5F5), // Màu nền khớp với body
+      color: AppColors.background,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         children: [
@@ -199,10 +152,10 @@ class _TabMenuDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 80; // Chiều cao tối đa (điều chỉnh theo nhu cầu)
+  double get maxExtent => 80;
 
   @override
-  double get minExtent => 80; // Chiều cao tối thiểu (giữ cố định)
+  double get minExtent => 80;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;

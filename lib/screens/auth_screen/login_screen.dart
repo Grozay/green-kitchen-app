@@ -191,6 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Forgot password feature coming soon!')),
                         );
+                        context.go('/custommeal');
                       },
                       child: const Text(
                         'Forgot your password?',

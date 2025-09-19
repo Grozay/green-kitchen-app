@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
 
-class tab_menu extends StatelessWidget {
-  const tab_menu({
+class tab_ingredient extends StatelessWidget {
+  const tab_ingredient({
     super.key,
     required TabController tabController,
   }) : _tabController = tabController;
@@ -15,7 +14,7 @@ class tab_menu extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: AppColors.secondary,
+          color: Color(0xFF7DD3C0),
           borderRadius: BorderRadius.circular(25),
         ),
         child: TabBar(
@@ -26,17 +25,17 @@ class tab_menu extends StatelessWidget {
           ),
           indicatorColor: Colors.transparent,
           indicatorSize: TabBarIndicatorSize.tab,
-          labelColor: AppColors.textPrimary,
+          labelColor: Color(0xFF4B0036),
           unselectedLabelColor: Colors.white,
           labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-          unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
           dividerColor: Colors.transparent,
           dividerHeight: 0,
-          tabs: [
-            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 15), child: Text('LOW'))),
-            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 1), child: Text('BALANCE'))),
-            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 15), child: Text('HIGH'))),
-            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 15), child: Text('VEG'))),
+          tabs: const [
+            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('PROTEIN'))),
+            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('CARBS'))),
+            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('SIDE'))),
+            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('SAUCE'))),
           ],
         ),
       ),

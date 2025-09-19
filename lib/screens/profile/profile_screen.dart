@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../theme/app_colors.dart';
-import 'account_info_screen.dart';
-import 'membership_screen.dart';
-import 'order_history_screen.dart';
+import './account_info_screen.dart';
+import './membership_screen.dart';
+import './order_history_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
