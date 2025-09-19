@@ -2,11 +2,11 @@
 class ApiEndpoints {
   // Base URL - Update this to your actual backend URL
 
-  // static const String baseUrl = 'http://172.16.2.9:8080/apis/v1'; //Trung
+  static const String baseUrl = 'http://192.168.1.252:8080/apis/v1'; //Trung
 
   // static const String baseUrl = 'http://192.168.1.23:8080/apis/v1'; //Quyen
 
-  static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
+//   static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
 
 
   // Authentication endpoints
@@ -39,6 +39,15 @@ class ApiEndpoints {
 
   // Store endpoints
   var stores = '$baseUrl/stores';
+
+  // Chat endpoints
+  static const String chatRoot = '$baseUrl/chat';
+  static const String initGuest = '$chatRoot/init-guest';
+  static const String send = '$chatRoot/send';
+  static const String messagesPaged = '$chatRoot/messages-paged';
+  static const String messages = '$chatRoot/messages';
+  static const String conversations = '$chatRoot/conversations';
+  static const String markRead = '$chatRoot/mark-read';
 
   //cart
   var getCartByCustomerId = '$baseUrl/carts/customer/:customerId';
