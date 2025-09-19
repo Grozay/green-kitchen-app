@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:green_kitchen_app/constants/app_constants.dart'; // Import cho CURRENT_CUSTOMER_ID
 import 'package:green_kitchen_app/constants/constants.dart';
 import 'package:green_kitchen_app/models/menu_meal.dart';
 import 'package:green_kitchen_app/services/menu_meal_service.dart';
 import 'package:provider/provider.dart';
-import '../../provider/cart_provider_v2.dart';
+import '../../provider/cart_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../theme/app_colors.dart';
 
@@ -29,9 +28,9 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
     _loadMenuMeal();
     // Thêm fetch cart
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cartProvider = Provider.of<CartProviderV2>(context, listen: false);
-      // final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final customerId = CURRENT_CUSTOMER_ID; // Lấy từ authProvider nếu có
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final customerId = (authProvider.currentUser?.id as int?) ?? 0;
       cartProvider.fetchCart(customerId);
     });
   }
@@ -52,11 +51,8 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<CartProviderV2, AuthProvider>(
+    return Consumer2<CartProvider, AuthProvider>(
       builder: (context, cartProvider, authProvider, child) {
-        // final customerId = authProvider.customer?.id ?? 0; // Uncomment nếu AuthProvider có field customer.id
-        final customerId = CURRENT_CUSTOMER_ID; // Giữ nguyên nếu dùng constant
-
         if (loading) {
           return Scaffold(
             backgroundColor: AppColors.background,
@@ -81,7 +77,9 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                 ),
               ),
             ),
-            body: Center(child: CircularProgressIndicator(color: AppColors.secondary)),
+            body: Center(
+              child: CircularProgressIndicator(color: AppColors.secondary),
+            ),
           );
         }
 
@@ -97,7 +95,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                   color: AppColors.textPrimary,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  GoRouter.of(context).push('/menumeal');
                 },
               ),
               title: const Text(
@@ -119,10 +117,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
             backgroundColor: AppColors.background,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                color: AppColors.textPrimary,
-              ),
+              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -137,7 +132,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
             ),
             centerTitle: false,
             actions: [
-              Consumer<CartProviderV2>(
+              Consumer<CartProvider>(
                 builder: (context, cartProvider, child) {
                   return Stack(
                     children: [
@@ -150,7 +145,8 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                           GoRouter.of(context).push('/cart');
                         },
                       ),
-                      if (cartProvider.cartItemCount > 0) // Đảm bảo condition đúng
+                      if (cartProvider.cartItemCount >
+                          0) // Đảm bảo condition đúng
                         Positioned(
                           right: 6,
                           top: 6,
@@ -161,8 +157,8 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                               shape: BoxShape.circle,
                             ),
                             constraints: const BoxConstraints(
-                              minWidth: 20,
-                              minHeight: 20,
+                              minWidth: 15,
+                              minHeight: 15,
                             ),
                             child: Text(
                               '${cartProvider.cartItemCount}',
@@ -219,7 +215,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                           Text(
                             menuMeal!.description,
                             style: const TextStyle(
-                              fontSize: 16, 
+                              fontSize: 16,
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -245,8 +241,14 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                                 'Protein',
                                 '${menuMeal!.protein.toInt()}g',
                               ),
-                              _buildNutrient('Carbs', '${menuMeal!.carbs.toInt()}g'),
-                              _buildNutrient('Fat', '${menuMeal!.fat.toInt()}g'),
+                              _buildNutrient(
+                                'Carbs',
+                                '${menuMeal!.carbs.toInt()}g',
+                              ),
+                              _buildNutrient(
+                                'Fat',
+                                '${menuMeal!.fat.toInt()}g',
+                              ),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -340,7 +342,8 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                           ),
                           IconButton(
                             onPressed: () {
-                              if (quantity < (menuMeal!.stock)) { // Thêm ?? 0 để handle null
+                              if (quantity < (menuMeal!.stock)) {
+                                // Thêm ?? 0 để handle null
                                 setState(() {
                                   quantity++;
                                 });
@@ -371,7 +374,8 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.secondary, // Thay Color(0xFF00B8A9) bằng AppColors.secondary
+                            color: AppColors
+                                .secondary, // Thay Color(0xFF00B8A9) bằng AppColors.secondary
                           ),
                         ),
                       ],
@@ -382,7 +386,9 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                 // Full width button to add to cart
                 SizedBox(
                   width: double.infinity,
-                  child: (menuMeal!.stock ?? 0) == 0 // Thêm ?? 0 để handle null
+                  child:
+                      (menuMeal!.stock) ==
+                          0 // Thêm ?? 0 để handle null
                       ? Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
@@ -402,9 +408,11 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                         )
                       : ElevatedButton(
                           onPressed: () async {
+                            final customerId = (authProvider.currentUser?.id as int?) ?? 0;
+                            
                             final itemData = {
                               'isCustom': false,
-                              'menuMealId': menuMeal!.id, // Giờ safe vì check null
+                              'menuMealId': menuMeal!.id,
                               'quantity': quantity,
                               'unitPrice': menuMeal!.price,
                               'totalPrice': menuMeal!.price! * quantity,
@@ -418,10 +426,15 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                               'fat': menuMeal!.fat,
                             };
 
-                            await cartProvider.addMealToCart(customerId, itemData);
+                            await cartProvider.addMealToCart(
+                              customerId,
+                              itemData,
+                            );
                             if (cartProvider.error != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: ${cartProvider.error}')),
+                                SnackBar(
+                                  content: Text('Error: ${cartProvider.error}'),
+                                ),
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -467,11 +480,8 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
           ),
         ),
         Text(
-          label, 
-          style: const TextStyle(
-            fontSize: 12, 
-            color: AppColors.textSecondary,
-          ),
+          label,
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
       ],
     );

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 // import 'package:green_kitchen_app/models/cartItem.dart'; // Bỏ import này
-import 'package:green_kitchen_app/provider/cart_provider_v2.dart'; // Giữ import CartProviderV2
+import 'package:green_kitchen_app/provider/cart_provider.dart'; // Giữ import CartProvider
 import 'package:green_kitchen_app/widgets/cart/cart_item.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../models/cart.dart'; // Thay cartv2.dart bằng cart.dart
-import '../../constants/app_constants.dart';
 import '../../theme/app_colors.dart';
+import 'package:green_kitchen_app/provider/auth_provider.dart'; // Thêm import AuthProvider
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -21,18 +21,27 @@ class _CartScreenState extends State<CartScreen> {
     super.initState();
     // Load cart data when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cartProvider = Provider.of<CartProviderV2>(context, listen: false); // Giữ CartProviderV2
-      cartProvider.fetchCart(CURRENT_CUSTOMER_ID); // Giữ nguyên
+      final cartProvider = Provider.of<CartProvider>(
+        context,
+        listen: false,
+      );
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      // Fix: Parse String to int safely
+      final customerId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
+      cartProvider.fetchCart(customerId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CartProviderV2>( // Giữ nguyên
-      builder: (context, cartProvider, child) {
-        final cart = cartProvider.cart; // Giờ là Cart từ cart.dart
+    return Consumer2<CartProvider, AuthProvider>(
+      builder: (context, cartProvider, authProvider, child) {
+        final cart = cartProvider.cart;
         final isLoading = cartProvider.isLoading;
         final error = cartProvider.error;
+
+        // Fix: Parse String to int safely
+        final customerId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -85,27 +94,37 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.error_outline, color: AppColors.primary),
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: AppColors.primary,
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       'Error: $error',
-                                      style: TextStyle(color: AppColors.primary),
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                      ),
                                     ),
                                   ),
                                   IconButton(
                                     onPressed: () {
                                       cartProvider.clearError();
-                                      cartProvider.fetchCart(CURRENT_CUSTOMER_ID); // Giữ nguyên
+                                      cartProvider.fetchCart(customerId); // Thay CURRENT_CUSTOMER_ID
                                     },
-                                    icon: Icon(Icons.refresh, color: AppColors.primary),
+                                    icon: Icon(
+                                      Icons.refresh,
+                                      color: AppColors.primary,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
 
                           // Empty cart message
-                          if (!isLoading && cart != null && cart.cartItems.isEmpty)
+                          if (!isLoading &&
+                              cart != null &&
+                              cart.cartItems.isEmpty)
                             Center(
                               child: Padding(
                                 padding: const EdgeInsets.all(32.0),
@@ -127,7 +146,9 @@ class _CartScreenState extends State<CartScreen> {
                                     const SizedBox(height: 8),
                                     Text(
                                       'Add some products to your cart',
-                                      style: TextStyle(color: AppColors.textSecondary),
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                      ),
                                     ),
                                     const SizedBox(height: 24),
                                     ElevatedButton(
@@ -141,7 +162,9 @@ class _CartScreenState extends State<CartScreen> {
                                           vertical: 12,
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                       ),
                                       child: const Text(
@@ -158,29 +181,35 @@ class _CartScreenState extends State<CartScreen> {
                             ),
 
                           // Cart items
-                          if (!isLoading && cart != null && cart.cartItems.isNotEmpty)
+                          if (!isLoading &&
+                              cart != null &&
+                              cart.cartItems.isNotEmpty)
                             ...cart.cartItems.map(
                               (cartItem) => Padding(
                                 padding: const EdgeInsets.only(bottom: 16),
                                 child: _CartItemWidget(
                                   cartItem: cartItem,
-                                  onIncrease: () => cartProvider.increaseQuantity(
-                                    CURRENT_CUSTOMER_ID,
-                                    cartItem.id,
-                                  ),
-                                  onDecrease: () => cartProvider.decreaseQuantity(
-                                    CURRENT_CUSTOMER_ID,
-                                    cartItem.id,
-                                  ),
+                                  onIncrease: () =>
+                                      cartProvider.increaseQuantity(
+                                        customerId, // Thay CURRENT_CUSTOMER_ID
+                                        cartItem.id,
+                                      ),
+                                  onDecrease: () =>
+                                      cartProvider.decreaseQuantity(
+                                        customerId, // Thay CURRENT_CUSTOMER_ID
+                                        cartItem.id,
+                                      ),
                                   onRemove: () => cartProvider.removeFromCart(
-                                    CURRENT_CUSTOMER_ID,
+                                    customerId, // Thay CURRENT_CUSTOMER_ID
                                     cartItem.id,
                                   ),
                                 ),
                               ),
                             ),
 
-                          const SizedBox(height: 100), // Space for fixed bottom section
+                          const SizedBox(
+                            height: 100,
+                          ), // Space for fixed bottom section
                         ],
                       ),
                     ),
@@ -190,7 +219,8 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ),
           // Fixed bottom section
-          bottomNavigationBar: (!isLoading && cart != null && cart.cartItems.isNotEmpty)
+          bottomNavigationBar:
+              (!isLoading && cart != null && cart.cartItems.isNotEmpty)
               ? Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -238,16 +268,27 @@ class _CartScreenState extends State<CartScreen> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 0,
                           ),
                           onPressed: () {
-                            GoRouter.of(context).push('/payment');
+                            // Thêm check login
+                            final authProvider = Provider.of<AuthProvider>(
+                              context,
+                              listen: false,
+                            );
+                            if (!authProvider.isAuthenticated) {
+                              GoRouter.of(context).push(
+                                '/auth/login',
+                              ); // Chuyển đến login nếu chưa authenticated
+                            } else {
+                              GoRouter.of(
+                                context,
+                              ).push('/payment'); // Tiếp tục nếu đã login
+                            }
                           },
                           child: const Text(
                             'Confirm and Pay',
@@ -284,7 +325,8 @@ class _CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CartItemWidget( // Thay cart_item thành CartItemWidget
+    return CartItemWidget(
+      // Thay cart_item thành CartItemWidget
       cartItem: cartItem,
       onIncrease: onIncrease,
       onDecrease: onDecrease,
