@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:green_kitchen_app/provider/cart_provider_v2.dart';
-import 'package:green_kitchen_app/widgets/nav_bar.dart';
+import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/models/menu_meal.dart';
 import 'package:green_kitchen_app/services/menu_meal_service.dart';
 import 'package:green_kitchen_app/widgets/menu_meal/menu_list.dart';
@@ -80,11 +79,76 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CartProviderV2>(
+    return Consumer<CartProvider>(
       builder: (context, cartProvider, child) {
-        return NavBar(
-          currentIndex: 0,
-          cartCount: cartProvider.cartItemCount,
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: AppColors.background,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                color: AppColors.textPrimary,
+              ),
+              onPressed: () {
+                GoRouter.of(context).push('/');
+              },
+            ),
+            title: Text(
+              'MENU MEALS',
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+              ),
+            ),
+            centerTitle: false,
+            actions: [
+              Consumer<CartProvider>(
+                builder: (context, cartProvider, child) {
+                  return Stack(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.shopping_cart,
+                          color: AppColors.textPrimary,
+                        ),
+                        onPressed: () {
+                          GoRouter.of(context).push('/cart');
+                        },
+                      ),
+                      if (cartProvider.cartItemCount > 0) // Đảm bảo condition đúng
+                        Positioned(
+                          right: 6,
+                          top: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: AppColors.secondary,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 15,
+                              minHeight: 15,
+                            ),
+                            child: Text(
+                              '${cartProvider.cartItemCount}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
           body: Container(
             color: AppColors.background,
             child: CustomScrollView(

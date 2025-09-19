@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_colors.dart';
 
 class MenuScreen extends StatelessWidget {
@@ -47,23 +48,14 @@ class MenuScreen extends StatelessWidget {
                       subtitle: 'Fresh meals prepared daily',
                       icon: Icons.restaurant_menu,
                       gradient: LinearGradient(
-                        colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
+                        colors: [
+                          AppColors.primary,
+                          AppColors.primary.withValues(alpha: 0.8),
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      onTap: () => context.go('/menumeal'),
-                    ),
-                    _buildMenuCard(
-                      context,
-                      title: 'Weekly Plans',
-                      subtitle: 'Plan your meals for the week',
-                      icon: Icons.calendar_view_week,
-                      gradient: LinearGradient(
-                        colors: [Colors.orange.shade400, Colors.orange.shade300],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      onTap: () => context.go('/weekmeal'),
+                      onTap: () => GoRouter.of(context).push('/menumeal'),
                     ),
                     _buildMenuCard(
                       context,
@@ -75,7 +67,52 @@ class MenuScreen extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      onTap: () => context.go('/custommeal'),
+                      onTap: () => GoRouter.of(context).push('/menumeal'),
+                    ),
+                    _buildMenuCard(
+                      context,
+                      title: 'Weekly Plans',
+                      subtitle: 'Plan your meals for the week',
+                      icon: Icons.calendar_view_week,
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.orange.shade400,
+                          Colors.orange.shade300,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      onTap: () async {
+                        bool? shouldOpenWeb = await showDialog<bool>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Open Web Version?'),
+                              content: const Text('Do you want to open the web version of Weekly Meal Planner?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: const Text('No'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  child: const Text('Yes'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        if (shouldOpenWeb == true) {
+                          final Uri url = Uri.parse('http://localhost:5173/week-meal-planner');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Could not launch URL')),
+                            );
+                          }
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -98,9 +135,7 @@ class MenuScreen extends StatelessWidget {
     return Card(
       elevation: 8,
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
@@ -121,11 +156,7 @@ class MenuScreen extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 24,
-                    color: Colors.white,
-                  ),
+                  child: Icon(icon, size: 24, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -158,11 +189,7 @@ class MenuScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                      size: 18,
-                    ),
+                    Icon(Icons.arrow_forward, color: Colors.white, size: 18),
                   ],
                 ),
               ],

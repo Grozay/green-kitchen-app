@@ -14,12 +14,11 @@ import 'package:green_kitchen_app/screens/profile/membership_screen.dart';
 import 'package:green_kitchen_app/screens/profile/order_history_screen.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_meal_screen.dart';
-import 'package:green_kitchen_app/screens/week_meal/week_meal_screen.dart';
+// import 'package:green_kitchen_app/screens/week_meal/week_meal_screen.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_detail_screen.dart';
 
 import 'package:green_kitchen_app/screens/cart/cart_screen.dart';
-import 'package:green_kitchen_app/screens/post/post_screen.dart';
 import 'package:green_kitchen_app/screens/payment/payment_screen.dart';
 
 final GoRouter router = GoRouter(
@@ -76,18 +75,12 @@ final GoRouter router = GoRouter(
         return const CartScreen();
       },
     ),
-    GoRoute(
-      path: '/articles',
-      builder: (BuildContext context, GoRouterState state) {
-        return const PostScreen();
-      },
-    ),
-    GoRoute(
-      path: '/weekmeal',
-      builder: (BuildContext context, GoRouterState state) {
-        return const WeekMealScreen();
-      },
-    ),
+    // GoRoute(
+    //   path: '/weekmeal',
+    //   builder: (BuildContext context, GoRouterState state) {
+    //     return const WeekMealScreen();
+    //   },
+    // ),
     GoRoute(
       path: '/ai-chat',
       builder: (BuildContext context, GoRouterState state) {
