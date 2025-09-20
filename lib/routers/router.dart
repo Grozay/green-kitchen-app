@@ -20,6 +20,7 @@ import 'package:green_kitchen_app/screens/menumeal/menu_detail_screen.dart';
 
 import 'package:green_kitchen_app/screens/cart/cart_screen.dart';
 import 'package:green_kitchen_app/screens/payment/payment_screen.dart';
+import 'package:green_kitchen_app/screens/chat/chat_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -28,6 +29,12 @@ final GoRouter router = GoRouter(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
         return const MainLayout(initialIndex: 0);
+      },
+    ),
+    GoRoute(
+      path: '/chat',
+      builder: (BuildContext context, GoRouterState state) {
+        return const ChatScreen();
       },
     ),
     GoRoute(
