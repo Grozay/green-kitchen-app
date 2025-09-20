@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../models/cart.dart'; // Thay cartv2.dart bằng cart.dart
 import '../../theme/app_colors.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart'; // Thêm import AuthProvider
+import 'package:intl/intl.dart'; // Thêm import này
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -250,7 +251,7 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                           ),
                           Text(
-                            '${cartProvider.totalAmount.toStringAsFixed(0)}đ',
+                            '${NumberFormat('#,###', 'vi_VN').format(cartProvider.totalAmount)} VND',
                             style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 24,

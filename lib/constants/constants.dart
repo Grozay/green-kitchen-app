@@ -18,5 +18,5 @@ const String ORDER_TYPE_CUSTOM_MEAL = 'CUSTOM_MEAL';
 const String ORDER_TYPE_WEEK_MEAL = 'WEEK_MEAL';
 
 
-const String imageCustomMealDefault = 'https://res.cloudinary.com/quyendev/image/upload/v1750922086/Top-blade-beef-steak-300x300_fvv3fj.png';
+const String imageCustomMealDefault = 'https://res.cloudinary.com/dbq8itp9r/image/upload/v1758084348/Top-blade-beef-steak-150x150_aonoe4.png';
 

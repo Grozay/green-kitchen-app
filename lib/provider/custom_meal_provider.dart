@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:green_kitchen_app/constants/constants.dart';
+import 'package:green_kitchen_app/models/cart.dart' hide CustomMeal;  // Hide CustomMeal from cart.dart
 import 'package:green_kitchen_app/models/ingredient.dart';
+import 'package:green_kitchen_app/models/custom_meal.dart';  // Use CustomMeal from this file
 import 'package:green_kitchen_app/services/ingredient_service.dart';  // Add this import
+import 'package:green_kitchen_app/services/custom_meal_service.dart';  // Add this import for CustomMealService
 
 class IngredientWithQuantity {
   final Ingredient item;
@@ -56,6 +60,9 @@ class CustomMealProvider extends ChangeNotifier {
   double totalCarbs = 0;
   double totalFat = 0;
 
+  bool isEditing = false;
+  CustomMeal? editingMeal;  // Add this to store the meal being edited
+
   // Getters
   Map<String, List<IngredientWithQuantity>> get selectCurrentMeal {
     return selectedItems;
@@ -78,7 +85,7 @@ class CustomMealProvider extends ChangeNotifier {
     double total = 0;
     for (var category in selectedItems.values) {
       for (var item in category) {
-        total += (item.item.price ?? 0) * item.quantity;
+        total += (item.item.price) * item.quantity;
       }
     }
     return total;
@@ -107,10 +114,11 @@ class CustomMealProvider extends ChangeNotifier {
       ));
     }
 
-    // Cập nhật nutrition totals
-    totalProtein += ingredient.protein ?? 0;
-    totalCarbs += ingredient.carbs ?? 0;
-    totalFat += ingredient.fat ?? 0;
+    // Update nutrition totals
+    totalProtein += ingredient.protein ;
+    totalCarbs += ingredient.carbs;
+    totalFat += ingredient.fat;
+    totalCalories += ((ingredient.protein) * 4) + ((ingredient.carbs) * 4) + ((ingredient.fat) * 9);  // Add calorie calculation
 
     notifyListeners();
   }
@@ -130,10 +138,11 @@ class CustomMealProvider extends ChangeNotifier {
         selectedItems[typeKey]!.removeAt(existingItemIndex);
       }
 
-      // Cập nhật nutrition totals
-      totalProtein -= ingredient.protein ?? 0;
-      totalCarbs -= ingredient.carbs ?? 0;
-      totalFat -= ingredient.fat ?? 0;
+      // Update nutrition totals
+      totalProtein -= ingredient.protein;
+      totalCarbs -= ingredient.carbs;
+      totalFat -= ingredient.fat;
+      totalCalories -= ((ingredient.protein) * 4) + ((ingredient.carbs) * 4) + ((ingredient.fat) * 9);  // Add calorie calculation
 
       notifyListeners();
     }
@@ -149,7 +158,7 @@ class CustomMealProvider extends ChangeNotifier {
     
     title = '';
     description = '';
-    image = 'https://res.cloudinary.com/quyendev/image/upload/v1750922086/Top-blade-beef-steak-300x300_fvv3fj.png';
+    image = imageCustomMealDefault;
     totalCalories = 0;
     totalProtein = 0;
     totalCarbs = 0;
@@ -161,14 +170,14 @@ class CustomMealProvider extends ChangeNotifier {
   // total calories = (Protein (g) × 4) + (Carbs (g) × 4) + (Fat (g) × 9)
   Map<String, double> get selectMealTotals {
     return {
-      'totalCalories': (totalProtein * 4) + (totalCarbs * 4) + (totalFat * 9),
+      'totalCalories': totalCalories,  // Use stored value instead of recalculating
       'totalProtein': totalProtein,
       'totalCarbs': totalCarbs,
       'totalFat': totalFat,
     };
   }
 
-  // Các methods bổ sung cho UI
+  // Additional methods for UI
   void increaseQuantity(Ingredient ingredient) {
     addItem(ingredient);
   }
@@ -201,8 +210,8 @@ class CustomMealProvider extends ChangeNotifier {
     
     if (proteinItem == null) return [];
 
-    // Logic gợi ý sauce dựa trên protein (có thể customize)
-    return []; // Trả về danh sách sauce được gợi ý
+    // Logic to suggest sauces based on protein (can be customized)
+    return []; // Return list of suggested sauces
   }
 
   // Setters
@@ -235,4 +244,88 @@ class CustomMealProvider extends ChangeNotifier {
   List<Ingredient> get allIngredients {
     return [...availableProteins, ...availableCarbs, ...availableSides, ...availableSauces];
   }
+
+  // Add this method to load a CustomMeal for editing
+  void loadFromCustomMeal(CustomMeal meal) {
+    print('DEBUG: Available proteins: ${availableProteins.length}, carbs: ${availableCarbs.length}, sides: ${availableSides.length}, sauces: ${availableSauces.length}');
+    clearCart();  // Clear existing state
+    isEditing = true;  // Set editing flag
+    editingMeal = meal;  // Store the meal
+    title = meal.title ?? '';
+    description = meal.description ?? '';
+    image = meal.image ?? imageCustomMealDefault;  // Use valid URL
+    totalCalories = meal.calories?.toDouble() ?? 0.0;
+    totalProtein = meal.protein?.toDouble() ?? 0.0;
+    totalCarbs = meal.carb?.toDouble() ?? 0.0;
+    totalFat = meal.fat?.toDouble() ?? 0.0;
+
+    for (var detail in meal.details ?? []) {
+      final typeKey = detail.type.toLowerCase();  // e.g., 'protein', 'carbs', etc.
+      if (selectedItems.containsKey(typeKey)) {
+        // Find the real Ingredient from available lists
+        List<Ingredient> availableList;
+        if (typeKey == 'protein') {
+          availableList = availableProteins;
+        } else if (typeKey == 'carbs') {
+          availableList = availableCarbs;
+        } else if (typeKey == 'side') {
+          availableList = availableSides;
+        } else if (typeKey == 'sauce') {
+          availableList = availableSauces;
+        } else {
+          print('DEBUG: Skipping unknown type: $typeKey');
+          continue;  // Skip if type not recognized
+        }
+
+        final Ingredient realIngredient = availableList.firstWhere(
+          (ing) => ing.id == detail.id,
+          orElse: () => Ingredient(
+            id: 0,  // Use 0 as not found indicator
+            title: '',
+            type: '',
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            description: '',
+            image: '',
+            price: 0,
+            stock: 0,
+          ),
+        );
+
+        if (realIngredient.id != 0) {
+          print('DEBUG: Found real ingredient: ${realIngredient.title}, price: ${realIngredient.price}');
+          // Use real ingredient
+          selectedItems[typeKey]!.add(IngredientWithQuantity(
+            item: realIngredient,
+            quantity: detail.quantity.toInt(),
+          ));
+        } else {
+          print('DEBUG: Real ingredient not found, using mock for: ${detail.title}');
+          // Fallback to mock if not found
+          final mockIngredient = Ingredient(
+            id: detail.id,
+            title: detail.title,
+            type: detail.type,
+            calories: detail.calories,
+            protein: detail.protein,
+            carbs: detail.carbs,
+            fat: detail.fat,
+            description: detail.description,
+            image: detail.image,
+            price: 0,  // Set to 0 since detail.price not available
+            stock: 0,  // Placeholder
+          );
+          selectedItems[typeKey]!.add(IngredientWithQuantity(
+            item: mockIngredient,
+            quantity: detail.quantity.toInt(),
+          ));
+        }
+      }
+    }
+    print('DEBUG: Selected items after loading: ${selectedItems}');
+    notifyListeners();
+  }
+
 }

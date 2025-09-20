@@ -35,7 +35,8 @@ class ApiEndpoints {
 
   // CustomMeal endpoints
   var createCustomMeal = '$baseUrl/custom-meals';
-  var getCustomMealById = '$baseUrl/custom-meals/:id';
+  var getCustomMealsForCustomer = '$baseUrl/custom-meals/customer/:customerId';
+  var updateCustomMeal = '$baseUrl/custom-meals/:id';
 
   // Ingredient endpoints
   var ingredients = '$baseUrl/ingredients';

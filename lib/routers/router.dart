@@ -7,6 +7,9 @@ import 'package:green_kitchen_app/screens/auth_screen/register_screen.dart';
 import 'package:green_kitchen_app/screens/auth_screen/phone_login_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/custom_meal_review_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/custom_meal_screen.dart';
+import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/save_custom_meal_review_screen.dart';
+import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/save_custom_meal_screen.dart';
+import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/your_custom_meal_screen.dart';
 import 'package:green_kitchen_app/screens/main_layout.dart';
 import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
 import 'package:green_kitchen_app/screens/profile/tabs/faq_tab.dart';
@@ -100,18 +103,14 @@ final GoRouter router = GoRouter(
             elevation: 0,
             title: const Text(
               'AI Chat',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.go('/'),
             ),
           ),
-          body: const Center(
-            child: Text('AI Chat Screen - Coming Soon!'),
-          ),
+          body: const Center(child: Text('AI Chat Screen - Coming Soon!')),
         );
       },
     ),
@@ -160,8 +159,8 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/custom-meal',
       builder: (BuildContext context, GoRouterState state) {
-        return const CustomMealScreen();
-        // return const MenuMealScreen();
+        // return const SavedCustomMealsScreen();
+        return const MenuMealScreen();
       },
       routes: <RouteBase>[
         GoRoute(
@@ -172,12 +171,26 @@ final GoRouter router = GoRouter(
         ),
       ],
     ),
-    // GoRoute(
-    //   path: '/meal-detail',
-    //   builder: (BuildContext context, GoRouterState state) {
-    //     return const MealDetailScreen();
-    //   },
-    // ),
+    GoRoute(
+      path: '/saved-custom-meal',
+      builder: (BuildContext context, GoRouterState state) {
+        return const SavedCustomMealsScreen(); // Keep this for saved meals
+      },
+      routes: <RouteBase>[
+        GoRoute(
+          path: '/create', // Add this subroute for creation
+          builder: (BuildContext context, GoRouterState state) {
+            return const YourCustomMealScreen(); // Your custom meal creation screen
+          },
+        ),
+        GoRoute(
+          path: '/review/:id',
+          builder: (BuildContext context, GoRouterState state) {
+            return const SaveCustomMealReviewScreen();
+          },
+        ),
+      ],
+    ),
     GoRoute(
       path: '/payment',
       builder: (BuildContext context, GoRouterState state) {
