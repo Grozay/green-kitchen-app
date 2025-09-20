@@ -178,7 +178,7 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
                           meals: filteredMeals,
                           loading: loading,
                           onTap: (meal) {
-                            context.go('/menumeal/${meal.slug}');
+                            context.go('/menu-meal/${meal.slug}');
                           },
                         ),
                         const SizedBox(height: 24),

@@ -504,14 +504,14 @@ class CartProvider with ChangeNotifier {
   }
 
   Future<void> _addToLocalCart(Map<String, dynamic> itemData) async {
-    // Tạo CartItem từ itemData (giả sử map phù hợp với CartItem constructor)
-    final uniqueId = DateTime.now().millisecondsSinceEpoch;
+    // Sử dụng menuMealId hoặc customMealId làm id để merge sản phẩm giống nhau
+    final uniqueId = itemData['menuMealId'] ?? itemData['customMealId'] ?? DateTime.now().millisecondsSinceEpoch;
     final newItem = CartItem(
       id: uniqueId,
-      cartId: 0, // Tạm thời
+      cartId: 0, // Temporary
       isCustom: itemData['isCustom'] ?? false,
-      menuMeal: null, // Có thể set nếu có data
-      customMeal: null,
+      menuMeal: itemData['menuMeal'], // Set nếu có data
+      customMeal: itemData['customMeal'], // Set nếu có data
       weekMeal: null,
       itemType: itemData['itemType'],
       quantity: itemData['quantity'] ?? 1,
@@ -537,7 +537,7 @@ class CartProvider with ChangeNotifier {
         totalQuantity: newItem.quantity,
       );
     } else {
-      // Check nếu item đã tồn tại (dựa trên id), tăng quantity
+      // Check nếu item đã tồn tại (dựa trên id, giờ là menuMealId hoặc customMealId)
       final existingIndex = _cart!.cartItems.indexWhere(
         (item) => item.id == newItem.id,
       );
@@ -553,9 +553,7 @@ class CartProvider with ChangeNotifier {
           itemType: existingItem.itemType,
           quantity: existingItem.quantity + newItem.quantity,
           unitPrice: existingItem.unitPrice,
-          totalPrice:
-              existingItem.unitPrice *
-              (existingItem.quantity + newItem.quantity),
+          totalPrice: existingItem.unitPrice * (existingItem.quantity + newItem.quantity),
           title: existingItem.title,
           image: existingItem.image,
           description: existingItem.description,

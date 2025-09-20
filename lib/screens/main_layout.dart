@@ -74,15 +74,15 @@ class _MainLayoutState extends State<MainLayout> {
         }
 
         // Clear cart khi logout
-        if (!authProvider.isAuthenticated && _cartFetched) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final cartProvider = Provider.of<CartProvider>(context, listen: false);
-            cartProvider.clearCart();  // Gọi clearCart khi logout
-            setState(() {
-              _cartFetched = false;
-            });
-          });
-        }
+        // if (!authProvider.isAuthenticated && _cartFetched) {
+        //   WidgetsBinding.instance.addPostFrameCallback((_) {
+        //     final cartProvider = Provider.of<CartProvider>(context, listen: false);
+        //     cartProvider.clearCart();  // Gọi clearCart khi logout
+        //     setState(() {
+        //       _cartFetched = false;
+        //     });
+        //   });
+        // }
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -156,7 +156,7 @@ class _MainLayoutState extends State<MainLayout> {
                       return Container(
                         margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          // color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Stack(

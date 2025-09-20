@@ -16,3 +16,7 @@ const String INGREDIENT_SAUCE = 'SAUCE';
 const String ORDER_TYPE_MENU_MEAL = 'MENU_MEAL';
 const String ORDER_TYPE_CUSTOM_MEAL = 'CUSTOM_MEAL';
 const String ORDER_TYPE_WEEK_MEAL = 'WEEK_MEAL';
+
+
+const String imageCustomMealDefault = 'https://res.cloudinary.com/quyendev/image/upload/v1750922086/Top-blade-beef-steak-300x300_fvv3fj.png';
+
