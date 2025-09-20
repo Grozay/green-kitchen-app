@@ -26,7 +26,7 @@ import 'package:green_kitchen_app/screens/menumeal/menu_meal_screen.dart';
 import 'package:green_kitchen_app/screens/menumeal/menu_detail_screen.dart';
 
 import 'package:green_kitchen_app/screens/cart/cart_screen.dart';
-import 'package:green_kitchen_app/screens/payment/payment_screen.dart';
+import 'package:green_kitchen_app/screens/checkout/checkout_screen.dart';
 import 'package:green_kitchen_app/screens/chat/chat_screen.dart';
 
 final GoRouter router = GoRouter(
@@ -208,9 +208,34 @@ final GoRouter router = GoRouter(
       ],
     ),
     GoRoute(
-      path: '/payment',
+      path: '/checkout',
       builder: (BuildContext context, GoRouterState state) {
-        return const PaymentScreen();
+        return const CheckoutScreen();
+      },
+    ),
+    GoRoute(
+      path: '/tracking',
+      builder: (BuildContext context, GoRouterState state) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: const Text(
+              'Order Tracking',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => context.go('/'),
+            ),
+          ),
+          body: const Center(
+            child: Text('Order Tracking Screen - Coming Soon!'),
+          ),
+        );
       },
     ),
   ],

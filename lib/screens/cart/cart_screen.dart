@@ -286,11 +286,11 @@ class _CartScreenState extends State<CartScreen> {
                             } else {
                               GoRouter.of(
                                 context,
-                              ).push('/payment');
+                              ).push('/checkout');
                             }
                           },
                           child: const Text(
-                            'Confirm and Pay',
+                            'Proceed to Checkout',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
