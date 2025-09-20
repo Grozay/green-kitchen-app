@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import '../../provider/auth_provider.dart';
-import '../../theme/app_colors.dart';
+import '../../widgets/app_layout.dart';
 import './account_info_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -26,26 +25,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.go('/'),
-        ),
-        title: const Text(
-          'Go Back',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        // Remove back button for bottom navigation screens
-        automaticallyImplyLeading: false,
-      ),
+    return AppLayout(
+      title: 'PROFILE',
+      currentIndex: 4, // Assuming profile is index 4 in bottom navigation
       body: const AccountInfoScreen(),
     );
   }

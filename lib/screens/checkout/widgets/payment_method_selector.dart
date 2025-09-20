@@ -29,31 +29,26 @@ class PaymentMethodSelector extends StatelessWidget {
       child: Column(
         children: [
           _buildPaymentOption(
-            'cash',
+            'cod',
             'Thanh toán khi nhận hàng (COD)',
-            Icons.money,
+            Icons.local_shipping,
             'Thanh toán bằng tiền mặt khi nhận hàng',
+            AppColors.primary,
           ),
           const SizedBox(height: 12),
           _buildPaymentOption(
-            'momo',
-            'Ví MoMo',
-            Icons.account_balance_wallet,
-            'Thanh toán nhanh qua ví điện tử MoMo',
-          ),
-          const SizedBox(height: 12),
-          _buildPaymentOption(
-            'zalopay',
-            'ZaloPay',
+            'paypal',
+            'Thanh toán qua PayPal',
             Icons.payment,
-            'Thanh toán nhanh qua ZaloPay',
+            'Thanh toán an toàn qua PayPal với thẻ hoặc tài khoản PayPal',
+            const Color(0xFF0070ba),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentOption(String value, String title, IconData icon, String description) {
+  Widget _buildPaymentOption(String value, String title, IconData icon, String description, Color iconColor) {
     final isSelected = selectedMethod == value;
 
     return GestureDetector(
@@ -73,12 +68,12 @@ class PaymentMethodSelector extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.secondary.withValues(alpha: 0.1) : AppColors.backgroundAlt,
+                color: isSelected ? iconColor.withValues(alpha: 0.1) : AppColors.backgroundAlt,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
-                color: isSelected ? AppColors.secondary : AppColors.textSecondary,
+                color: isSelected ? iconColor : AppColors.textSecondary,
                 size: 24,
               ),
             ),

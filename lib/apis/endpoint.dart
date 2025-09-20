@@ -25,6 +25,7 @@ class ApiEndpoints {
   static const String changePassword = '$baseUrl/customers/updatePassword';
 
   static String trackOrder(String orderCode) => '$baseUrl/orders/search/$orderCode';
+  static String createOrder() => '$baseUrl/orders'; //post
 
   //endpoint
   // static const String baseUrl = 'http://192.168.1.23:8080';

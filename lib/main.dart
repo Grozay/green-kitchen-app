@@ -4,6 +4,7 @@ import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/provider/custom_meal_provider.dart';
 import 'package:green_kitchen_app/provider/save_custom_meal_provider.dart';
 import 'package:green_kitchen_app/services/custom_meal_service.dart';
+import 'package:green_kitchen_app/services/order_service.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:green_kitchen_app/routers/router.dart';
@@ -35,6 +36,9 @@ void main() async {
 
   // Initialize CustomMealService (add this line)
   await CustomMealService().init();
+
+  // Initialize OrderService
+  await OrderService.init();
 
   runApp(
     MultiProvider(
