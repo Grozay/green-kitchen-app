@@ -1,58 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:green_kitchen_app/provider/cart_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import '../theme/app_colors.dart';
-import 'home_screen/home_screen.dart';
-import 'menu_screen/menu_screen.dart';
-import 'tracking_screen/tracking_screen.dart';
-import 'more_screen/more_screen.dart';
-import '../provider/auth_provider.dart';
-import '../constants/app_constants.dart';
+import 'package:provider/provider.dart';
+import '../../theme/app_colors.dart';
+import '../../provider/cart_provider.dart';
+import '../../provider/auth_provider.dart';
+import '../../constants/app_constants.dart';
 
-class MainLayout extends StatefulWidget {
-  final int initialIndex;
+class AppLayout extends StatelessWidget {
+  final Widget body;
+  final String title;
+  final int currentIndex;
+  final bool showFloatingChat;
 
-  const MainLayout({super.key, this.initialIndex = 0});
-
-  @override
-  State<MainLayout> createState() => _MainLayoutState();
-}
-
-class _MainLayoutState extends State<MainLayout> {
-  late int _selectedIndex;
-  bool _cartFetched = false; // Flag để tránh fetch nhiều lần
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedIndex = widget.initialIndex;
-  }
+  const AppLayout({
+    super.key,
+    required this.body,
+    required this.title,
+    this.currentIndex = 0,
+    this.showFloatingChat = true,
+  });
 
   void _onItemTapped(int index, BuildContext context) {
-    
-    if (index == 3) {
-      context.go('/ai-chat');
-      return;
-    }
-
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  Widget _getCurrentScreen() {
-    switch (_selectedIndex) {
+    switch (index) {
       case 0:
-        return const HomeScreen();
+        context.go('/');
+        break;
       case 1:
-        return const MenuScreen();
+        context.go('/menu');
+        break;
       case 2:
-        return const TrackingScreen();
+        context.go('/tracking');
+        break;
+      case 3:
+        context.go('/chat');
+        break;
       case 4:
-        return const MoreScreen();
-      default:
-        return const HomeScreen();
+        context.go('/more');
+        break;
     }
   }
 
@@ -60,29 +44,6 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        final customerId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
-
-        // Fetch cart nếu user đã login và chưa fetch
-        if (authProvider.isAuthenticated && !_cartFetched && customerId != 0) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final cartProvider = Provider.of<CartProvider>(context, listen: false);
-            cartProvider.fetchCart(customerId);
-            setState(() {
-              _cartFetched = true;
-            });
-          });
-        }
-
-        // Clear cart khi logout
-        // if (!authProvider.isAuthenticated && _cartFetched) {
-        //   WidgetsBinding.instance.addPostFrameCallback((_) {
-        //     final cartProvider = Provider.of<CartProvider>(context, listen: false);
-        //     cartProvider.clearCart();  // Gọi clearCart khi logout
-        //     setState(() {
-        //       _cartFetched = false;
-        //     });
-        //   });
-        // }
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -130,9 +91,9 @@ class _MainLayoutState extends State<MainLayout> {
                     tooltip: 'Go to Profile',
                   ),
                 ),
-                title: const Text(
-                  'GREEN KITCHEN',
-                  style: TextStyle(
+                title: Text(
+                  title,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -156,7 +117,6 @@ class _MainLayoutState extends State<MainLayout> {
                       return Container(
                         margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
-                          // color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Stack(
@@ -206,8 +166,8 @@ class _MainLayoutState extends State<MainLayout> {
               ),
             ),
           ),
-          body: _getCurrentScreen(),
-          floatingActionButton: _buildFloatingChat(context),
+          body: body,
+          // floatingActionButton: showFloatingChat ? _buildFloatingChat(context) : null,
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -220,7 +180,7 @@ class _MainLayoutState extends State<MainLayout> {
               ],
             ),
             child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
+              currentIndex: currentIndex,
               onTap: (index) => _onItemTapped(index, context),
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.white,
@@ -265,11 +225,11 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
-  Widget? _buildFloatingChat(BuildContext context) {
+  Widget _buildFloatingChat(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     // Ẩn trên các route bị chặn
     for (final prefix in ChatBubbleConfig.hiddenRoutePrefixes) {
-      if (location.startsWith(prefix)) return null;
+      if (location.startsWith(prefix)) return const SizedBox.shrink();
     }
 
     return Container(

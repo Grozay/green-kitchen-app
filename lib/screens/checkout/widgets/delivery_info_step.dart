@@ -4,6 +4,7 @@ import '../../../provider/auth_provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../widgets/custom_text_field.dart';
 import 'store_selector.dart';
+import 'delivery_time_selector.dart';
 
 class DeliveryInfoStep extends StatefulWidget {
   final Map<String, dynamic> formData;
@@ -108,7 +109,17 @@ class _DeliveryInfoStepState extends State<DeliveryInfoStep> {
 
             const SizedBox(height: 24),
 
-            // Store Selection Section
+            // Delivery Time Section
+            _buildSectionHeader('Thời gian giao hàng'),
+            const SizedBox(height: 16),
+            DeliveryTimeSelector(
+              selectedDateTime: widget.formData['deliveryTime'],
+              onTimeSelected: (dateTime) {
+                widget.onFormDataChanged('deliveryTime', dateTime);
+              },
+            ),
+
+            const SizedBox(height: 24),
             _buildSectionHeader('Chọn cửa hàng giao hàng'),
             const SizedBox(height: 16),
             StoreSelector(

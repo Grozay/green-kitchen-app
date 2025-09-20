@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
+import '../../../services/store_service.dart';
 
 class Store {
   final String id;
@@ -7,6 +8,8 @@ class Store {
   final String address;
   final double distance;
   final String estimatedTime;
+  final double latitude;
+  final double longitude;
 
   const Store({
     required this.id,
@@ -14,7 +17,31 @@ class Store {
     required this.address,
     required this.distance,
     required this.estimatedTime,
+    required this.latitude,
+    required this.longitude,
   });
+
+  factory Store.fromMap(Map<String, dynamic> map, double userLat, double userLon) {
+    final distance = StoreService.calculateDistance(
+      userLat,
+      userLon,
+      map['latitude'] as double,
+      map['longitude'] as double,
+    );
+
+    final deliveryTime = StoreService.estimateDeliveryTime(distance);
+    final estimatedTime = '${deliveryTime.inMinutes}-${deliveryTime.inMinutes + 10} phút';
+
+    return Store(
+      id: map['id'].toString(),
+      name: map['name'] as String,
+      address: map['address'] as String,
+      distance: double.parse(distance.toStringAsFixed(1)),
+      estimatedTime: estimatedTime,
+      latitude: map['latitude'] as double,
+      longitude: map['longitude'] as double,
+    );
+  }
 }
 
 class StoreSelector extends StatefulWidget {
@@ -32,33 +59,115 @@ class StoreSelector extends StatefulWidget {
 }
 
 class _StoreSelectorState extends State<StoreSelector> {
-  // Mock store data - in real app this would come from API
-  final List<Store> _stores = [
-    const Store(
-      id: '1',
-      name: 'Green Kitchen - Nguyễn Du',
-      address: '123 Nguyễn Du, Quận 1, TP.HCM',
-      distance: 2.5,
-      estimatedTime: '25-35 phút',
-    ),
-    const Store(
-      id: '2',
-      name: 'Green Kitchen - Lê Lợi',
-      address: '456 Lê Lợi, Quận 3, TP.HCM',
-      distance: 3.2,
-      estimatedTime: '30-40 phút',
-    ),
-    const Store(
-      id: '3',
-      name: 'Green Kitchen - Võ Văn Tần',
-      address: '789 Võ Văn Tần, Quận 3, TP.HCM',
-      distance: 1.8,
-      estimatedTime: '20-30 phút',
-    ),
-  ];
+  List<Store> _stores = [];
+  bool _isLoading = true;
+  String? _error;
+
+  // Mock user location (TP.HCM center for demo)
+  final double _userLat = 10.762622;
+  final double _userLon = 106.660172;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStores();
+  }
+
+  Future<void> _loadStores() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      // Get nearest stores from StoreService
+      final storesData = await StoreService.findNearestStores(
+        _userLat,
+        _userLon,
+        limit: 3,
+      );
+
+      final stores = storesData.map((storeData) {
+        return Store.fromMap(storeData, _userLat, _userLon);
+      }).toList();
+
+      setState(() {
+        _stores = stores;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Không thể tải danh sách cửa hàng: $e';
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Column(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Đang tải danh sách cửa hàng...'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_error != null) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _error!,
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadStores,
+              child: const Text('Thử lại'),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -75,13 +184,23 @@ class _StoreSelectorState extends State<StoreSelector> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Chọn cửa hàng gần nhất',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Text(
+                'Chọn cửa hàng gần nhất',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                onPressed: _loadStores,
+                icon: const Icon(Icons.refresh),
+                tooltip: 'Làm mới',
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           ..._stores.map((store) => _buildStoreOption(store)),

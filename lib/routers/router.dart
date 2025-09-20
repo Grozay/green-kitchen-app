@@ -6,11 +6,10 @@ import 'package:green_kitchen_app/screens/auth_screen/login_screen.dart';
 import 'package:green_kitchen_app/screens/auth_screen/register_screen.dart';
 import 'package:green_kitchen_app/screens/auth_screen/phone_login_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/custom_meal_review_screen.dart';
-import 'package:green_kitchen_app/screens/custom_meal/custom_meal_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/save_custom_meal_review_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/save_custom_meal_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/your_custom_meal_screen.dart';
-import 'package:green_kitchen_app/screens/main_layout.dart';
+import 'package:green_kitchen_app/screens/home_screen/home_screen.dart';
 import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
 import 'package:green_kitchen_app/screens/profile/tabs/faq_tab.dart';
 import 'package:green_kitchen_app/screens/profile/tabs/location_tab.dart';
@@ -19,6 +18,7 @@ import 'package:green_kitchen_app/screens/profile/tabs/about_tab.dart';
 import 'package:green_kitchen_app/screens/profile/tabs/policy_tab.dart';
 import 'package:green_kitchen_app/screens/profile/membership_screen.dart';
 import 'package:green_kitchen_app/screens/profile/order_history_screen.dart';
+import 'package:green_kitchen_app/screens/menu_screen/menu_screen.dart';
 
 import 'package:green_kitchen_app/screens/menumeal/menu_meal_screen.dart';
 // import 'package:green_kitchen_app/screens/week_meal/week_meal_screen.dart';
@@ -28,6 +28,8 @@ import 'package:green_kitchen_app/screens/menumeal/menu_detail_screen.dart';
 import 'package:green_kitchen_app/screens/cart/cart_screen.dart';
 import 'package:green_kitchen_app/screens/checkout/checkout_screen.dart';
 import 'package:green_kitchen_app/screens/chat/chat_screen.dart';
+import 'package:green_kitchen_app/screens/more_screen/more_screen.dart';
+import 'package:green_kitchen_app/screens/tracking_screen/tracking_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -35,7 +37,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const MainLayout(initialIndex: 0);
+        return const HomeScreen();
       },
     ),
     GoRoute(
@@ -214,28 +216,28 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
+      path: '/more',
+      builder: (BuildContext context, GoRouterState state) {
+        return const MoreScreen();
+      },
+    ),
+    GoRoute(
+      path: '/menu',
+      builder: (BuildContext context, GoRouterState state) {
+        return const MenuScreen();
+      },
+    ),
+    GoRoute(
       path: '/tracking',
       builder: (BuildContext context, GoRouterState state) {
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            title: const Text(
-              'Order Tracking',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/'),
-            ),
-          ),
-          body: const Center(
-            child: Text('Order Tracking Screen - Coming Soon!'),
-          ),
-        );
+        return const TrackingScreen();
+      },
+    ),
+    GoRoute(
+      path: '/tracking/:orderCode',
+      builder: (BuildContext context, GoRouterState state) {
+        final orderCode = state.pathParameters['orderCode'];
+        return TrackingScreen(orderCode: orderCode);
       },
     ),
   ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
+import '../../../services/voucher_service.dart';
 
 class Coupon {
   final String id;
@@ -19,6 +20,18 @@ class Coupon {
     required this.minOrder,
     required this.expiryDate,
   });
+
+  factory Coupon.fromMap(Map<String, dynamic> map) {
+    return Coupon(
+      id: map['id'].toString(),
+      code: map['code'] as String,
+      description: map['description'] as String,
+      discount: (map['discountValue'] as num).toDouble(),
+      discountType: (map['discountType'] as String).toLowerCase(),
+      minOrder: (map['minimumOrderValue'] as num?)?.toDouble() ?? 0.0,
+      expiryDate: DateTime.parse(map['expiresAt'] as String),
+    );
+  }
 
   bool get isValid => DateTime.now().isBefore(expiryDate);
 }
@@ -40,37 +53,41 @@ class CouponSelector extends StatefulWidget {
 class _CouponSelectorState extends State<CouponSelector> {
   final TextEditingController _couponController = TextEditingController();
   bool _isExpanded = false;
+  List<Coupon> _availableCoupons = [];
+  bool _isLoading = true;
+  String? _error;
 
-  // Mock coupon data - in real app this would come from API
-  final List<Coupon> _availableCoupons = [
-    Coupon(
-      id: '1',
-      code: 'GREEN10',
-      description: 'Giảm 10% cho đơn hàng từ 100k',
-      discount: 0.1,
-      discountType: 'percentage',
-      minOrder: 100000,
-      expiryDate: DateTime(2024, 12, 31),
-    ),
-    Coupon(
-      id: '2',
-      code: 'SHIPFREE',
-      description: 'Miễn phí giao hàng',
-      discount: 25000,
-      discountType: 'fixed',
-      minOrder: 150000,
-      expiryDate: DateTime(2024, 12, 31),
-    ),
-    Coupon(
-      id: '3',
-      code: 'NEWUSER',
-      description: 'Giảm 50k cho khách hàng mới',
-      discount: 50000,
-      discountType: 'fixed',
-      minOrder: 200000,
-      expiryDate: DateTime(2024, 12, 31),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadVouchers();
+  }
+
+  Future<void> _loadVouchers() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      // For demo, use a mock customer ID
+      const mockCustomerId = 1;
+      final vouchers = await VoucherService.getAvailableVouchers(
+        customerId: mockCustomerId,
+      );
+      final coupons = vouchers.map((voucher) => Coupon.fromMap(voucher)).toList();
+
+      setState(() {
+        _availableCoupons = coupons;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Không thể tải danh sách voucher: $e';
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -78,31 +95,45 @@ class _CouponSelectorState extends State<CouponSelector> {
     super.dispose();
   }
 
-  void _applyCoupon(String code) {
-    final coupon = _availableCoupons.firstWhere(
-      (c) => c.code.toLowerCase() == code.toLowerCase(),
-      orElse: () => throw Exception('Mã giảm giá không hợp lệ'),
-    );
+  void _applyCoupon(String code) async {
+    try {
+      // For demo, use a mock customer ID and order value
+      const mockCustomerId = 1;
+      const mockOrderValue = 100000.0; // Minimum order value for demo
 
-    if (!coupon.isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mã giảm giá đã hết hạn')),
+      final voucher = await VoucherService.validateVoucherCode(
+        code,
+        orderValue: mockOrderValue,
+        customerId: mockCustomerId,
       );
-      return;
+
+      if (!mounted) return;
+
+      if (voucher == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Mã voucher không hợp lệ hoặc không đủ điều kiện')),
+        );
+        return;
+      }
+
+      widget.onCouponSelected({
+        'id': voucher['id'],
+        'code': voucher['code'],
+        'description': voucher['description'],
+        'discount': voucher['discountValue'],
+        'discountType': voucher['discountType'].toLowerCase(),
+        'minOrder': voucher['minimumOrderValue'],
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Đã áp dụng voucher ${voucher['code']}')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Có lỗi xảy ra khi áp dụng voucher')),
+      );
     }
-
-    widget.onCouponSelected({
-      'id': coupon.id,
-      'code': coupon.code,
-      'description': coupon.description,
-      'discount': coupon.discount,
-      'discountType': coupon.discountType,
-      'minOrder': coupon.minOrder,
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Đã áp dụng mã ${coupon.code}')),
-    );
   }
 
   void _removeCoupon() {
@@ -112,6 +143,69 @@ class _CouponSelectorState extends State<CouponSelector> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Column(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Đang tải danh sách voucher...'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_error != null) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _error!,
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadVouchers,
+              child: const Text('Thử lại'),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -135,7 +229,7 @@ class _CouponSelectorState extends State<CouponSelector> {
                 child: TextField(
                   controller: _couponController,
                   decoration: InputDecoration(
-                    hintText: 'Nhập mã giảm giá',
+                    hintText: 'Nhập mã voucher',
                     filled: true,
                     fillColor: AppColors.inputFill,
                     border: OutlineInputBorder(
@@ -169,7 +263,7 @@ class _CouponSelectorState extends State<CouponSelector> {
                       _applyCoupon(_couponController.text);
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Mã giảm giá không hợp lệ')),
+                        const SnackBar(content: Text('Mã voucher không hợp lệ')),
                       );
                     }
                   }
@@ -228,7 +322,7 @@ class _CouponSelectorState extends State<CouponSelector> {
             child: Row(
               children: [
                 Text(
-                  'Mã giảm giá có sẵn',
+                  'Voucher có sẵn',
                   style: TextStyle(
                     color: AppColors.secondary,
                     fontWeight: FontWeight.w600,

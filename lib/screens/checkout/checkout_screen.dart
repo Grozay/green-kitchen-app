@@ -3,15 +3,17 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../provider/cart_provider.dart';
 import '../../provider/auth_provider.dart';
+import '../../services/order_service.dart';
+import '../../models/create_order_request.dart';
 import '../../theme/app_colors.dart';
 import 'widgets/delivery_info_step.dart';
-import 'widgets/checkout_summary_step.dart';
-import 'widgets/order_confirm_step.dart';
+import 'widgets/order_summary_step.dart';
+import 'widgets/order_confirmation_dialog.dart';
 
 enum CheckoutStep {
   deliveryInfo,
   summary,
-  confirm,
+  confirmation,
 }
 
 class CheckoutScreen extends StatefulWidget {
@@ -45,29 +47,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
     } else if (_currentStep == CheckoutStep.summary) {
       setState(() {
-        _currentStep = CheckoutStep.confirm;
+        _currentStep = CheckoutStep.confirmation;
       });
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  void _previousStep() {
-    if (_currentStep == CheckoutStep.summary) {
-      setState(() {
-        _currentStep = CheckoutStep.deliveryInfo;
-      });
-      _pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    } else if (_currentStep == CheckoutStep.confirm) {
-      setState(() {
-        _currentStep = CheckoutStep.summary;
-      });
-      _pageController.previousPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -128,18 +110,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         onFormDataChanged: _onFormDataChanged,
                         onNext: _nextStep,
                       ),
-                      CheckoutSummaryStep(
+                      OrderSummaryStep(
                         formData: _formData,
-                        cart: cart,
                         onFormDataChanged: _onFormDataChanged,
                         onNext: _nextStep,
-                        onPrevious: _previousStep,
                       ),
-                      OrderConfirmStep(
-                        formData: _formData,
-                        cart: cart,
-                        onPrevious: _previousStep,
-                        onOrderPlaced: () => _placeOrder(cartProvider),
+                      OrderConfirmationDialog(
+                        deliveryInfo: _formData,
+                        paymentMethod: _formData['paymentMethod'] ?? 'cod',
+                        orderSummary: {
+                          'items': cart.cartItems.map((item) => {
+                            'name': item.title,
+                            'quantity': item.quantity,
+                            'price': item.unitPrice,
+                            'totalPrice': item.totalPrice,
+                          }).toList(),
+                          'subtotal': cart.totalAmount,
+                          'shippingFee': _formData['shippingFee'] ?? 0.0,
+                          'membershipDiscount': _formData['membershipDiscount'] ?? 0.0,
+                          'couponDiscount': _formData['couponDiscount'] ?? 0.0,
+                          'total': (cart.totalAmount + (_formData['shippingFee'] ?? 0.0)) -
+                                   (_formData['membershipDiscount'] ?? 0.0) -
+                                   (_formData['couponDiscount'] ?? 0.0),
+                        },
+                        onConfirm: () {
+                          Navigator.of(context).pop();
+                          _placeOrder(cartProvider);
+                        },
+                        onCancel: () => Navigator.of(context).pop(),
                       ),
                     ],
                   ),
@@ -161,7 +159,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           _buildStepLine(),
           _buildStepCircle(CheckoutStep.summary, 'Tóm tắt'),
           _buildStepLine(),
-          _buildStepCircle(CheckoutStep.confirm, 'Xác nhận'),
+          _buildStepCircle(CheckoutStep.confirmation, 'Xác nhận'),
         ],
       ),
     );
@@ -226,24 +224,125 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _placeOrder(CartProvider cartProvider) async {
     try {
-      // TODO: Implement actual order placement
-      await Future.delayed(const Duration(seconds: 2));
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final cart = cartProvider.cart;
 
-      // Show success and navigate to tracking
+      if (cart == null || authProvider.currentUser == null) {
+        throw Exception('Missing cart or user information');
+      }
+
+      // Prepare order data
+      final customerId = int.parse(authProvider.currentUser!.id);
+
+      final paymentMethod = _formData['paymentMethod'] ?? 'cod';
+      final subtotal = cart.totalAmount;
+      final shippingFee = _formData['shippingFee'] ?? 0.0;
+      final membershipDiscount = _formData['membershipDiscount'] ?? 0.0;
+      final couponDiscount = _formData['couponDiscount'] ?? 0.0;
+      final totalAmount = subtotal + shippingFee - membershipDiscount - couponDiscount;
+
+      final orderItems = cart.cartItems.map((item) {
+        // Determine item type
+        String itemType;
+        int? menuMealId;
+        int? customMealId;
+
+        if (item.menuMeal != null) {
+          itemType = 'MENU_MEAL';
+          menuMealId = item.menuMeal!.id;
+        } else if (item.customMeal != null) {
+          itemType = 'CUSTOM_MEAL';
+          customMealId = item.customMeal!.id;
+        } else {
+          throw Exception('Invalid cart item: no menuMeal or customMeal');
+        }
+
+        return OrderItemRequest(
+          itemType: itemType,
+          menuMealId: menuMealId,
+          customMealId: customMealId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        );
+      }).toList();
+
+      // Step 1: Create order
+      final order = await OrderService.createOrder(
+        customerId: customerId,
+        street: _formData['address'] ?? '',
+        ward: _formData['ward'] ?? '',
+        district: _formData['district'] ?? '',
+        city: _formData['city'] ?? '',
+        recipientName: _formData['fullName'] ?? '',
+        recipientPhone: _formData['phone'] ?? '',
+        deliveryTime: _formData['deliveryTime'],
+        subtotal: subtotal,
+        shippingFee: shippingFee,
+        totalAmount: totalAmount,
+        paymentMethod: paymentMethod,
+        orderItems: orderItems,
+        membershipDiscount: membershipDiscount,
+        couponDiscount: couponDiscount,
+        notes: _formData['note'],
+      );
+
+      // Step 2: Process payment (only if order creation succeeded)
+      try {
+        if (paymentMethod == 'cod') {
+          await OrderService.processCodPayment(
+            orderId: order.id.toString(),
+            amount: totalAmount,
+          );
+        } else if (paymentMethod == 'paypal') {
+          // PayPal processing would be handled in the PayPal payment flow
+          // For now, we'll assume it's already processed
+        }
+      } catch (paymentError) {
+        // Payment processing failed, but order was created
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Đơn hàng đã được tạo thành công! Mã: ${order.orderCode}. Lỗi thanh toán: $paymentError'),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+          context.go('/tracking/${order.orderCode}');
+        }
+        return; // Exit early since order was created but payment failed
+      }
+
+      // Step 3: Clear cart (only if both order creation and payment succeeded)
+      try {
+        await cartProvider.clearCart();
+      } catch (cartError) {
+        // Cart clearing failed, but order was created and payment processed
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Đơn hàng thành công! Mã: ${order.orderCode}. Lỗi xóa giỏ hàng: $cartError'),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      }
+
+      // Step 4: Show success and navigate to tracking
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đặt hàng thành công!'),
+          SnackBar(
+            content: Text('Đặt hàng thành công! Mã đơn hàng: ${order.orderCode}'),
             backgroundColor: Colors.green,
           ),
         );
-        context.go('/tracking');
+        context.go('/tracking/${order.orderCode}');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Có lỗi xảy ra: $e'),
+            content: Text('Có lỗi xảy ra khi tạo đơn hàng: $e'),
             backgroundColor: Colors.red,
           ),
         );
