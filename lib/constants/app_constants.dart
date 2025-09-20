@@ -1,9 +1,10 @@
+import '../apis/endpoint.dart';
+
 // App constants for Chat/WebSocket
-const CURRENT_CUSTOMER_ID = 4;
+const int CURRENT_CUSTOMER_ID = 11;
 class ChatSocketConfig {
   // SockJS/STOMP endpoint (Spring Boot starter websocket)
-  // Ví dụ: http://<host>:<port>/apis/v1/ws
-  static const String wsEndpoint = 'http://192.168.1.252:8080/apis/v1/ws';
+  static String get wsEndpoint => '${ApiEndpoints.baseUrl}/ws';
 
   // Heartbeat
   static const Duration heartbeatOutgoing = Duration(seconds: 10);

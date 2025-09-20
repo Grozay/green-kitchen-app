@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../theme/app_colors.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -38,9 +39,17 @@ class MoreScreen extends StatelessWidget {
                 children: [
                   _buildMenuCard(
                     context,
+                    icon: Icons.chat,
+                    title: 'Chat Support',
+                    onTap: () => context.go('/chat'),
+                  ),
+                  const SizedBox(height: 16),
+
+                  _buildMenuCard(
+                    context,
                     icon: Icons.location_on,
                     title: 'Store Location',
-                    onTap: () => _navigateToPage(context, 'Store Location'),
+                    onTap: () => context.go('/profile/location'),
                   ),
                   const SizedBox(height: 16),
 
@@ -48,7 +57,7 @@ class MoreScreen extends StatelessWidget {
                     context,
                     icon: Icons.info,
                     title: 'About Us',
-                    onTap: () => _navigateToPage(context, 'About Us'),
+                    onTap: () => context.go('/profile/faq'),
                   ),
                   const SizedBox(height: 16),
 
@@ -56,7 +65,7 @@ class MoreScreen extends StatelessWidget {
                     context,
                     icon: Icons.contact_mail,
                     title: 'Contact',
-                    onTap: () => _navigateToPage(context, 'Contact'),
+                    onTap: () => context.go('/profile/feedback'),
                   ),
                   const SizedBox(height: 16),
 
@@ -64,7 +73,7 @@ class MoreScreen extends StatelessWidget {
                     context,
                     icon: Icons.help,
                     title: 'FAQ',
-                    onTap: () => _navigateToPage(context, 'FAQ'),
+                    onTap: () => context.go('/profile/faq'),
                   ),
                   const SizedBox(height: 16),
 

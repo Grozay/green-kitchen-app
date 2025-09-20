@@ -95,7 +95,13 @@ class ChatWebSocketService {
           final Map<String, dynamic> data = jsonDecode(body) as Map<String, dynamic>;
           final message = ChatResponse.fromJson(data);
           print('📨 Parsed message: ${message.content} from ${message.senderRole}');
-          _messageStreamController.add(message);
+          
+          // Kiểm tra stream chưa bị đóng trước khi add
+          if (!_messageStreamController.isClosed) {
+            _messageStreamController.add(message);
+          } else {
+            print('⚠️ Cannot add message: Stream is closed');
+          }
         } catch (e) {
           print('❌ Error parsing message: $e');
         }
@@ -125,7 +131,11 @@ class ChatWebSocketService {
     if (client != null && client.connected) {
       client.deactivate();
     }
-    await _messageStreamController.close();
+    
+    // Chỉ close stream nếu chưa bị đóng
+    if (!_messageStreamController.isClosed) {
+      await _messageStreamController.close();
+    }
   }
 
   // no-op helpers

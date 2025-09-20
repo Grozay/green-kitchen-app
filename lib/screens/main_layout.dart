@@ -8,6 +8,7 @@ import 'tracking_screen/tracking_screen.dart';
 import 'profile/profile_screen.dart';
 import 'more_screen/more_screen.dart';
 import '../provider/auth_provider.dart';
+import '../constants/app_constants.dart';
 
 class MainLayout extends StatefulWidget {
   final int initialIndex;
@@ -149,59 +150,7 @@ class _MainLayoutState extends State<MainLayout> {
             ),
           ),
           body: _getCurrentScreen(),
-          floatingActionButton: Container(
-            height: 60,
-            width: 60,
-            margin: const EdgeInsets.only(bottom: 10),
-            child: FloatingActionButton(
-              onPressed: () {
-                // TODO: Navigate to AI chat screen when created
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text(
-                      '🤖 AI Chat feature coming soon!',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    backgroundColor: AppColors.primary,
-                    duration: const Duration(seconds: 2),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                );
-              },
-              backgroundColor: Colors.transparent,
-              elevation: 8,
-              child: Container(
-                height: 60,
-                width: 60,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primary,
-                      AppColors.primary.withValues(alpha: 0.8),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.chat_bubble_outline,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-            ),
-          ),
+          floatingActionButton: _buildFloatingChat(context),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -258,6 +207,54 @@ class _MainLayoutState extends State<MainLayout> {
           ),
         );
       },
+    );
+  }
+
+  Widget? _buildFloatingChat(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+    // Ẩn trên các route bị chặn
+    for (final prefix in ChatBubbleConfig.hiddenRoutePrefixes) {
+      if (location.startsWith(prefix)) return null;
+    }
+
+    return Container(
+      height: 60,
+      width: 60,
+      margin: const EdgeInsets.only(bottom: 10),
+      child: FloatingActionButton(
+        onPressed: () {
+          context.go('/chat');
+        },
+        backgroundColor: Colors.transparent,
+        elevation: 8,
+        child: Container(
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primary,
+                AppColors.primary.withValues(alpha: 0.8),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.chat_bubble_outline,
+            color: Colors.white,
+            size: 28,
+          ),
+        ),
+      ),
     );
   }
 }
