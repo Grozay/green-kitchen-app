@@ -74,7 +74,11 @@ class ApiEndpoints {
   static const Duration receiveTimeout = Duration(seconds: 30);
 
   //profile
-  
+
+  // Feedback endpoints
+  static const String submitFeedback = '$baseUrl/support/feedback';
+  static const String submitSupportRequest = '$baseUrl/support/ticket';
+
 }
 
 // //endpoint

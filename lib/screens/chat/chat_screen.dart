@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../provider/chat_provider.dart';
@@ -19,6 +21,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   late AnimationController _typingAnimationController;
   late List<AnimationController> _messageControllers;
   late List<Animation<Offset>> _messageAnimations;
+
+  // Tap counter cho double tap gesture
+  int _tapCount = 0;
+  DateTime? _lastTap;
+  Timer? _tapResetTimer;
 
   @override
   void initState() {
@@ -112,6 +119,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    // Cleanup timer
+    _tapResetTimer?.cancel();
+
     // Chỉ disconnect WebSocket nhưng giữ lại conversation
     context.read<ChatProvider>().disconnectButKeepConversation();
     _controller.dispose();
@@ -452,117 +462,174 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     ),
                   ),
                 Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: chat.messages.length + (chat.aiTyping ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        // Hiển thị typing indicator ở cuối danh sách
-                        if (index == chat.messages.length && chat.aiTyping) {
-                          return SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0, 0.3),
-                              end: Offset.zero,
-                            ).animate(CurvedAnimation(
-                              parent: AnimationController(
-                                duration: const Duration(milliseconds: 300),
-                                vsync: this,
-                              )..forward(),
-                              curve: Curves.easeOutCubic,
-                            )),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 16, left: 8),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(4),
-                                    topRight: Radius.circular(20),
-                                    bottomLeft: Radius.circular(20),
-                                    bottomRight: Radius.circular(20),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 32,
-                                      height: 32,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            AppColors.primary.withValues(alpha: 0.8),
-                                            AppColors.primary,
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: const Icon(
-                                        Icons.smart_toy,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    const Text(
-                                      'AI đang trả lời...',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    _buildTypingIndicator(),
-                                  ],
-                                ),
+                  child: GestureDetector(
+                    onTap: () {
+                      final now = DateTime.now();
+
+                      // Handle double tap để scroll to bottom
+                      if (_lastTap != null && now.difference(_lastTap!) < const Duration(milliseconds: 300)) {
+                        _tapCount++;
+                        if (_tapCount >= 2) {
+                          _tapCount = 0;
+                          _lastTap = null;
+
+                          // Cancel previous timer
+                          _tapResetTimer?.cancel();
+
+                          _autoScrollToBottom(forceScroll: true);
+
+                          // Haptic feedback cho double tap
+                          HapticFeedback.mediumImpact();
+
+                          // Hiển thị snackbar thông báo
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Đã cuộn xuống cuối'),
+                              duration: const Duration(seconds: 1),
+                              backgroundColor: AppColors.secondary,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                           );
+
+                          debugPrint('🔄 Double tap detected - scrolled to bottom');
+                          return;
                         }
-                    
-                        final m = chat.messages[index];
-                        final isMine = m.isFromCustomer;
-                        debugPrint('🎨 Building message $index: "${m.content}" from ${m.senderRole} (isMine: $isMine)');
+                      } else {
+                        _tapCount = 1;
+                      }
 
-                        Widget messageWidget;
+                      _lastTap = now;
 
-                        // Sử dụng ProductMessageBubble cho tin nhắn có menu
-                        if (m.hasMenu && m.menu!.isNotEmpty) {
-                          messageWidget = ProductMessageBubble(
-                            message: m,
-                            isMine: isMine,
+                      // Set timer để reset tap count sau 300ms
+                      _tapResetTimer?.cancel();
+                      _tapResetTimer = Timer(const Duration(milliseconds: 300), () {
+                        _tapCount = 0;
+                        _lastTap = null;
+                      });
+
+                      // Ẩn keyboard khi tap vào vùng chat (single tap)
+                      FocusScope.of(context).unfocus();
+
+                      // Thêm haptic feedback nhẹ
+                      HapticFeedback.selectionClick();
+
+                      debugPrint('🔽 Keyboard hidden by chat tap');
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: chat.messages.length + (chat.aiTyping ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          // Hiển thị typing indicator ở cuối danh sách
+                          if (index == chat.messages.length && chat.aiTyping) {
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.3),
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(
+                                parent: AnimationController(
+                                  duration: const Duration(milliseconds: 300),
+                                  vsync: this,
+                                )..forward(),
+                                curve: Curves.easeOutCubic,
+                              )),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 16, left: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(4),
+                                      topRight: Radius.circular(20),
+                                      bottomLeft: Radius.circular(20),
+                                      bottomRight: Radius.circular(20),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 32,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              AppColors.primary.withValues(alpha: 0.8),
+                                              AppColors.primary,
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        child: const Icon(
+                                          Icons.smart_toy,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Text(
+                                        'AI đang trả lời...',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      _buildTypingIndicator(),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          final m = chat.messages[index];
+                          final isMine = m.isFromCustomer;
+                          debugPrint('🎨 Building message $index: "${m.content}" from ${m.senderRole} (isMine: $isMine)');
+
+                          Widget messageWidget;
+
+                          // Sử dụng ProductMessageBubble cho tin nhắn có menu
+                          if (m.hasMenu && m.menu!.isNotEmpty) {
+                            messageWidget = ProductMessageBubble(
+                              message: m,
+                              isMine: isMine,
+                            );
+                          } else {
+                            // Tin nhắn thường với animation
+                            messageWidget = SlideTransition(
+                              position: index < _messageAnimations.length
+                                  ? _messageAnimations[index]
+                                  : const AlwaysStoppedAnimation(Offset.zero),
+                              child: _buildMessageBubble(m, isMine),
+                            );
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: messageWidget,
                           );
-                        } else {
-                          // Tin nhắn thường với animation
-                          messageWidget = SlideTransition(
-                            position: index < _messageAnimations.length
-                                ? _messageAnimations[index]
-                                : const AlwaysStoppedAnimation(Offset.zero),
-                            child: _buildMessageBubble(m, isMine),
-                          );
-                        }
-
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: messageWidget,
-                        );
-                  },
-                  )
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-              ),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
