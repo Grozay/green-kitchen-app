@@ -55,7 +55,7 @@ class MenuScreen extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      onTap: () => GoRouter.of(context).push('/menumeal'),
+                      onTap: () => GoRouter.of(context).push('/menu-meal'),
                     ),
                     _buildMenuCard(
                       context,
@@ -67,7 +67,7 @@ class MenuScreen extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      onTap: () => GoRouter.of(context).push('/menumeal'),
+                      onTap: () => GoRouter.of(context).push('/custom-meal'),
                     ),
                     _buildMenuCard(
                       context,

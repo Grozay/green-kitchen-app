@@ -95,7 +95,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                   color: AppColors.textPrimary,
                 ),
                 onPressed: () {
-                  GoRouter.of(context).push('/menumeal');
+                  GoRouter.of(context).push('/menu-meal');
                 },
               ),
               title: const Text(

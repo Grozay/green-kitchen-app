@@ -64,22 +64,26 @@ class meal_part_selector extends StatelessWidget {
           Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.70,
-                ),
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  final quantity = getItemQuantity(item);
-                  return MealItemCard(
-                    item: item,
-                    quantity: quantity,
-                    onIncrease: () => onIncreaseQuantity(item),
-                    onDecrease: () => onDecreaseQuantity(item),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double itemWidth = (constraints.maxWidth - 8) / 2; // 2 cột với spacing 8
+                  if (itemWidth < 160) itemWidth = constraints.maxWidth - 16; // 1 cột nếu quá nhỏ
+
+                  return Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: items.map((item) {
+                      final quantity = getItemQuantity(item);
+                      return SizedBox(
+                        width: itemWidth,
+                        child: MealItemCard(
+                          item: item,
+                          quantity: quantity,
+                          onIncrease: () => onIncreaseQuantity(item),
+                          onDecrease: () => onDecreaseQuantity(item),
+                        ),
+                      );
+                    }).toList(),
                   );
                 },
               ),

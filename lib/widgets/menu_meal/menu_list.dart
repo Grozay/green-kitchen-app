@@ -20,7 +20,6 @@ class MenuList extends StatelessWidget {
     if (loading) {
       return LayoutBuilder(
         builder: (context, constraints) {
-          // Tính width mỗi item dựa trên constraints thay vì MediaQuery cố định
           double itemWidth = (constraints.maxWidth - 8) / 2; // 2 cột với spacing 8
           if (itemWidth < 160) itemWidth = constraints.maxWidth - 16; // 1 cột nếu quá nhỏ
 
