@@ -8,6 +8,7 @@ import 'menu_screen/menu_screen.dart';
 import 'tracking_screen/tracking_screen.dart';
 import 'more_screen/more_screen.dart';
 import '../provider/auth_provider.dart';
+import '../constants/app_constants.dart';
 
 class MainLayout extends StatefulWidget {
   final int initialIndex;
@@ -73,15 +74,15 @@ class _MainLayoutState extends State<MainLayout> {
         }
 
         // Clear cart khi logout
-        if (!authProvider.isAuthenticated && _cartFetched) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final cartProvider = Provider.of<CartProvider>(context, listen: false);
-            cartProvider.clearCart();  // Gọi clearCart khi logout
-            setState(() {
-              _cartFetched = false;
-            });
-          });
-        }
+        // if (!authProvider.isAuthenticated && _cartFetched) {
+        //   WidgetsBinding.instance.addPostFrameCallback((_) {
+        //     final cartProvider = Provider.of<CartProvider>(context, listen: false);
+        //     cartProvider.clearCart();  // Gọi clearCart khi logout
+        //     setState(() {
+        //       _cartFetched = false;
+        //     });
+        //   });
+        // }
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -155,7 +156,7 @@ class _MainLayoutState extends State<MainLayout> {
                       return Container(
                         margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          // color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Stack(
@@ -206,6 +207,7 @@ class _MainLayoutState extends State<MainLayout> {
             ),
           ),
           body: _getCurrentScreen(),
+          floatingActionButton: _buildFloatingChat(context),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -260,6 +262,54 @@ class _MainLayoutState extends State<MainLayout> {
           ),
         );
       },
+    );
+  }
+
+  Widget? _buildFloatingChat(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+    // Ẩn trên các route bị chặn
+    for (final prefix in ChatBubbleConfig.hiddenRoutePrefixes) {
+      if (location.startsWith(prefix)) return null;
+    }
+
+    return Container(
+      height: 60,
+      width: 60,
+      margin: const EdgeInsets.only(bottom: 10),
+      child: FloatingActionButton(
+        onPressed: () {
+          context.go('/chat');
+        },
+        backgroundColor: Colors.transparent,
+        elevation: 8,
+        child: Container(
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primary,
+                AppColors.primary.withValues(alpha: 0.8),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.chat_bubble_outline,
+            color: Colors.white,
+            size: 28,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -95,7 +95,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                   color: AppColors.textPrimary,
                 ),
                 onPressed: () {
-                  GoRouter.of(context).push('/menumeal');
+                  GoRouter.of(context).push('/menu-meal');
                 },
               ),
               title: const Text(
@@ -408,7 +408,8 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                         )
                       : ElevatedButton(
                           onPressed: () async {
-                            final customerId = (authProvider.currentUser?.id as int?) ?? 0;
+                            final customerIdString = authProvider.currentUser?.id;
+                            final customerId = customerIdString != null ? int.parse(customerIdString) : 0;
                             
                             final itemData = {
                               'isCustom': false,
@@ -438,7 +439,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Added to cart!')),
+                                const SnackBar(content: Text('Added to cart!')),
                               );
                             }
                           },

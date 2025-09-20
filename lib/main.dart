@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:green_kitchen_app/provider/cart_provider.dart';
+import 'package:green_kitchen_app/provider/custom_meal_provider.dart';
+import 'package:green_kitchen_app/provider/save_custom_meal_provider.dart';
+import 'package:green_kitchen_app/services/custom_meal_service.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:green_kitchen_app/routers/router.dart';
 // import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
+import 'package:green_kitchen_app/provider/chat_provider.dart';
 
 void main() async {
-  //custom lock screen orientation to portrait only
   WidgetsFlutterBinding.ensureInitialized();
   
   SystemChrome.setPreferredOrientations([
@@ -30,11 +33,15 @@ void main() async {
   final cartProvider = CartProvider();
   await cartProvider.initialize();
 
+  // Initialize CustomMealService (add this line)
+  await CustomMealService().init();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: cartProvider),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
       ],
       child: const MyApp(),
     ),
@@ -51,7 +58,8 @@ class MyApp extends StatelessWidget {
       providers: [
         // ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        // ChangeNotifierProvider(create: (_) => CustomMealProvider()),
+        ChangeNotifierProvider(create: (_) => CustomMealProvider()),
+        ChangeNotifierProvider(create: (_) => SavedCustomMealsProvider()),
 
       ],
       child: MaterialApp.router(title: 'Green Kitchen', routerConfig: router),

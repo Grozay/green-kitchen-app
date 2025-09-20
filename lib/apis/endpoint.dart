@@ -33,12 +33,26 @@ class ApiEndpoints {
   var menuMeals = '$baseUrl/menu-meals/customers';
   var menuMealBySlug = '$baseUrl/menu-meals/customers/slug/:slug';
 
+  // CustomMeal endpoints
+  var createCustomMeal = '$baseUrl/custom-meals';
+  var getCustomMealsForCustomer = '$baseUrl/custom-meals/customer/:customerId';
+  var updateCustomMeal = '$baseUrl/custom-meals/:id';
+
   // Ingredient endpoints
   var ingredients = '$baseUrl/ingredients';
   // var ingredientById = '$baseUrl/ingredients/:id';
 
   // Store endpoints
   var stores = '$baseUrl/stores';
+
+  // Chat endpoints
+  static const String chatRoot = '$baseUrl/chat';
+  static const String initGuest = '$chatRoot/init-guest';
+  static const String send = '$chatRoot/send';
+  static const String messagesPaged = '$chatRoot/messages-paged';
+  static const String messages = '$chatRoot/messages';
+  static const String conversations = '$chatRoot/conversations';
+  static const String markRead = '$chatRoot/mark-read';
 
   //cart
   var getCartByCustomerId = '$baseUrl/carts/customer/:customerId';
@@ -61,7 +75,11 @@ class ApiEndpoints {
   static const Duration receiveTimeout = Duration(seconds: 30);
 
   //profile
-  
+
+  // Feedback endpoints
+  static const String submitFeedback = '$baseUrl/support/feedback';
+  static const String submitSupportRequest = '$baseUrl/support/ticket';
+
 }
 
 // //endpoint

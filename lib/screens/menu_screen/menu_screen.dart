@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:green_kitchen_app/provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_colors.dart';
 
@@ -55,7 +57,7 @@ class MenuScreen extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      onTap: () => GoRouter.of(context).push('/menumeal'),
+                      onTap: () => GoRouter.of(context).push('/menu-meal'),
                     ),
                     _buildMenuCard(
                       context,
@@ -67,8 +69,26 @@ class MenuScreen extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      onTap: () => GoRouter.of(context).push('/menumeal'),
+                      onTap: () => GoRouter.of(context).push('/custom-meal'),
                     ),
+                    if (Provider.of<AuthProvider>(context).isAuthenticated)
+                      _buildMenuCard(
+                        context,
+                        title: 'Your Custom Meals', // Changed title
+                        subtitle: 'View and manage your saved custom meals',
+                        icon: Icons.restaurant_menu, // Changed icon
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.blue.shade400,
+                            Colors.blue.shade300,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onTap: () => GoRouter.of(
+                          context,
+                        ).push('/saved-custom-meal'), // Changed route
+                      ),
                     _buildMenuCard(
                       context,
                       title: 'Weekly Plans',
@@ -88,14 +108,18 @@ class MenuScreen extends StatelessWidget {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: const Text('Open Web Version?'),
-                              content: const Text('Do you want to open the web version of Weekly Meal Planner?'),
+                              content: const Text(
+                                'Do you want to open the web version of Weekly Meal Planner?',
+                              ),
                               actions: <Widget>[
                                 TextButton(
-                                  onPressed: () => Navigator.of(context).pop(false),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
                                   child: const Text('No'),
                                 ),
                                 TextButton(
-                                  onPressed: () => Navigator.of(context).pop(true),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
                                   child: const Text('Yes'),
                                 ),
                               ],
@@ -103,12 +127,16 @@ class MenuScreen extends StatelessWidget {
                           },
                         );
                         if (shouldOpenWeb == true) {
-                          final Uri url = Uri.parse('http://localhost:5173/week-meal-planner');
+                          final Uri url = Uri.parse(
+                            'http://localhost:5173/week-meal-planner',
+                          );
                           if (await canLaunchUrl(url)) {
                             await launchUrl(url);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Could not launch URL')),
+                              const SnackBar(
+                                content: Text('Could not launch URL'),
+                              ),
                             );
                           }
                         }

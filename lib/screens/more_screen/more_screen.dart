@@ -56,9 +56,17 @@ class _MoreScreenState extends State<MoreScreen> {
                 children: [
                   _buildMenuCard(
                     context,
+                    icon: Icons.chat,
+                    title: 'Chat Support',
+                    onTap: () => context.go('/chat'),
+                  ),
+                  const SizedBox(height: 16),
+
+                  _buildMenuCard(
+                    context,
                     icon: Icons.location_on,
                     title: 'Store Location',
-                    onTap: () => _navigateToPage(context, 'Store Location'),
+                    onTap: () => context.go('/location'),
                   ),
                   const SizedBox(height: 16),
 
@@ -66,7 +74,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.info,
                     title: 'About Us',
-                    onTap: () => _navigateToPage(context, 'About Us'),
+                    onTap: () => context.go('/about'),
                   ),
                   const SizedBox(height: 16),
 
@@ -74,7 +82,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.contact_mail,
                     title: 'Contact',
-                    onTap: () => _navigateToPage(context, 'Contact'),
+                    onTap: () => context.go('/feedback'),
                   ),
                   const SizedBox(height: 16),
 
@@ -82,7 +90,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.help,
                     title: 'FAQ',
-                    onTap: () => _navigateToPage(context, 'FAQ'),
+                    onTap: () => context.go('/faq'),
                   ),
                   const SizedBox(height: 16),
 
@@ -90,7 +98,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.policy,
                     title: 'Policy',
-                    onTap: () => _navigateToPage(context, 'Policy'),
+                    onTap: () => context.go('/policy'),
                   ),
                   const SizedBox(height: 16),
 
