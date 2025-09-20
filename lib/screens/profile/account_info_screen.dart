@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../provider/auth_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/edit_profile_dialog.dart';
@@ -150,7 +151,47 @@ class AccountInfoScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Account Information Card
+          // Navigation Cards
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'More Information',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildNavigationCard(
+                    context,
+                    'Membership',
+                    'View your membership details and benefits',
+                    Icons.card_membership,
+                    () => context.go('/profile/membership'),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildNavigationCard(
+                    context,
+                    'Order History',
+                    'View your past orders and track current ones',
+                    Icons.history,
+                    () => context.go('/profile/orderhistory'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -316,6 +357,68 @@ class AccountInfoScreen extends StatelessWidget {
       default:
         return gender;
     }
+  }
+
+  Widget _buildNavigationCard(BuildContext context, String title, String subtitle, IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.backgroundAlt,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.primary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.textSecondary,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   String _formatActivityLevel(String? level) {

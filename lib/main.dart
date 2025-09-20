@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:green_kitchen_app/routers/router.dart';
 // import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';
+import 'package:green_kitchen_app/provider/chat_provider.dart';
 
 void main() async {
   //custom lock screen orientation to portrait only
@@ -38,7 +39,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: cartProvider),
-        
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
       ],
       child: const MyApp(),
     ),

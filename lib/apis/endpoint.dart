@@ -44,6 +44,15 @@ class ApiEndpoints {
   // Store endpoints
   var stores = '$baseUrl/stores';
 
+  // Chat endpoints
+  static const String chatRoot = '$baseUrl/chat';
+  static const String initGuest = '$chatRoot/init-guest';
+  static const String send = '$chatRoot/send';
+  static const String messagesPaged = '$chatRoot/messages-paged';
+  static const String messages = '$chatRoot/messages';
+  static const String conversations = '$chatRoot/conversations';
+  static const String markRead = '$chatRoot/mark-read';
+
   //cart
   var getCartByCustomerId = '$baseUrl/carts/customer/:customerId';
   var addMealToCart = '$baseUrl/carts/customer/items/:customerId';
