@@ -41,6 +41,19 @@ class _LocationTabState extends State<LocationTab> {
     final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      // Fallback: try to open in browser if external app fails
+      final browserUri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving');
+      if (await canLaunchUrl(browserUri)) {
+        await launchUrl(browserUri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể mở Google Maps. Vui lòng cài đặt ứng dụng Google Maps.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
