@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
 import '../services/phone_auth_service.dart';
 import '../services/service.dart';
 import '../apis/endpoint.dart';
+import 'cart_provider.dart';
 
 // AuthProvider manages authentication state
 class AuthProvider with ChangeNotifier {
@@ -62,6 +64,7 @@ class AuthProvider with ChangeNotifier {
         _currentUser = response.user;
         // Fetch customer details from backend
         await _fetchCustomerDetails(email);
+        
         notifyListeners();
         return true;
       } else {
