@@ -66,7 +66,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.location_on,
                     title: 'Store Location',
-                    onTap: () => context.go('/profile/location'),
+                    onTap: () => context.go('/location'),
                   ),
                   const SizedBox(height: 16),
 
@@ -74,7 +74,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.info,
                     title: 'About Us',
-                    onTap: () => context.go('/profile/faq'),
+                    onTap: () => context.go('/about-us'),
                   ),
                   const SizedBox(height: 16),
 
@@ -82,7 +82,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.contact_mail,
                     title: 'Contact',
-                    onTap: () => context.go('/profile/feedback'),
+                    onTap: () => context.go('/feedback'),
                   ),
                   const SizedBox(height: 16),
 
@@ -90,7 +90,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.help,
                     title: 'FAQ',
-                    onTap: () => context.go('/profile/faq'),
+                    onTap: () => context.go('/faq'),
                   ),
                   const SizedBox(height: 16),
 

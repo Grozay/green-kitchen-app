@@ -138,19 +138,19 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/profile/faq',
+      path: '/faq',
       builder: (BuildContext context, GoRouterState state) {
         return const FaqTab();
       },
     ),
     GoRoute(
-      path: '/profile/location',
+      path: '/location',
       builder: (BuildContext context, GoRouterState state) {
         return const LocationTab();
       },
     ),
     GoRoute(
-      path: '/profile/feedback',
+      path: '/feedback',
       builder: (BuildContext context, GoRouterState state) {
         return const FeedbackTab();
       },
