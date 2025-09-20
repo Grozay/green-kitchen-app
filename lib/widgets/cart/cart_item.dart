@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:green_kitchen_app/models/cart.dart';
+import 'package:green_kitchen_app/widgets/menu_meal/meal_card.dart';
+import 'package:intl/intl.dart'; // Thêm import này
 
 class CartItemWidget extends StatelessWidget {
   const CartItemWidget({
@@ -36,13 +38,14 @@ class CartItemWidget extends StatelessWidget {
         children: [
           // Image ở trên cùng
           Center(
-            child:
-                cartItem.image.isEmpty
+            child: cartItem.image.isEmpty
                 ? CircleAvatar(
                     radius: 40,
                     backgroundColor: Colors.grey[400],
                     child: Text(
-                      cartItem.title.isNotEmpty // Thay menuMealTitle bằng title
+                      cartItem
+                              .title
+                              .isNotEmpty // Thay menuMealTitle bằng title
                           ? cartItem.title[0].toUpperCase()
                           : 'M',
                       style: const TextStyle(fontSize: 32, color: Colors.white),
@@ -60,7 +63,9 @@ class CartItemWidget extends StatelessWidget {
                           radius: 40,
                           backgroundColor: Colors.grey[400],
                           child: Text(
-                            cartItem.title.isNotEmpty // Thay menuMealTitle bằng title
+                            cartItem
+                                    .title
+                                    .isNotEmpty // Thay menuMealTitle bằng title
                                 ? cartItem.title[0].toUpperCase()
                                 : 'M',
                             style: const TextStyle(
@@ -79,22 +84,60 @@ class CartItemWidget extends StatelessWidget {
             cartItem.title, // Thay menuMealTitle bằng title
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
+          const SizedBox(height: 16),
+          
+          // Thay Row bằng Wrap để responsive hơn nếu cần
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: CustomPaint(
+              size: const Size(double.infinity, 1),
+              painter: DottedLinePainter(),
+            ),
+          ),
           const SizedBox(height: 8),
+
           Row(
             children: [
               Expanded(
                 child: Text(
-                  '${cartItem.calories.toStringAsFixed(0)} Calories',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  '${cartItem.calories.toStringAsFixed(0)} Cal',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
               Expanded(
-                child: Text('${cartItem.protein.toStringAsFixed(1)}g Protein'),
+                child: Text(
+                  '${cartItem.protein.toStringAsFixed(1)}g Protein',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
               Expanded(
-                child: Text('${cartItem.carbs.toStringAsFixed(1)}g Carbs'),
+                child: Text(
+                  '${cartItem.carbs.toStringAsFixed(1)}g Carbs',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              Expanded(child: Text('${cartItem.fat.toStringAsFixed(1)}g Fat')),
+              Expanded(
+                child: Text(
+                  '${cartItem.fat.toStringAsFixed(1)}g Fat',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ],
           ),
           if (cartItem.menuMeal?.menuIngredients.isNotEmpty ?? false) ...[
@@ -125,7 +168,7 @@ class CartItemWidget extends StatelessWidget {
           const SizedBox(height: 8),
           // Price bên dưới
           Text(
-            '${cartItem.unitPrice.toStringAsFixed(0)} VNĐ',
+            '${NumberFormat('#,###', 'vi_VN').format(cartItem.unitPrice)} VND', // Sửa format
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
           const SizedBox(height: 12),
@@ -138,7 +181,9 @@ class CartItemWidget extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.remove),
                     onPressed: () {
-                      print('Decrease pressed for item ${cartItem.id}, quantity: ${cartItem.quantity}');
+                      print(
+                        'Decrease pressed for item ${cartItem.id}, quantity: ${cartItem.quantity}',
+                      );
                       if (cartItem.quantity > 1) {
                         onDecrease();
                       } else {
@@ -219,7 +264,7 @@ class CartItemWidget extends StatelessWidget {
                               onRemove();
                             },
                             child: const Text(
-                              'Xóa',
+                              'Remove',
                               style: TextStyle(color: Colors.red),
                             ),
                           ),

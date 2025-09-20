@@ -20,10 +20,9 @@ class CustomMealService {
     try {
       final endpoints = ApiEndpoints();
       final response = await _apiService.post(endpoints.createCustomMeal, body: data);
-      print('Response from createCustomMeal: $response'); // Debug response
       return CustomMeal.fromJson(response);
     } catch (e) {
-      print('Error in createCustomMeal: $e'); // Debug error
+      print('Error in createCustomMeal: $e');
       if (e is ApiError) {
         throw Exception('Failed to create custom meal: ${e.message}');
       }
@@ -31,18 +30,35 @@ class CustomMealService {
     }
   }
 
-  // Get custom meal by ID
-  Future<CustomMeal> getCustomMealById(String id) async {
+  // Update a custom meal
+  Future<CustomMeal> updateCustomMeal(int id, Map<String, dynamic> data) async {
     try {
       final endpoints = ApiEndpoints();
-      final url = endpoints.getCustomMealById.replaceFirst(':id', id);
-      final response = await _apiService.get(url);
+      final url = endpoints.updateCustomMeal.replaceFirst(':id', id.toString());
+      final response = await _apiService.put(url, body: data);
       return CustomMeal.fromJson(response);
     } catch (e) {
+      print('Error in updateCustomMeal: $e');
       if (e is ApiError) {
-        throw Exception('Failed to load custom meal: ${e.message}');
+        throw Exception('Failed to update custom meal: ${e.message}');
       }
-      throw Exception('Failed to load custom meal: ${e.toString()}');
+      throw Exception('Failed to update custom meal: ${e.toString()}');
+    }
+  }
+
+  // Get all custom meals for a customer
+  Future<List<CustomMeal>> getCustomMealsForCustomer(int customerId) async {
+    try {
+      final endpoints = ApiEndpoints();
+      final url = endpoints.getCustomMealsForCustomer.replaceFirst(':customerId', customerId.toString()); // Giả định endpoint này tồn tại
+      final response = await _apiService.get(url);
+      // Giả định response là List<Map<String, dynamic>>
+      return (response as List).map((json) => CustomMeal.fromJson(json)).toList();
+    } catch (e) {
+      if (e is ApiError) {
+        throw Exception('Failed to load custom meals: ${e.message}');
+      }
+      throw Exception('Failed to load custom meals: ${e.toString()}');
     }
   }
 }
