@@ -37,6 +37,7 @@ dependencies:
   font_awesome_flutter: ^10.9.1
   url_launcher: ^6.3.1
   
+  intl: ^0.19.0
   # HTTP client for API calls
   http: ^1.5.0
   

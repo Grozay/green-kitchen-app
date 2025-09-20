@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:green_kitchen_app/screens/auth_screen/login_screen.dart';
 import 'package:green_kitchen_app/screens/auth_screen/register_screen.dart';
 import 'package:green_kitchen_app/screens/auth_screen/phone_login_screen.dart';
+import 'package:green_kitchen_app/screens/custom_meal/custom_meal_review_screen.dart';
+import 'package:green_kitchen_app/screens/custom_meal/custom_meal_screen.dart';
 import 'package:green_kitchen_app/screens/main_layout.dart';
 import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
 import 'package:green_kitchen_app/screens/profile/tabs/faq_tab.dart';
@@ -64,7 +66,7 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/menumeal',
+      path: '/menu-meal',
       builder: (BuildContext context, GoRouterState state) {
         return const MenuMealScreen();
       },
@@ -158,6 +160,7 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
+
       path: '/about',
       builder: (BuildContext context, GoRouterState state) {
         return const AboutTab();
@@ -170,11 +173,20 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/custommeal',
+      path: '/custom-meal',
+
       builder: (BuildContext context, GoRouterState state) {
-        // return const CustomMealScreen();
-        return const MenuMealScreen();
+        return const CustomMealScreen();
+        // return const MenuMealScreen();
       },
+      routes: <RouteBase>[
+        GoRoute(
+          path: '/review',
+          builder: (BuildContext context, GoRouterState state) {
+            return const CustomMealReviewScreen();
+          },
+        ),
+      ],
     ),
     // GoRoute(
     //   path: '/meal-detail',

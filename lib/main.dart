@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:green_kitchen_app/provider/cart_provider.dart';
+import 'package:green_kitchen_app/provider/custom_meal_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:green_kitchen_app/routers/router.dart';
@@ -31,15 +32,14 @@ void main() async {
   final cartProvider = CartProvider();
   await cartProvider.initialize();
 
+
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
-        // ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
-        // ChangeNotifierProvider(create: (_) => CustomMealProvider()),
+        ChangeNotifierProvider.value(value: cartProvider),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
-
       ],
       child: const MyApp(),
     ),
@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
       providers: [
         // ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        // ChangeNotifierProvider(create: (_) => CustomMealProvider()),
+        ChangeNotifierProvider(create: (_) => CustomMealProvider()),
 
       ],
       child: MaterialApp.router(title: 'Green Kitchen', routerConfig: router),

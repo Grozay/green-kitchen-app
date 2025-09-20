@@ -33,6 +33,10 @@ class ApiEndpoints {
   var menuMeals = '$baseUrl/menu-meals/customers';
   var menuMealBySlug = '$baseUrl/menu-meals/customers/slug/:slug';
 
+  // CustomMeal endpoints
+  var createCustomMeal = '$baseUrl/custom-meals';
+  var getCustomMealById = '$baseUrl/custom-meals/:id';
+
   // Ingredient endpoints
   var ingredients = '$baseUrl/ingredients';
   // var ingredientById = '$baseUrl/ingredients/:id';

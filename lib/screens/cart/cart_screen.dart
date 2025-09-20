@@ -21,10 +21,7 @@ class _CartScreenState extends State<CartScreen> {
     super.initState();
     // Load cart data when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cartProvider = Provider.of<CartProvider>(
-        context,
-        listen: false,
-      );
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       // Fix: Parse String to int safely
       final customerId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
@@ -41,7 +38,8 @@ class _CartScreenState extends State<CartScreen> {
         final error = cartProvider.error;
 
         // Fix: Parse String to int safely
-        final customerId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
+        final customerId =
+            int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -110,7 +108,9 @@ class _CartScreenState extends State<CartScreen> {
                                   IconButton(
                                     onPressed: () {
                                       cartProvider.clearError();
-                                      cartProvider.fetchCart(customerId); // Thay CURRENT_CUSTOMER_ID
+                                      cartProvider.fetchCart(
+                                        customerId,
+                                      ); // Thay CURRENT_CUSTOMER_ID
                                     },
                                     icon: Icon(
                                       Icons.refresh,
@@ -153,7 +153,7 @@ class _CartScreenState extends State<CartScreen> {
                                     const SizedBox(height: 24),
                                     ElevatedButton(
                                       onPressed: () {
-                                        context.go('/menumeal');
+                                        context.go('/menu-meal');
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.secondary,
@@ -281,13 +281,11 @@ class _CartScreenState extends State<CartScreen> {
                               listen: false,
                             );
                             if (!authProvider.isAuthenticated) {
-                              GoRouter.of(context).push(
-                                '/auth/login',
-                              ); // Chuyển đến login nếu chưa authenticated
+                              _showLoginPrompt(context);
                             } else {
                               GoRouter.of(
                                 context,
-                              ).push('/payment'); // Tiếp tục nếu đã login
+                              ).push('/payment');
                             }
                           },
                           child: const Text(
@@ -333,4 +331,33 @@ class _CartItemWidget extends StatelessWidget {
       onRemove: onRemove,
     );
   }
+}
+
+void _showLoginPrompt(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Login Required'),
+        content: const Text(
+          'You need to log in to place an order. Do you want to go to the login page?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('No'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              GoRouter.of(
+                context,
+              ).push('/auth/login'); // Adjust route as needed
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -32,7 +32,7 @@ class tab_ingredient extends StatelessWidget {
           dividerColor: Colors.transparent,
           dividerHeight: 0,
           tabs: const [
-            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('PROTEIN'))),
+            Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 1), child: Text('PROTEIN'))),
             Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('CARBS'))),
             Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('SIDE'))),
             Tab(child: Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('SAUCE'))),
