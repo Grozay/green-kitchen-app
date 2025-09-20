@@ -225,7 +225,7 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
       onTap: () {
         // Navigate to product detail
         if (product.slug != null) {
-          context.go('/menumeal/${product.slug}');
+          context.go('/menu-meal/${product.slug}');
         }
       },
       child: Container(
