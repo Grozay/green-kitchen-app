@@ -41,8 +41,8 @@ class _LocationTabState extends State<LocationTab> {
   Future<void> _openGoogleMaps(double lat, double lng) async {
     final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving');
     try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
         throw Exception('Không thể mở Google Maps');
       }
@@ -355,7 +355,7 @@ class _LocationTabState extends State<LocationTab> {
         if (Navigator.of(context).canPop()) {
           return true;
         }
-       
+        context.go('/profile');
         return false;
       },
       child: Scaffold(
@@ -368,7 +368,7 @@ class _LocationTabState extends State<LocationTab> {
               Icons.arrow_back_rounded,
               color: AppColors.textPrimary,
             ),
-            onPressed: () => context.pop(),
+            onPressed: () => context.go('/profile'),
           ),
           title: Text(
             'Cửa hàng',
@@ -385,14 +385,14 @@ class _LocationTabState extends State<LocationTab> {
           color: AppColors.secondary,
           child: _loading
               ? _buildLoadingState()
-              : _error != null
+          : _error != null
                   ? _buildErrorState()
                   : _stores.isEmpty
                       ? _buildEmptyState()
-                      : ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _stores.length,
-                          itemBuilder: (context, index) {
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _stores.length,
+                  itemBuilder: (context, index) {
                             return _buildStoreCard(_stores[index]);
                           },
                         ),

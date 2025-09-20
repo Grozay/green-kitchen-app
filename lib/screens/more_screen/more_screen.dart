@@ -74,7 +74,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.info,
                     title: 'About Us',
-                    onTap: () => context.go('/about-us'),
+                    onTap: () => context.go('/about'),
                   ),
                   const SizedBox(height: 16),
 
@@ -98,7 +98,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     context,
                     icon: Icons.policy,
                     title: 'Policy',
-                    onTap: () => _navigateToPage(context, 'Policy'),
+                    onTap: () => context.go('/policy'),
                   ),
                   const SizedBox(height: 16),
 
