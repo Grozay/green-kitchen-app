@@ -195,9 +195,9 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        childAspectRatio: 1.2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        childAspectRatio: 0.99, // Giảm xuống để có đủ không gian cho 5 hàng (ảnh + title + nutrition + description + price)
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
       ),
       itemCount: products.length,
       itemBuilder: (context, index) {
@@ -225,8 +225,12 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
       onTap: () {
         // Navigate to product detail
         if (product.slug != null) {
-          context.go('/menumeal/${product.slug}');
+          context.go('/menu-meal/${product.slug}');
         }
+      },
+      onLongPress: () {
+        // Show detailed info overlay
+        _showProductDetails(product);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -243,10 +247,11 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
           borderRadius: BorderRadius.circular(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Product image
-              Expanded(
-                flex: 3,
+              // Product image với AspectRatio cố định
+              AspectRatio(
+                aspectRatio: 1.4, // Giảm từ 1.6 xuống 1.4 để ảnh ngắn hơn
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -278,39 +283,65 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
                 ),
               ),
               
-              // Product info
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      Text(
-                        product.title ?? 'Sản phẩm',
+              // Title
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(
+                  product.title ?? 'Product',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              
+              // Nutrition info
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: Text(
+                  [
+                    if (product.calo != null) '${product.calo!.round()} cal',
+                    if (product.protein != null) '${product.protein!.toStringAsFixed(1)}g protein',
+                    if (product.carb != null) '${product.carb!.toStringAsFixed(1)}g carbs',
+                    if (product.fat != null) '${product.fat!.toStringAsFixed(1)}g fat',
+                  ].join(' • '),
                         style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                        ),
-                        maxLines: 2,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                  maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                      ),
-                      
-                      const SizedBox(height: 4),
+                ),
+              ),
+              
+              // Description
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: Text(
+                  product.description ?? '',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  maxLines: 2, // Tăng từ 1 lên 2 để hiển thị đầy đủ hơn
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
                       
                       // Price
-                      if (product.price != null)
-                        Text(
-                          _formatPrice(product.price),
-                          style: TextStyle(
-                            fontSize: 14,
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Text(
+                  product.price != null ? _formatPriceVND(product.price) : 'Price not available',
+                  style: const TextStyle(
+                    fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Colors.green.shade700,
-                          ),
-                        ),
-                    ],
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -328,28 +359,226 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
       final difference = now.difference(dateTime);
 
       if (difference.inDays > 0) {
-        return '${difference.inDays} ngày trước';
+        return '${difference.inDays} days ago';
       } else if (difference.inHours > 0) {
-        return '${difference.inHours} giờ trước';
+        return '${difference.inHours} hours ago';
       } else if (difference.inMinutes > 0) {
-        return '${difference.inMinutes} phút trước';
+        return '${difference.inMinutes} minutes ago';
       } else {
-        return 'Vừa xong';
+        return 'Just now';
       }
     } catch (e) {
-      return 'Vừa xong';
+      return 'Just now';
     }
   }
 
-  String _formatPrice(dynamic price) {
+  String _formatPriceVND(dynamic price) {
     try {
       final numPrice = double.tryParse(price.toString()) ?? 0;
       return '${numPrice.toStringAsFixed(0).replaceAllMapped(
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-        (Match m) => '${m[1]},',
-      )} ₫';
+        (Match m) => '${m[1]}.',
+      )} VND';
     } catch (e) {
-      return '0 ₫';
+      return '0 VND';
+    }
+  }
+
+  void _showProductDetails(dynamic product) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(product.title ?? 'Product Details'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Description
+                if (product.description != null && product.description.isNotEmpty) ...[
+                  const Text(
+                    'Description:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(product.description),
+                  const SizedBox(height: 16),
+                ],
+                
+                // Nutrition info
+                const Text(
+                  'Nutrition Information:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildNutritionItem(
+                        'Calories',
+                        product.calo?.round().toString() ?? 'N/A',
+                        Icons.local_fire_department,
+                        Colors.orange,
+                      ),
+                    ),
+                    Expanded(
+                      child: _buildNutritionItem(
+                        'Protein',
+                        product.protein?.toStringAsFixed(1) ?? 'N/A',
+                        Icons.fitness_center,
+                        Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildNutritionItem(
+                        'Carbs',
+                        product.carb?.toStringAsFixed(1) ?? 'N/A',
+                        Icons.grain,
+                        Colors.green,
+                      ),
+                    ),
+                    Expanded(
+                      child: _buildNutritionItem(
+                        'Fat',
+                        product.fat?.toStringAsFixed(1) ?? 'N/A',
+                        Icons.opacity,
+                        Colors.purple,
+                      ),
+                    ),
+                  ],
+                ),
+                
+                // Price
+                const SizedBox(height: 16),
+                const Text(
+                  'Price:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  product.price != null ? _formatPriceVND(product.price) : 'Price not available',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green.shade700,
+                  ),
+                ),
+                
+                // Allergens
+                if (product.menuIngredient != null && product.menuIngredient!.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Allergy Information:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: product.menuIngredient!.map((ingredient) {
+                      return Chip(
+                        label: Text(
+                          _getAllergenDisplayName(ingredient.name),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        backgroundColor: Colors.red.shade50,
+                        labelStyle: TextStyle(color: Colors.red.shade700),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+            if (product.slug != null)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.go('/menu-meal/${product.slug}');
+                },
+                child: const Text('View Details'),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildNutritionItem(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 16),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: color,
+              fontSize: 12,
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: color.withOpacity(0.8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getAllergenDisplayName(String allergen) {
+    switch (allergen) {
+      case 'GLUTEN':
+        return 'Gluten';
+      case 'PEANUTS':
+        return 'Peanuts';
+      case 'TREE_NUTS':
+        return 'Tree Nuts';
+      case 'DAIRY':
+        return 'Dairy';
+      case 'EGG':
+        return 'Egg';
+      case 'SOY':
+        return 'Soy';
+      case 'FISH':
+        return 'Fish';
+      case 'SHELLFISH':
+        return 'Shellfish';
+      case 'SESAME':
+        return 'Sesame';
+      case 'CELERY':
+        return 'Celery';
+      case 'MUSTARD':
+        return 'Mustard';
+      case 'LUPIN':
+        return 'Lupin';
+      case 'MOLLUSCS':
+        return 'Molluscs';
+      case 'SULPHITES':
+        return 'Sulphites';
+      default:
+        return allergen;
     }
   }
 }
