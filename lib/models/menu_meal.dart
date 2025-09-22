@@ -10,6 +10,7 @@ class MenuMeal {
   final double? price;  // Made nullable to handle null in JSON
   final String slug;
   final int stock;
+  final int soldCount;
   final String type;
   final List<String> menuIngredients;
   final List<dynamic> reviews;
@@ -26,6 +27,7 @@ class MenuMeal {
     required this.price,
     required this.slug,
     required this.stock,
+    required this.soldCount,
     required this.type,
     required this.menuIngredients,
     required this.reviews,
@@ -44,6 +46,7 @@ class MenuMeal {
       price: json['price'] as double?,  // Handle null
       slug: json['slug'],
       stock: json['stock'],
+      soldCount: json['soldCount'] ?? 0,
       type: json['type'],
       menuIngredients: List<String>.from(json['menuIngredients']),
       reviews: json['reviews'],
@@ -63,6 +66,7 @@ class MenuMeal {
       'price': price,
       'slug': slug,
       'stock': stock,
+      'soldCount': soldCount,
       'type': type,
       'menuIngredients': menuIngredients,
       'reviews': reviews,

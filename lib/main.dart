@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:green_kitchen_app/config/env_config.dart';
 import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:green_kitchen_app/provider/custom_meal_provider.dart';
 import 'package:green_kitchen_app/provider/save_custom_meal_provider.dart';
@@ -14,14 +15,25 @@ import 'package:green_kitchen_app/provider/chat_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Load environment variables
+  await EnvConfig.load();
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Initialize Firebase (without options - will use google-services.json)
-  await Firebase.initializeApp();
+  // Initialize Firebase with environment variables
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: EnvConfig.firebaseApiKey,
+      appId: EnvConfig.firebaseAppId,
+      messagingSenderId: EnvConfig.firebaseProjectNumber,
+      projectId: EnvConfig.firebaseProjectId,
+      storageBucket: EnvConfig.firebaseStorageBucket,
+    ),
+  );
 
   // Initialize AuthProvider
   final authProvider = AuthProvider();

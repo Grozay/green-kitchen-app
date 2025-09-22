@@ -22,18 +22,43 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.selectedDateTime ?? DateTime.now().add(const Duration(days: 1));
-    _selectedTime = widget.selectedDateTime != null
-        ? TimeOfDay.fromDateTime(widget.selectedDateTime!)
-        : const TimeOfDay(hour: 10, minute: 0);
+    final defaultDateTime = _calculateDefaultDeliveryTime();
+    _selectedDate = DateTime(defaultDateTime.year, defaultDateTime.month, defaultDateTime.day);
+    _selectedTime = TimeOfDay.fromDateTime(defaultDateTime);
+  }
+
+  DateTime _calculateDefaultDeliveryTime() {
+    final now = DateTime.now();
+    final currentTime = TimeOfDay.fromDateTime(now);
+
+    // If it's before 10 AM, set to 10:40 AM today
+    if (currentTime.hour < 10 || (currentTime.hour == 10 && currentTime.minute < 40)) {
+      return DateTime(now.year, now.month, now.day, 10, 40);
+    }
+    // If it's after 9 PM, set to 10:40 AM tomorrow
+    else if (currentTime.hour >= 21) {
+      final tomorrow = now.add(const Duration(days: 1));
+      return DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 10, 40);
+    }
+    // Otherwise, add 40 minutes to current time
+    else {
+      final deliveryTime = now.add(const Duration(minutes: 40));
+      return deliveryTime;
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final now = DateTime.now();
+    final minDate = now;
+
+    // Calculate maximum date (30 days from now)
+    final maxDate = now.add(const Duration(days: 30));
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 30)),
+      firstDate: minDate,
+      lastDate: maxDate,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -50,14 +75,47 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
     );
 
     if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
+      // Validate that the selected date/time is not in the past
+      final selectedDateTime = DateTime(
+        picked.year,
+        picked.month,
+        picked.day,
+        _selectedTime.hour,
+        _selectedTime.minute,
+      );
+
+      if (selectedDateTime.isBefore(now)) {
+        // If selected time is in the past, adjust to minimum allowed time
+        final adjustedDateTime = _calculateDefaultDeliveryTime();
+        setState(() {
+          _selectedDate = DateTime(adjustedDateTime.year, adjustedDateTime.month, adjustedDateTime.day);
+          _selectedTime = TimeOfDay.fromDateTime(adjustedDateTime);
+        });
+      } else {
+        setState(() {
+          _selectedDate = picked;
+        });
+      }
       _updateDateTime();
     }
   }
 
   Future<void> _selectTime(BuildContext context) async {
+    final now = DateTime.now();
+
+    // Define allowed time range: 10:40 AM to 9:00 PM
+    final minTime = const TimeOfDay(hour: 10, minute: 40);
+    final maxTime = const TimeOfDay(hour: 21, minute: 0);
+
+    // If selecting time for today, ensure it's not before current time + 40 minutes
+    TimeOfDay actualMinTime = minTime;
+    if (_selectedDate.year == now.year &&
+        _selectedDate.month == now.month &&
+        _selectedDate.day == now.day) {
+      final minAllowedTime = TimeOfDay.fromDateTime(now.add(const Duration(minutes: 40)));
+      actualMinTime = _getLaterTime(minTime, minAllowedTime);
+    }
+
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime,
@@ -77,11 +135,35 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
     );
 
     if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-      _updateDateTime();
+      // Validate time is within allowed range
+      if (_isTimeInRange(picked, actualMinTime, maxTime)) {
+        setState(() {
+          _selectedTime = picked;
+        });
+        _updateDateTime();
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a time between 10:40 AM and 9:00 PM'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
+  }
+
+  TimeOfDay _getLaterTime(TimeOfDay time1, TimeOfDay time2) {
+    final minutes1 = time1.hour * 60 + time1.minute;
+    final minutes2 = time2.hour * 60 + time2.minute;
+    return minutes1 > minutes2 ? time1 : time2;
+  }
+
+  bool _isTimeInRange(TimeOfDay time, TimeOfDay minTime, TimeOfDay maxTime) {
+    final timeMinutes = time.hour * 60 + time.minute;
+    final minMinutes = minTime.hour * 60 + minTime.minute;
+    final maxMinutes = maxTime.hour * 60 + maxTime.minute;
+    return timeMinutes >= minMinutes && timeMinutes <= maxMinutes;
   }
 
   void _updateDateTime() {
@@ -100,9 +182,9 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
     final tomorrow = now.add(const Duration(days: 1));
 
     if (date.year == now.year && date.month == now.month && date.day == now.day) {
-      return 'Hôm nay';
+      return 'Today';
     } else if (date.year == tomorrow.year && date.month == tomorrow.month && date.day == tomorrow.day) {
-      return 'Ngày mai';
+      return 'Tomorrow';
     } else {
       return '${date.day}/${date.month}/${date.year}';
     }
@@ -133,7 +215,7 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Thời gian giao hàng',
+            'Delivery Time',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -150,7 +232,7 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Ngày giao',
+                      'Delivery Date',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -194,7 +276,7 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Giờ giao',
+                      'Delivery Time',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -237,64 +319,9 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
 
           const SizedBox(height: 16),
 
-          // Quick Time Options
-          const Text(
-            'Chọn nhanh',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildQuickTimeOption('10:00', 'Sáng sớm'),
-              _buildQuickTimeOption('12:00', 'Trưa'),
-              _buildQuickTimeOption('18:00', 'Tối'),
-              _buildQuickTimeOption('20:00', 'Khuya'),
-            ],
-          ),
+          // Add some bottom padding to prevent screen jumping when time picker opens
+          const SizedBox(height: 20),
         ],
-      ),
-    );
-  }
-
-  Widget _buildQuickTimeOption(String time, String label) {
-    final isSelected = _selectedTime.hour == int.parse(time.split(':')[0]) &&
-                      _selectedTime.minute == int.parse(time.split(':')[1]);
-
-    return InkWell(
-      onTap: () {
-        final timeParts = time.split(':');
-        setState(() {
-          _selectedTime = TimeOfDay(
-            hour: int.parse(timeParts[0]),
-            minute: int.parse(timeParts[1]),
-          );
-        });
-        _updateDateTime();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.grey[100],
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inputBorder,
-          ),
-        ),
-        child: Text(
-          '$time\n$label',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            color: isSelected ? Colors.white : AppColors.textPrimary,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
       ),
     );
   }

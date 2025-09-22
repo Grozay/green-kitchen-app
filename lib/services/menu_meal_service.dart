@@ -56,4 +56,31 @@ class MenuMealService {
       throw Exception('Failed to load menu meal: ${e.toString()}');
     }
   }
+
+  // Get popular menu meals
+  Future<List<MenuMeal>> getPopularMenuMeals() async {
+    try {
+      final endpoints = ApiEndpoints();
+      final response = await _apiService.get('${endpoints.menuMeals}/popular');
+
+      if (response is Map<String, dynamic>) {
+        if (response.containsKey('data')) {
+          List<dynamic> data = response['data'] as List<dynamic>;
+          return data.map((json) => MenuMeal.fromJson(json)).toList();
+        } else {
+          throw Exception('Response does not contain "data" key');
+        }
+      } else if (response is List<dynamic>) {
+        return response.map((json) => MenuMeal.fromJson(json)).toList();
+      } else {
+        throw Exception('Unexpected response type: ${response.runtimeType}');
+      }
+    } catch (e) {
+      print('Error in getPopularMenuMeals: $e'); // Debug error
+      if (e is ApiError) {
+        throw Exception('Failed to load popular menu meals: ${e.message}');
+      }
+      throw Exception('Failed to load popular menu meals: ${e.toString()}');
+    }
+  }
 }

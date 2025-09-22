@@ -1,40 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../services/voucher_service.dart';
-
-class Coupon {
-  final String id;
-  final String code;
-  final String description;
-  final double discount;
-  final String discountType; // 'percentage' or 'fixed'
-  final double minOrder;
-  final DateTime expiryDate;
-
-  const Coupon({
-    required this.id,
-    required this.code,
-    required this.description,
-    required this.discount,
-    required this.discountType,
-    required this.minOrder,
-    required this.expiryDate,
-  });
-
-  factory Coupon.fromMap(Map<String, dynamic> map) {
-    return Coupon(
-      id: map['id'].toString(),
-      code: map['code'] as String,
-      description: map['description'] as String,
-      discount: (map['discountValue'] as num).toDouble(),
-      discountType: (map['discountType'] as String).toLowerCase(),
-      minOrder: (map['minimumOrderValue'] as num?)?.toDouble() ?? 0.0,
-      expiryDate: DateTime.parse(map['expiresAt'] as String),
-    );
-  }
-
-  bool get isValid => DateTime.now().isBefore(expiryDate);
-}
+import '../../../models/coupon.dart';
+import '../../../provider/auth_provider.dart';
 
 class CouponSelector extends StatefulWidget {
   final Map<String, dynamic>? selectedCoupon;
@@ -53,6 +22,7 @@ class CouponSelector extends StatefulWidget {
 class _CouponSelectorState extends State<CouponSelector> {
   final TextEditingController _couponController = TextEditingController();
   bool _isExpanded = false;
+  bool _isCustomerCouponsExpanded = false;
   List<Coupon> _availableCoupons = [];
   bool _isLoading = true;
   String? _error;
@@ -83,7 +53,7 @@ class _CouponSelectorState extends State<CouponSelector> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Không thể tải danh sách voucher: $e';
+        _error = 'Unable to load voucher list: $e';
         _isLoading = false;
       });
     }
@@ -111,7 +81,7 @@ class _CouponSelectorState extends State<CouponSelector> {
 
       if (voucher == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mã voucher không hợp lệ hoặc không đủ điều kiện')),
+          const SnackBar(content: Text('Invalid voucher code or does not meet conditions')),
         );
         return;
       }
@@ -121,17 +91,17 @@ class _CouponSelectorState extends State<CouponSelector> {
         'code': voucher['code'],
         'description': voucher['description'],
         'discount': voucher['discountValue'],
-        'discountType': voucher['discountType'].toLowerCase(),
-        'minOrder': voucher['minimumOrderValue'],
+        'discountType': voucher['discountType'],
+        'pointsRequired': voucher['pointsRequired'],
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đã áp dụng voucher ${voucher['code']}')),
+        SnackBar(content: Text('Applied voucher ${voucher['code']}')),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Có lỗi xảy ra khi áp dụng voucher')),
+        const SnackBar(content: Text('Error occurred while applying voucher')),
       );
     }
   }
@@ -143,6 +113,11 @@ class _CouponSelectorState extends State<CouponSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final customerDetails = authProvider.customerDetails;
+    final membershipInfo = customerDetails?['membership'] ?? [];
+    final customerCoupons = customerDetails?['customerCoupons'] ?? [];
+
     if (_isLoading) {
       return Container(
         padding: const EdgeInsets.all(20),
@@ -162,7 +137,7 @@ class _CouponSelectorState extends State<CouponSelector> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Đang tải danh sách voucher...'),
+              Text('Loading voucher list...'),
             ],
           ),
         ),
@@ -199,7 +174,7 @@ class _CouponSelectorState extends State<CouponSelector> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadVouchers,
-              child: const Text('Thử lại'),
+              child: const Text('Try Again'),
             ),
           ],
         ),
@@ -222,6 +197,81 @@ class _CouponSelectorState extends State<CouponSelector> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Available Points Display
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.star, color: AppColors.primary, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Available Points: ${membershipInfo?['availablePoints']?.toString() ?? '0'} pts',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Customer Coupons Section
+          if (customerCoupons.isNotEmpty) ...[
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isCustomerCouponsExpanded = !_isCustomerCouponsExpanded;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.blue.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.card_giftcard, color: Colors.blue, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Your Coupons (${customerCoupons.length})',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      _isCustomerCouponsExpanded ? Icons.expand_less : Icons.expand_more,
+                      color: Colors.blue,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Customer Coupons List
+            if (_isCustomerCouponsExpanded) ...[
+              const SizedBox(height: 12),
+              ...customerCoupons.map((coupon) => _buildCustomerCouponOption(coupon)),
+            ],
+
+            const SizedBox(height: 16),
+          ],
+
           // Coupon input
           Row(
             children: [
@@ -229,7 +279,7 @@ class _CouponSelectorState extends State<CouponSelector> {
                 child: TextField(
                   controller: _couponController,
                   decoration: InputDecoration(
-                    hintText: 'Nhập mã voucher',
+                    hintText: 'Enter voucher code',
                     filled: true,
                     fillColor: AppColors.inputFill,
                     border: OutlineInputBorder(
@@ -263,13 +313,13 @@ class _CouponSelectorState extends State<CouponSelector> {
                       _applyCoupon(_couponController.text);
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Mã voucher không hợp lệ')),
+                        const SnackBar(content: Text('Invalid voucher code')),
                       );
                     }
                   }
                 },
                 child: const Text(
-                  'Áp dụng',
+                  'Apply',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -322,7 +372,7 @@ class _CouponSelectorState extends State<CouponSelector> {
             child: Row(
               children: [
                 Text(
-                  'Voucher có sẵn',
+                  'Available Vouchers',
                   style: TextStyle(
                     color: AppColors.secondary,
                     fontWeight: FontWeight.w600,
@@ -339,7 +389,7 @@ class _CouponSelectorState extends State<CouponSelector> {
           // Available coupons list
           if (_isExpanded) ...[
             const SizedBox(height: 12),
-            ..._availableCoupons.where((coupon) => coupon.isValid).map(
+            ..._availableCoupons.where((coupon) => coupon.isValid && coupon.applicability == 'GENERAL').map(
               (coupon) => _buildCouponOption(coupon),
             ),
           ],
@@ -387,9 +437,9 @@ class _CouponSelectorState extends State<CouponSelector> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    coupon.discountType == 'percentage'
-                        ? '${(coupon.discount * 100).toInt()}%'
-                        : '${coupon.discount.toStringAsFixed(0)}đ',
+                    coupon.type == 'PERCENTAGE'
+                        ? '${coupon.discountValue.toInt()}%'
+                        : '${coupon.discountValue.toStringAsFixed(0)}đ',
                     style: const TextStyle(
                       color: Colors.green,
                       fontSize: 12,
@@ -401,7 +451,7 @@ class _CouponSelectorState extends State<CouponSelector> {
             ),
             const SizedBox(height: 4),
             Text(
-              coupon.description,
+              coupon.description ?? '',
               style: TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
@@ -409,7 +459,7 @@ class _CouponSelectorState extends State<CouponSelector> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Đơn tối thiểu: ${coupon.minOrder.toStringAsFixed(0)}đ',
+              'Points required: ${coupon.pointsRequired.toStringAsFixed(0)} points',
               style: TextStyle(
                 fontSize: 11,
                 color: AppColors.textSecondary,
@@ -419,5 +469,102 @@ class _CouponSelectorState extends State<CouponSelector> {
         ),
       ),
     );
+  }
+
+  Widget _buildCustomerCouponOption(Map<String, dynamic> coupon) {
+    final isAvailable = coupon['status'] == 'AVAILABLE';
+    final couponName = coupon['couponName'] ?? 'Coupon';
+    final couponCode = coupon['couponCode'] ?? '';
+    final discountValue = coupon['couponDiscountValue'] ?? 0;
+    final discountType = coupon['couponType'] ?? 'FIXED_AMOUNT';
+    final expiresAt = coupon['expiresAt'] != null ? _formatDate(coupon['expiresAt']) : 'N/A';
+
+    return GestureDetector(
+      onTap: () {
+        if (isAvailable) {
+          _couponController.text = couponCode;
+          _applyCoupon(couponCode);
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isAvailable ? Colors.white : Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isAvailable ? Colors.blue.withValues(alpha: 0.3) : Colors.grey.shade300,
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.card_giftcard,
+                  color: isAvailable ? Colors.blue : Colors.grey,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    couponName,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Code: $couponCode',
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            Text(
+              'Discount: ${discountType == 'PERCENTAGE' ? '$discountValue%' : '${discountValue.toString()} VND'}',
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            Text(
+              'Expires: $expiresAt',
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isAvailable ? Colors.green : Colors.grey,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isAvailable ? 'Available' : 'Used',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return 'N/A';
+    try {
+      final date = DateTime.parse(dateString);
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (e) {
+      return dateString;
+    }
   }
 }

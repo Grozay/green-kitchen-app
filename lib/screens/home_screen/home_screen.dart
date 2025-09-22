@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/app_layout.dart';
+import '../../services/menu_meal_service.dart';
+import '../../models/menu_meal.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,54 +15,13 @@ class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController();
   final ScrollController _scrollController = ScrollController();
 
-  bool _showLeftButton = false;
-  bool _showRightButton = true;
+  bool _showLeftArrow = false;
+  bool _showRightArrow = true;
 
-  // Sample food data - in real app this would come from API
-  final List<Map<String, dynamic>> _foodItems = [
-    {
-      'name': 'Grilled Chicken Salad',
-      'price': 25.99,
-      'image': 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400',
-      'rating': 4.5,
-      'calories': 320,
-    },
-    {
-      'name': 'Quinoa Buddha Bowl',
-      'price': 22.99,
-      'image': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400',
-      'rating': 4.8,
-      'calories': 450,
-    },
-    {
-      'name': 'Salmon Poke Bowl',
-      'price': 28.99,
-      'image': 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400',
-      'rating': 4.7,
-      'calories': 380,
-    },
-    {
-      'name': 'Veggie Stir Fry',
-      'price': 19.99,
-      'image': 'https://images.unsplash.com/photo-1563379091339-03246963d96c?w=400',
-      'rating': 4.3,
-      'calories': 280,
-    },
-    {
-      'name': 'Avocado Toast',
-      'price': 15.99,
-      'image': 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=400',
-      'rating': 4.6,
-      'calories': 220,
-    },
-    {
-      'name': 'Green Smoothie Bowl',
-      'price': 18.99,
-      'image': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-      'rating': 4.4,
-      'calories': 180,
-    },
-  ];
+  // Popular items state
+  List<MenuMeal> _popularItems = [];
+  bool _isLoadingPopular = true;
+  String? _popularError;
 
   // Sample slider images
   final List<String> _sliderImages = [
@@ -73,7 +34,30 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_updateScrollButtons);
+    _scrollController.addListener(_updateArrowVisibility);
+    _loadPopularItems();
+  }
+
+  Future<void> _loadPopularItems() async {
+    try {
+      setState(() {
+        _isLoadingPopular = true;
+        _popularError = null;
+      });
+
+      final menuMealService = MenuMealService();
+      final popularItems = await menuMealService.getPopularMenuMeals();
+
+      setState(() {
+        _popularItems = popularItems;
+        _isLoadingPopular = false;
+      });
+    } catch (e) {
+      setState(() {
+        _popularError = e.toString();
+        _isLoadingPopular = false;
+      });
+    }
   }
 
   @override
@@ -85,13 +69,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _updateScrollButtons() {
+  void _updateArrowVisibility() {
+    if (!_scrollController.hasClients) return;
+
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
 
     setState(() {
-      _showLeftButton = currentScroll > 0;
-      _showRightButton = currentScroll < maxScroll;
+      _showLeftArrow = currentScroll > 10; // Show when scrolled more than 10 pixels
+      _showRightArrow = currentScroll < maxScroll - 10; // Show when not at the end
     });
   }
 
@@ -232,87 +218,72 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Horizontal Scroll with Navigation Buttons
+                  // Horizontal Scroll with subtle arrow indicators
                   Stack(
                     children: [
                       SizedBox(
                         height: 280,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _foodItems.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              margin: EdgeInsets.only(
-                                left: index == 0 ? 0 : 16,
-                                right: index == _foodItems.length - 1 ? 80 : 0,
-                              ),
-                              child: _buildFoodItemCard(_foodItems[index]),
-                            );
-                          },
-                        ),
+                        child: _isLoadingPopular
+                            ? const Center(child: CircularProgressIndicator())
+                            : _popularError != null
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Failed to load popular items',
+                                          style: TextStyle(color: AppColors.textSecondary),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ElevatedButton(
+                                          onPressed: _loadPopularItems,
+                                          child: const Text('Retry'),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    controller: _scrollController,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: _popularItems.length,
+                                    itemBuilder: (context, index) {
+                                      return Container(
+                                        margin: EdgeInsets.only(
+                                          left: index == 0 ? 0 : 16,
+                                          right: index == _popularItems.length - 1 ? 16 : 0,
+                                        ),
+                                        child: _buildMenuMealCard(_popularItems[index]),
+                                      );
+                                    },
+                                  ),
                       ),
 
-                      // Left Navigation Button
-                      if (_showLeftButton)
+                      // Left Arrow - only visible when scrolled
+                      if (_showLeftArrow)
                         Positioned(
-                          left: 0,
+                          left: 8,
                           top: 0,
                           bottom: 0,
-                          child: Container(
-                            width: 40,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.background,
-                                  AppColors.background.withValues(alpha: 0.8),
-                                  Colors.transparent,
-                                ],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              ),
-                            ),
-                            child: Center(
-                              child: IconButton(
-                                onPressed: _scrollLeft,
-                                icon: Icon(
-                                  Icons.chevron_left,
-                                  color: AppColors.primary,
-                                  size: 30,
-                                ),
-                              ),
+                          child: Center(
+                            child: Icon(
+                              Icons.chevron_left,
+                              color: AppColors.primary.withValues(alpha: 0.7),
+                              size: 24,
                             ),
                           ),
                         ),
 
-                      // Right Navigation Button
-                      if (_showRightButton)
+                      // Right Arrow - only visible when can scroll right
+                      if (_showRightArrow)
                         Positioned(
-                          right: 0,
+                          right: 8,
                           top: 0,
                           bottom: 0,
-                          child: Container(
-                            width: 40,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.transparent,
-                                  AppColors.background.withValues(alpha: 0.8),
-                                  AppColors.background,
-                                ],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              ),
-                            ),
-                            child: Center(
-                              child: IconButton(
-                                onPressed: _scrollRight,
-                                icon: Icon(
-                                  Icons.chevron_right,
-                                  color: AppColors.primary,
-                                  size: 30,
-                                ),
-                              ),
+                          child: Center(
+                            child: Icon(
+                              Icons.chevron_right,
+                              color: AppColors.primary.withValues(alpha: 0.7),
+                              size: 24,
                             ),
                           ),
                         ),
@@ -385,13 +356,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFoodItemCard(Map<String, dynamic> item) {
+  Widget _buildMenuMealCard(MenuMeal menuMeal) {
     return GestureDetector(
       onTap: () {
         // Navigate to food detail screen
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Selected: ${item['name']}'),
+            content: Text('Selected: ${menuMeal.title}'),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -438,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Stack(
                   children: [
                     Image.network(
-                      item['image'],
+                      menuMeal.image,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
@@ -494,13 +465,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item['name'],
+                          menuMeal.title,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
@@ -513,7 +484,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '${item['rating']}',
+                              '4.5', // Default rating since API doesn't provide it
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -521,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${item['calories']} cal',
+                              '${menuMeal.calories.toInt()} cal',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -529,13 +500,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${menuMeal.soldCount} sold',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${item['price']}',
+                          '\$${menuMeal.price?.toStringAsFixed(2) ?? 'N/A'}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -603,30 +582,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  }
-
-  void _scrollLeft() {
-    if (_scrollController.hasClients) {
-      final currentOffset = _scrollController.offset;
-      final newOffset = (currentOffset - 220).clamp(0.0, _scrollController.position.maxScrollExtent);
-      _scrollController.animateTo(
-        newOffset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  void _scrollRight() {
-    if (_scrollController.hasClients) {
-      final currentOffset = _scrollController.offset;
-      final newOffset = (currentOffset + 220).clamp(0.0, _scrollController.position.maxScrollExtent);
-      _scrollController.animateTo(
-        newOffset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
   }
 
   @override

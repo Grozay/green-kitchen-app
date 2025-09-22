@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
 import '../services/phone_auth_service.dart';
 import '../services/service.dart';
 import '../apis/endpoint.dart';
-import 'cart_provider.dart';
 
 // AuthProvider manages authentication state
 class AuthProvider with ChangeNotifier {
@@ -192,39 +190,65 @@ class AuthProvider with ChangeNotifier {
     _clearError();
 
     try {
-      final result = await _phoneAuthService.verifyOTP(smsCode);
+      // First verify OTP with Firebase
+      final firebaseResult = await _phoneAuthService.verifyOTP(smsCode);
 
-      if (result['success'] == true) {
-        // Set current user from backend response
-        final backendResponse = result['backendResponse'];
-        if (backendResponse is Map<String, dynamic>) {
-          _currentUser = User.fromJson(backendResponse);
+      if (firebaseResult['success'] == true) {
+        // Get phone number from Firebase result
+        final phoneNumber = firebaseResult['phoneNumber'];
+
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+          _setError('Phone number not found from Firebase verification');
+          return false;
+        }
+
+        // Now call our backend API to get user data and JWT token
+        final response = await _authService.phoneLoginMobile(phoneNumber);
+
+        if (response.success) {
+          _currentUser = response.user;
+
+          // Try to fetch customer details from backend using email from response
+          if (_currentUser?.email != null && _currentUser!.email.isNotEmpty) {
+            try {
+              // Ensure token is stored before making API call
+              await Future.delayed(Duration(milliseconds: 100));
+              await _fetchCustomerDetails(_currentUser!.email);
+
+              // Update current user with customer details
+              if (_customerDetails != null && _customerDetails!['email'] != null) {
+                _currentUser = User(
+                  id: _customerDetails!['id'] ?? _currentUser!.id,
+                  email: _customerDetails!['email'],
+                  phone: _customerDetails!['phone'] ?? _currentUser!.phone,
+                  fullName: _customerDetails!['firstName'] != null && _customerDetails!['lastName'] != null
+                      ? '${_customerDetails!['firstName']} ${_customerDetails!['lastName']}'
+                      : _currentUser!.fullName,
+                );
+              }
+            } catch (e) {
+              // Don't fail the entire login if customer details fetch fails
+            }
+          }
+
+          notifyListeners();
+          return true;
         } else {
-          // Create a basic user from Firebase data
-          _currentUser = User(
-            id: result['firebaseIdToken']?.substring(0, 10) ?? 'firebase_user',
-            email: '', // Phone auth doesn't have email
-            phone: result['phoneNumber'],
-            fullName: 'Phone User',
-          );
+          _setError(response.message);
+          return false;
         }
-
-        // Fetch customer details if user has email
-        if (_currentUser?.email != null && _currentUser!.email.isNotEmpty) {
-          await _fetchCustomerDetails(_currentUser!.email);
-        }
-
-        notifyListeners();
-        return true;
       } else {
-        _setError('OTP verification failed');
+        _setError(firebaseResult['message'] ?? 'Firebase OTP verification failed');
         return false;
       }
     } catch (e) {
       _setError('OTP verification failed: ${e.toString()}');
       return false;
     } finally {
-      _setLoading(false);
+      // Only set loading to false after a short delay to allow navigation to complete
+      Future.delayed(const Duration(milliseconds: 200), () {
+        _setLoading(false);
+      });
     }
   }
 

@@ -70,10 +70,6 @@ class AppLayout extends StatelessWidget {
               child: AppBar(
                 leading: Container(
                   margin: const EdgeInsets.only(left: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                   child: IconButton(
                     icon: const Icon(
                       Icons.person,

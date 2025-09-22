@@ -41,9 +41,7 @@ class _CustomMealScreenState extends State<CustomMealScreen>
   @override
   Widget build(BuildContext context) {
     // Ensure _tabController is initialized (for hot reload)
-    if (_tabController == null) {
-      _tabController = TabController(length: 4, vsync: this);
-    }
+    _tabController ??= TabController(length: 4, vsync: this);
 
     return Consumer<CustomMealProvider>(
       builder: (context, customMealProvider, child) {

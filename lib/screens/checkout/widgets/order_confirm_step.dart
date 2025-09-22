@@ -37,7 +37,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Có lỗi xảy ra: $e'),
+            content: Text('An error occurred: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -63,21 +63,21 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Order Summary Section
-          _buildSectionHeader('Xác nhận đơn hàng'),
+          _buildSectionHeader('Order Confirmation'),
           const SizedBox(height: 16),
           _buildOrderSummary(),
 
           const SizedBox(height: 24),
 
           // Delivery Information Section
-          _buildSectionHeader('Thông tin giao hàng'),
+          _buildSectionHeader('Delivery Information'),
           const SizedBox(height: 16),
           _buildDeliveryInfo(selectedStore),
 
           const SizedBox(height: 24),
 
           // Payment Information Section
-          _buildSectionHeader('Thông tin thanh toán'),
+          _buildSectionHeader('Payment Information'),
           const SizedBox(height: 16),
           _buildPaymentInfo(paymentMethod, selectedCoupon),
 
@@ -97,7 +97,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
                   ),
                   onPressed: widget.onPrevious,
                   child: Text(
-                    'Quay lại',
+                    'Back',
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: 16,
@@ -121,7 +121,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
                   child: _isProcessing
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
-                          paymentMethod == 'cash' ? 'Đặt hàng' : 'Thanh toán',
+                          paymentMethod == 'cash' ? 'Place Order' : 'Pay',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -196,7 +196,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
                         ),
                       ),
                       Text(
-                        'Số lượng: ${item.quantity}',
+                        'Quantity: ${item.quantity}',
                         style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -238,21 +238,21 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Customer Info
-          _buildInfoRow('Người nhận', widget.formData['fullName'] ?? ''),
-          _buildInfoRow('Số điện thoại', widget.formData['phone'] ?? ''),
+          _buildInfoRow('Recipient', widget.formData['fullName'] ?? ''),
+          _buildInfoRow('Phone Number', widget.formData['phone'] ?? ''),
           _buildInfoRow('Email', widget.formData['email'] ?? ''),
 
           const Divider(height: 20),
 
           // Delivery Address
-          _buildInfoRow('Địa chỉ', widget.formData['address'] ?? ''),
-          _buildInfoRow('Phường/Xã', widget.formData['ward'] ?? ''),
-          _buildInfoRow('Quận/Huyện', widget.formData['district'] ?? ''),
-          _buildInfoRow('Tỉnh/Thành phố', widget.formData['city'] ?? ''),
+          _buildInfoRow('Address', widget.formData['address'] ?? ''),
+          _buildInfoRow('Ward/Commune', widget.formData['ward'] ?? ''),
+          _buildInfoRow('District', widget.formData['district'] ?? ''),
+          _buildInfoRow('Province/City', widget.formData['city'] ?? ''),
 
           if (widget.formData['note']?.isNotEmpty ?? false) ...[
             const Divider(height: 20),
-            _buildInfoRow('Ghi chú', widget.formData['note']),
+            _buildInfoRow('Note', widget.formData['note']),
           ],
 
           const Divider(height: 20),
@@ -264,7 +264,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
                 const Icon(Icons.store, color: Colors.green, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Cửa hàng giao hàng',
+                  'Delivery Store',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -288,7 +288,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
               ),
             ),
             Text(
-              'Khoảng cách: ${selectedStore.distance}km • ${selectedStore.estimatedTime}',
+              'Distance: ${(selectedStore.distance as num).toDouble()}km • ${selectedStore.estimatedTime}',
               style: TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
@@ -318,25 +318,25 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Payment Method
-          _buildInfoRow('Phương thức thanh toán', _getPaymentMethodName(paymentMethod)),
+          _buildInfoRow('Payment Method', _getPaymentMethodName(paymentMethod)),
 
           // Coupon
           if (selectedCoupon != null && selectedCoupon.isNotEmpty) ...[
             const Divider(height: 20),
-            _buildInfoRow('Mã giảm giá', selectedCoupon['code']),
-            _buildInfoRow('Giảm giá', '-${_formatDiscount(selectedCoupon)}'),
+            _buildInfoRow('Coupon Code', selectedCoupon['code']),
+            _buildInfoRow('Discount', '-${_formatDiscount(selectedCoupon)}'),
           ],
 
           const Divider(height: 20),
 
           // Order Totals
-          _buildTotalRow('Tạm tính', '${widget.cart.totalAmount.toStringAsFixed(0)}đ'),
-          _buildTotalRow('Phí giao hàng', '25,000đ'),
-          _buildTotalRow('Thuế VAT (10%)', '${(widget.cart.totalAmount * 0.1).toStringAsFixed(0)}đ'),
+          _buildTotalRow('Subtotal', '${widget.cart.totalAmount.toStringAsFixed(0)}đ'),
+          _buildTotalRow('Shipping Fee', '25,000đ'),
+          _buildTotalRow('VAT Tax (10%)', '${(widget.cart.totalAmount * 0.1).toStringAsFixed(0)}đ'),
 
           if (selectedCoupon != null && selectedCoupon.isNotEmpty) ...[
             _buildTotalRow(
-              'Giảm giá (${selectedCoupon['code']})',
+              'Discount (${selectedCoupon['code']})',
               '-${_formatDiscount(selectedCoupon)}',
               isDiscount: true,
             ),
@@ -344,7 +344,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
 
           const Divider(height: 16),
           _buildTotalRow(
-            'Tổng cộng',
+            'Total',
             '${_calculateTotal(selectedCoupon).toStringAsFixed(0)}đ',
             isTotal: true,
           ),
@@ -415,13 +415,13 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
   String _getPaymentMethodName(String method) {
     switch (method) {
       case 'cash':
-        return 'Thanh toán khi nhận hàng (COD)';
+        return 'Cash on Delivery (COD)';
       case 'momo':
-        return 'Ví MoMo';
+        return 'MoMo Wallet';
       case 'zalopay':
         return 'ZaloPay';
       default:
-        return 'Thanh toán khi nhận hàng (COD)';
+        return 'Cash on Delivery (COD)';
     }
   }
 

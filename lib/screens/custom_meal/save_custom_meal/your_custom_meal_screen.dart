@@ -44,9 +44,7 @@ class _YourCustomMealScreenState extends State<YourCustomMealScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (_tabController == null) {
-      _tabController = TabController(length: 4, vsync: this);
-    }
+    _tabController ??= TabController(length: 4, vsync: this);
 
     return Consumer<CustomMealProvider>(
       builder: (context, customMealProvider, child) {

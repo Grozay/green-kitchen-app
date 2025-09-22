@@ -6,6 +6,7 @@ import 'package:green_kitchen_app/screens/auth_screen/login_screen.dart';
 import 'package:green_kitchen_app/screens/auth_screen/register_screen.dart';
 import 'package:green_kitchen_app/screens/auth_screen/phone_login_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/custom_meal_review_screen.dart';
+import 'package:green_kitchen_app/screens/custom_meal/custom_meal_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/save_custom_meal_review_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/save_custom_meal_screen.dart';
 import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/your_custom_meal_screen.dart';
@@ -31,65 +32,108 @@ import 'package:green_kitchen_app/screens/chat/chat_screen.dart';
 import 'package:green_kitchen_app/screens/more_screen/more_screen.dart';
 import 'package:green_kitchen_app/screens/tracking_screen/tracking_screen.dart';
 
+/// Helper function to create custom page transitions
+CustomTransitionPage<T> createCustomTransitionPage<T>({
+  required LocalKey key,
+  required Widget child,
+  Offset begin = const Offset(1.0, 0.0),
+  Offset end = Offset.zero,
+  Curve curve = Curves.easeInOutCubic,
+}) {
+  return CustomTransitionPage<T>(
+    key: key,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 final GoRouter router = GoRouter(
   initialLocation: '/',
   routes: <RouteBase>[
     GoRoute(
       path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return const HomeScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const HomeScreen(),
+        begin: Offset.zero,
+        end: Offset.zero,
+      ),
     ),
     GoRoute(
       path: '/chat',
-      builder: (BuildContext context, GoRouterState state) {
-        return const ChatScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const ChatScreen(),
+      ),
     ),
     GoRoute(
       path: '/auth/login',
-      builder: (BuildContext context, GoRouterState state) {
-        return const LoginScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const LoginScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/auth/register',
-      builder: (BuildContext context, GoRouterState state) {
-        return const RegisterScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const RegisterScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/auth/phone-login',
-      builder: (BuildContext context, GoRouterState state) {
-        return const PhoneLoginScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const PhoneLoginScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/auth/email-verification',
-      builder: (BuildContext context, GoRouterState state) {
-        return const EmailVerificationScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const EmailVerificationScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/menu-meal',
-      builder: (BuildContext context, GoRouterState state) {
-        return const MenuMealScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const MenuMealScreen(),
+      ),
       routes: <RouteBase>[
         GoRoute(
           path: '/:slug',
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final slug = state.pathParameters['slug']!;
-            return MenuDetailScreen(slug: slug);
+            return createCustomTransitionPage(
+              key: state.pageKey,
+              child: MenuDetailScreen(slug: slug),
+            );
           },
         ),
       ],
     ),
     GoRoute(
       path: '/cart',
-      builder: (BuildContext context, GoRouterState state) {
-        return const CartScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const CartScreen(),
+      ),
     ),
     // GoRoute(
     //   path: '/weekmeal',
@@ -99,8 +143,9 @@ final GoRouter router = GoRouter(
     // ),
     GoRoute(
       path: '/ai-chat',
-      builder: (BuildContext context, GoRouterState state) {
-        return Scaffold(
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: Colors.white,
@@ -115,129 +160,157 @@ final GoRouter router = GoRouter(
             ),
           ),
           body: const Center(child: Text('AI Chat Screen - Coming Soon!')),
-        );
-      },
+        ),
+      ),
     ),
     GoRoute(
       path: '/profile',
-      builder: (BuildContext context, GoRouterState state) {
-        return const ProfileScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const ProfileScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/profile/accountinfo',
-      builder: (BuildContext context, GoRouterState state) {
-        return const ProfileScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const ProfileScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/profile/membership',
-      builder: (BuildContext context, GoRouterState state) {
-        return const MembershipScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const MembershipScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/profile/orderhistory',
-      builder: (BuildContext context, GoRouterState state) {
-        return const OrderHistoryScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const OrderHistoryScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/faq',
-      builder: (BuildContext context, GoRouterState state) {
-        return const FaqTab();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const FaqTab(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/location',
-      builder: (BuildContext context, GoRouterState state) {
-        return const LocationTab();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const LocationTab(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/feedback',
-      builder: (BuildContext context, GoRouterState state) {
-        return const FeedbackTab();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const FeedbackTab(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
-
       path: '/about',
-      builder: (BuildContext context, GoRouterState state) {
-        return const AboutTab();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const AboutTab(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/policy',
-      builder: (BuildContext context, GoRouterState state) {
-        return const PolicyTab();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const PolicyTab(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/custom-meal',
-
-      builder: (BuildContext context, GoRouterState state) {
-        // return const SavedCustomMealsScreen();
-        return const MenuMealScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const CustomMealScreen(),
+      ),
       routes: <RouteBase>[
         GoRoute(
           path: '/review',
-          builder: (BuildContext context, GoRouterState state) {
-            return const CustomMealReviewScreen();
-          },
+          pageBuilder: (context, state) => createCustomTransitionPage(
+            key: state.pageKey,
+            child: const CustomMealReviewScreen(),
+          ),
         ),
       ],
     ),
     GoRoute(
       path: '/saved-custom-meal',
-      builder: (BuildContext context, GoRouterState state) {
-        return const SavedCustomMealsScreen(); // Keep this for saved meals
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const SavedCustomMealsScreen(),
+      ),
       routes: <RouteBase>[
         GoRoute(
-          path: '/create', // Add this subroute for creation
-          builder: (BuildContext context, GoRouterState state) {
-            return const YourCustomMealScreen(); // Your custom meal creation screen
-          },
+          path: '/create',
+          pageBuilder: (context, state) => createCustomTransitionPage(
+            key: state.pageKey,
+            child: const YourCustomMealScreen(),
+          ),
         ),
         GoRoute(
           path: '/review/:id',
-          builder: (BuildContext context, GoRouterState state) {
-            return const SaveCustomMealReviewScreen();
-          },
+          pageBuilder: (context, state) => createCustomTransitionPage(
+            key: state.pageKey,
+            child: const SaveCustomMealReviewScreen(),
+          ),
         ),
       ],
     ),
     GoRoute(
       path: '/checkout',
-      builder: (BuildContext context, GoRouterState state) {
-        return const CheckoutScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const CheckoutScreen(),
+      ),
     ),
     GoRoute(
       path: '/more',
-      builder: (BuildContext context, GoRouterState state) {
-        return const MoreScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const MoreScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
     ),
     GoRoute(
       path: '/menu',
-      builder: (BuildContext context, GoRouterState state) {
-        return const MenuScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const MenuScreen(),
+      ),
     ),
     GoRoute(
       path: '/tracking',
-      builder: (BuildContext context, GoRouterState state) {
-        return const TrackingScreen();
-      },
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const TrackingScreen(),
+      ),
     ),
     GoRoute(
       path: '/tracking/:orderCode',
-      builder: (BuildContext context, GoRouterState state) {
+      pageBuilder: (context, state) {
         final orderCode = state.pathParameters['orderCode'];
-        return TrackingScreen(orderCode: orderCode);
+        return createCustomTransitionPage(
+          key: state.pageKey,
+          child: TrackingScreen(orderCode: orderCode),
+        );
       },
     ),
   ],

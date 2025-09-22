@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:green_kitchen_app/constants/constants.dart';
-import 'package:green_kitchen_app/models/cart.dart' hide CustomMeal;  // Hide CustomMeal from cart.dart
+// Hide CustomMeal from cart.dart
 import 'package:green_kitchen_app/models/ingredient.dart';
 import 'package:green_kitchen_app/models/custom_meal.dart';  // Use CustomMeal from this file
 import 'package:green_kitchen_app/services/ingredient_service.dart';  // Add this import
-import 'package:green_kitchen_app/services/custom_meal_service.dart';  // Add this import for CustomMealService
+// Add this import for CustomMealService
 
 class IngredientWithQuantity {
   final Ingredient item;
@@ -254,10 +254,10 @@ class CustomMealProvider extends ChangeNotifier {
     title = meal.title ?? '';
     description = meal.description ?? '';
     image = meal.image ?? imageCustomMealDefault;  // Use valid URL
-    totalCalories = meal.calories?.toDouble() ?? 0.0;
-    totalProtein = meal.protein?.toDouble() ?? 0.0;
-    totalCarbs = meal.carb?.toDouble() ?? 0.0;
-    totalFat = meal.fat?.toDouble() ?? 0.0;
+    totalCalories = meal.calories.toDouble() ?? 0.0;
+    totalProtein = meal.protein.toDouble() ?? 0.0;
+    totalCarbs = meal.carb.toDouble() ?? 0.0;
+    totalFat = meal.fat.toDouble() ?? 0.0;
 
     for (var detail in meal.details ?? []) {
       final typeKey = detail.type.toLowerCase();  // e.g., 'protein', 'carbs', etc.
@@ -324,7 +324,7 @@ class CustomMealProvider extends ChangeNotifier {
         }
       }
     }
-    print('DEBUG: Selected items after loading: ${selectedItems}');
+    print('DEBUG: Selected items after loading: $selectedItems');
     notifyListeners();
   }
 

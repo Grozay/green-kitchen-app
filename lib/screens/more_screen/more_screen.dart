@@ -27,7 +27,7 @@ class _MoreScreenState extends State<MoreScreen> {
 
     return AppLayout(
       title: 'MORE',
-      currentIndex: 3,
+      currentIndex: 4,
       body: _buildMoreContent(context, authProvider),
     );
   }

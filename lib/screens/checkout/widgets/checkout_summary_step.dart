@@ -49,14 +49,14 @@ class _CheckoutSummaryStepState extends State<CheckoutSummaryStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Order Summary Section
-          _buildSectionHeader('Tóm tắt đơn hàng'),
+          _buildSectionHeader('Order Summary'),
           const SizedBox(height: 16),
           _buildOrderSummary(),
 
           const SizedBox(height: 24),
 
           // Coupon Section
-          _buildSectionHeader('Mã giảm giá'),
+          _buildSectionHeader('Coupon Code'),
           const SizedBox(height: 16),
           CouponSelector(
             selectedCoupon: widget.formData['selectedCoupon'],
@@ -68,7 +68,7 @@ class _CheckoutSummaryStepState extends State<CheckoutSummaryStep> {
           const SizedBox(height: 24),
 
           // Payment Method Section
-          _buildSectionHeader('Phương thức thanh toán'),
+          _buildSectionHeader('Payment Method'),
           const SizedBox(height: 16),
           PaymentMethodSelector(
             selectedMethod: _selectedPaymentMethod,
@@ -91,7 +91,7 @@ class _CheckoutSummaryStepState extends State<CheckoutSummaryStep> {
                   ),
                   onPressed: widget.onPrevious,
                   child: Text(
-                    'Quay lại',
+                    'Back',
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: 16,
@@ -113,7 +113,7 @@ class _CheckoutSummaryStepState extends State<CheckoutSummaryStep> {
                   ),
                   onPressed: widget.onNext,
                   child: const Text(
-                    'Tiếp tục',
+                    'Continue',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -188,7 +188,7 @@ class _CheckoutSummaryStepState extends State<CheckoutSummaryStep> {
                         ),
                       ),
                       Text(
-                        'Số lượng: ${item.quantity}',
+                        'Quantity: ${item.quantity}',
                         style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -211,14 +211,14 @@ class _CheckoutSummaryStepState extends State<CheckoutSummaryStep> {
           const Divider(height: 24),
 
           // Order Totals
-          _buildTotalRow('Tạm tính', '${widget.cart.totalAmount.toStringAsFixed(0)}đ'),
-          _buildTotalRow('Phí giao hàng', '25,000đ'),
-          _buildTotalRow('Thuế VAT (10%)', '${(widget.cart.totalAmount * 0.1).toStringAsFixed(0)}đ'),
+          _buildTotalRow('Subtotal', '${widget.cart.totalAmount.toStringAsFixed(0)}đ'),
+          _buildTotalRow('Shipping Fee', '25,000đ'),
+          _buildTotalRow('VAT Tax (10%)', '${(widget.cart.totalAmount * 0.1).toStringAsFixed(0)}đ'),
 
           // Coupon discount if applied
           if (widget.formData['selectedCoupon'] != null) ...[
             _buildTotalRow(
-              'Giảm giá (${widget.formData['selectedCoupon']['code']})',
+              'Discount (${widget.formData['selectedCoupon']['code']})',
               '-${widget.formData['selectedCoupon']['discount'].toStringAsFixed(0)}đ',
               isDiscount: true,
             ),
@@ -226,7 +226,7 @@ class _CheckoutSummaryStepState extends State<CheckoutSummaryStep> {
 
           const Divider(height: 16),
           _buildTotalRow(
-            'Tổng cộng',
+            'Total',
             '${_calculateTotal().toStringAsFixed(0)}đ',
             isTotal: true,
           ),

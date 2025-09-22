@@ -48,7 +48,7 @@ class CartItem {
         menuMeal: json['menuMeal'] != null ? MenuMeal.fromJson(json['menuMeal']) : null,
         customMeal: json['customMeal'] != null ? CustomMeal.fromJson(json['customMeal']) : null,
         weekMeal: json['weekMeal'] != null ? WeekMeal.fromJson(json['weekMeal']) : null,
-        itemType: json['itemType'] != null ? json['itemType'] : '', // Thêm null check
+        itemType: json['itemType'] ?? '', // Thêm null check
         quantity: json['quantity'] ?? 0,
         unitPrice: (json['unitPrice'] as num?)?.toDouble() ?? 0.0,
         totalPrice: (json['totalPrice'] as num?)?.toDouble() ?? 0.0,

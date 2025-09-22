@@ -81,8 +81,9 @@ class CartProvider with ChangeNotifier {
   }
 
   Future<void> syncCartAfterLogin(int customerId) async {
-    if (_cart == null || _cart!.cartItems.isEmpty)
+    if (_cart == null || _cart!.cartItems.isEmpty) {
       return; // Không có gì để sync
+    }
 
     try {
       // Loop qua từng item trong local cart và add vào DB
@@ -598,6 +599,35 @@ class CartProvider with ChangeNotifier {
     }
     _saveCartToLocal(); // Lưu local để đảm bảo clear
     notifyListeners();
+  }
+
+  // Clear cart from server
+  Future<void> clearCartFromServer(int customerId) async {
+    if (_cart == null || _cart!.cartItems.isEmpty) {
+      return; // Nothing to clear
+    }
+
+    try {
+      // Remove each item from cart one by one
+      final itemsToRemove = List.from(_cart!.cartItems); // Copy to avoid modification during iteration
+      
+      for (var item in itemsToRemove) {
+        try {
+          await CartService().removeFromCart(customerId, item.id);
+        } catch (itemError) {
+          print('Failed to remove item ${item.id} from cart: $itemError');
+          // Continue with other items even if one fails
+        }
+      }
+      
+      // After successfully removing all items from server, clear local cart
+      await clearCart();
+    } catch (e) {
+      _error = 'Failed to clear cart from server: $e';
+      notifyListeners();
+      // Still clear local cart even if server clearing partially failed
+      await clearCart();
+    }
   }
 
   // Clear error

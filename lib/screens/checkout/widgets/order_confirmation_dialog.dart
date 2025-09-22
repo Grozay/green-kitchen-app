@@ -47,7 +47,7 @@ class OrderConfirmationDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Xác nhận đơn hàng',
+                    'Order Confirmation',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class OrderConfirmationDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Vui lòng kiểm tra lại thông tin trước khi đặt hàng',
+                    'Please review the information before placing your order',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,
@@ -76,7 +76,7 @@ class OrderConfirmationDialog extends StatelessWidget {
                   children: [
                     // Delivery Information
                     _buildSection(
-                      'Thông tin giao hàng',
+                      'Delivery Information',
                       Icons.location_on,
                       _buildDeliveryInfo(),
                     ),
@@ -85,7 +85,7 @@ class OrderConfirmationDialog extends StatelessWidget {
 
                     // Payment Method
                     _buildSection(
-                      'Phương thức thanh toán',
+                      'Payment Method',
                       Icons.payment,
                       _buildPaymentMethod(),
                     ),
@@ -94,7 +94,7 @@ class OrderConfirmationDialog extends StatelessWidget {
 
                     // Order Summary
                     _buildSection(
-                      'Tóm tắt đơn hàng',
+                      'Order Summary',
                       Icons.shopping_cart,
                       _buildOrderSummary(),
                     ),
@@ -126,7 +126,7 @@ class OrderConfirmationDialog extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Quay lại',
+                        'Back',
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w600,
@@ -147,7 +147,7 @@ class OrderConfirmationDialog extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: const Text(
-                        'Xác nhận đặt hàng',
+                        'Confirm Order',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -208,22 +208,22 @@ class OrderConfirmationDialog extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildInfoRow(Icons.person, 'Người nhận', deliveryInfo['fullName'] ?? ''),
+          _buildInfoRow(Icons.person, 'Recipient', deliveryInfo['fullName'] ?? ''),
           const SizedBox(height: 8),
-          _buildInfoRow(Icons.phone, 'Số điện thoại', deliveryInfo['phone'] ?? ''),
+          _buildInfoRow(Icons.phone, 'Phone Number', deliveryInfo['phone'] ?? ''),
           const SizedBox(height: 8),
-          _buildInfoRow(Icons.location_on, 'Địa chỉ', fullAddress),
+          _buildInfoRow(Icons.location_on, 'Address', fullAddress),
           if (deliveryInfo['deliveryTime'] != null) ...[
             const SizedBox(height: 8),
             _buildInfoRow(
               Icons.access_time,
-              'Thời gian',
+              'Time',
               _formatDateTime(deliveryInfo['deliveryTime']),
             ),
           ],
           if (deliveryInfo['note'] != null && deliveryInfo['note'].toString().isNotEmpty) ...[
             const SizedBox(height: 8),
-            _buildInfoRow(Icons.note, 'Ghi chú', deliveryInfo['note']),
+            _buildInfoRow(Icons.note, 'Note', deliveryInfo['note']),
           ],
         ],
       ),
@@ -232,8 +232,8 @@ class OrderConfirmationDialog extends StatelessWidget {
 
   Widget _buildPaymentMethod() {
     final methodText = paymentMethod == 'cod'
-        ? 'Thanh toán khi nhận hàng (COD)'
-        : 'Thanh toán qua PayPal';
+        ? 'Cash on Delivery (COD)'
+        : 'PayPal Payment';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -265,11 +265,11 @@ class OrderConfirmationDialog extends StatelessWidget {
 
   Widget _buildOrderSummary() {
     final items = orderSummary['items'] as List<dynamic>? ?? [];
-    final subtotal = orderSummary['subtotal'] ?? 0.0;
-    final shippingFee = orderSummary['shippingFee'] ?? 0.0;
-    final membershipDiscount = orderSummary['membershipDiscount'] ?? 0.0;
-    final couponDiscount = orderSummary['couponDiscount'] ?? 0.0;
-    final total = orderSummary['total'] ?? 0.0;
+    final subtotal = (orderSummary['subtotal'] as num?)?.toDouble() ?? 0.0;
+    final shippingFee = (orderSummary['shippingFee'] as num?)?.toDouble() ?? 0.0;
+    final membershipDiscount = (orderSummary['membershipDiscount'] as num?)?.toDouble() ?? 0.0;
+    final couponDiscount = (orderSummary['couponDiscount'] as num?)?.toDouble() ?? 0.0;
+    final total = (orderSummary['total'] as num?)?.toDouble() ?? 0.0;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -286,19 +286,19 @@ class OrderConfirmationDialog extends StatelessWidget {
           ],
 
           // Price breakdown
-          _buildPriceRow('Tạm tính:', _formatPrice(subtotal)),
+          _buildPriceRow('Subtotal:', _formatPrice(subtotal)),
           const SizedBox(height: 8),
-          _buildPriceRow('Phí vận chuyển:', shippingFee > 0 ? _formatPrice(shippingFee) : 'Miễn phí'),
+          _buildPriceRow('Shipping Fee:', shippingFee > 0 ? _formatPrice(shippingFee) : 'Free'),
           if (membershipDiscount > 0) ...[
             const SizedBox(height: 8),
-            _buildPriceRow('Giảm giá thành viên:', '-${_formatPrice(membershipDiscount)}', isDiscount: true),
+            _buildPriceRow('Membership Discount:', '-${_formatPrice(membershipDiscount)}', isDiscount: true),
           ],
           if (couponDiscount > 0) ...[
             const SizedBox(height: 8),
-            _buildPriceRow('Giảm giá coupon:', '-${_formatPrice(couponDiscount)}', isDiscount: true),
+            _buildPriceRow('Coupon Discount:', '-${_formatPrice(couponDiscount)}', isDiscount: true),
           ],
           const Divider(height: 24),
-          _buildPriceRow('Tổng cộng:', _formatPrice(total), isTotal: true),
+          _buildPriceRow('Total:', _formatPrice(total), isTotal: true),
         ],
       ),
     );
@@ -398,7 +398,7 @@ class OrderConfirmationDialog extends StatelessWidget {
   }
 
   String _formatDateTime(dynamic dateTime) {
-    if (dateTime == null) return 'Không xác định';
+    if (dateTime == null) return 'Not specified';
 
     try {
       final dt = dateTime is DateTime ? dateTime : DateTime.parse(dateTime.toString());
@@ -410,7 +410,7 @@ class OrderConfirmationDialog extends StatelessWidget {
 
       return '$day/$month/$year $hour:$minute';
     } catch (e) {
-      return 'Không xác định';
+      return 'Not specified';
     }
   }
 

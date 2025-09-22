@@ -437,7 +437,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             child: Column(
               children: [
                 if (chat.loading || chat.connecting)
-                  Container(
+                  SizedBox(
                     height: 2,
                     child: LinearProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),

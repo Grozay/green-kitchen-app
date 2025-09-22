@@ -1,99 +1,52 @@
-class VoucherService {
-  // Fake voucher data for demo purposes
-  static final List<Map<String, dynamic>> _fakeVouchers = [
-    {
-      'id': '1',
-      'code': 'GREEN10',
-      'name': 'Giảm 10%',
-      'description': 'Giảm 10% cho đơn hàng từ 100k',
-      'discountType': 'PERCENTAGE',
-      'discountValue': 10.0,
-      'minimumOrderValue': 100000.0,
-      'maximumDiscount': null,
-      'expiresAt': '2024-12-31T23:59:59Z',
-      'isActive': true,
-      'usageLimit': null,
-      'usedCount': 0,
-    },
-    {
-      'id': '2',
-      'code': 'SHIPFREE',
-      'name': 'Miễn phí giao hàng',
-      'description': 'Miễn phí giao hàng cho đơn hàng từ 150k',
-      'discountType': 'FIXED_AMOUNT',
-      'discountValue': 25000.0,
-      'minimumOrderValue': 150000.0,
-      'maximumDiscount': null,
-      'expiresAt': '2024-12-31T23:59:59Z',
-      'isActive': true,
-      'usageLimit': null,
-      'usedCount': 0,
-    },
-    {
-      'id': '3',
-      'code': 'NEWUSER',
-      'name': 'Khách hàng mới',
-      'description': 'Giảm 50k cho khách hàng mới',
-      'discountType': 'FIXED_AMOUNT',
-      'discountValue': 50000.0,
-      'minimumOrderValue': 200000.0,
-      'maximumDiscount': null,
-      'expiresAt': '2024-12-31T23:59:59Z',
-      'isActive': true,
-      'usageLimit': 1,
-      'usedCount': 0,
-    },
-    {
-      'id': '4',
-      'code': 'FLASH50',
-      'name': 'Flash Sale',
-      'description': 'Giảm 50k cho đơn hàng từ 300k',
-      'discountType': 'FIXED_AMOUNT',
-      'discountValue': 50000.0,
-      'minimumOrderValue': 300000.0,
-      'maximumDiscount': 50000.0,
-      'expiresAt': '2024-12-31T23:59:59Z',
-      'isActive': true,
-      'usageLimit': 100,
-      'usedCount': 45,
-    },
-  ];
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../apis/endpoint.dart';
 
+class VoucherService {
   // Get all available vouchers for a customer
   static Future<List<Map<String, dynamic>>> getAvailableVouchers({
     required int customerId,
     double? orderValue,
   }) async {
     try {
-      // In real app, this would call the API with customer ID
-      // final response = await http.get(Uri.parse('${ApiEndpoints.baseUrl}/customers/$customerId/vouchers'));
+      final url = Uri.parse('${ApiEndpoints.baseUrl}/coupons/available');
+      final response = await http.get(url);
 
-      // For demo, filter fake data based on criteria
-      await Future.delayed(const Duration(milliseconds: 300)); // Simulate network delay
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        final vouchers = data.map((item) {
+          return {
+            'id': item['id'].toString(),
+            'code': item['code'] as String,
+            'name': item['name'] as String,
+            'description': item['description'] as String? ?? '',
+            'type': item['type'] as String,
+            'discountValue': (item['discountValue'] as num).toDouble(),
+            'maxDiscount': item['maxDiscount'] as double?,
+            'pointsRequired': (item['pointsRequired'] as num).toDouble(),
+            'validUntil': item['validUntil'] as String,
+            'exchangeLimit': item['exchangeLimit'] as int?,
+            'exchangeCount': (item['exchangeCount'] as num?)?.toInt() ?? 0,
+            'status': item['status'] as String,
+            'applicability': item['applicability'] as String,
+            'isActive': item['status'] == 'ACTIVE',
+            'usageLimit': null,
+            'usedCount': 0,
+          };
+        }).toList();
 
-      final now = DateTime.now();
-      final availableVouchers = _fakeVouchers.where((voucher) {
-        // Check if voucher is active and not expired
-        if (!voucher['isActive']) return false;
-
-        final expiresAt = DateTime.parse(voucher['expiresAt']);
-        if (expiresAt.isBefore(now)) return false;
-
-        // Check usage limit
-        final usageLimit = voucher['usageLimit'];
-        final usedCount = voucher['usedCount'];
-        if (usageLimit != null && usedCount >= usageLimit) return false;
-
-        // Check minimum order value if provided
-        final minOrderValue = voucher['minimumOrderValue'];
-        if (orderValue != null && minOrderValue != null && orderValue < minOrderValue) {
-          return false;
+        // Filter by order value if provided (optional)
+        if (orderValue != null) {
+          return vouchers.where((voucher) {
+            // You can add order value filtering logic here if needed
+            return true; // For now, return all
+          }).toList();
         }
 
-        return true;
-      }).toList();
-
-      return availableVouchers;
+        return vouchers;
+      } else {
+        throw Exception('Failed to load vouchers: ${response.statusCode}');
+      }
     } catch (e) {
       throw Exception('Failed to load vouchers: $e');
     }
@@ -106,14 +59,32 @@ class VoucherService {
     int? customerId,
   }) async {
     try {
-      final vouchers = await getAvailableVouchers(
-        customerId: customerId ?? 0,
-        orderValue: orderValue,
-      );
+      if (customerId == null) {
+        throw Exception('Customer ID is required');
+      }
 
-      return vouchers.firstWhere(
-        (voucher) => voucher['code'].toString().toUpperCase() == code.toUpperCase(),
-      );
+      final url = Uri.parse(ApiEndpoints.validateVoucherCode(code, customerId, orderValue: orderValue));
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'id': data['id'].toString(),
+          'code': data['code'] as String,
+          'name': data['name'] as String,
+          'description': data['description'] as String? ?? '',
+          'discountType': data['discountType'] == 'PERCENTAGE' ? 'percentage' : 'fixed',
+          'discountValue': (data['discountValue'] as num).toDouble(),
+          'maximumDiscount': data['maxDiscount'] as double?,
+          'pointsRequired': (data['pointsRequired'] as num?)?.toDouble() ?? 0.0,
+          'expiresAt': data['expiresAt'] as String,
+        };
+      } else if (response.statusCode == 400) {
+        final error = jsonDecode(response.body);
+        throw Exception(error['error'] ?? 'Invalid voucher code');
+      } else {
+        throw Exception('Failed to validate voucher: ${response.statusCode}');
+      }
     } catch (e) {
       return null;
     }
