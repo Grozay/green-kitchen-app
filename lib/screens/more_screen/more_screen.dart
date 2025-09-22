@@ -36,23 +36,10 @@ class _MoreScreenState extends State<MoreScreen> {
     return SafeArea(
       child: Column(
         children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              'More',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-
           // Menu Items
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
               children: [
                 _buildMenuCard(
                   context,
@@ -60,7 +47,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   title: 'Chat Support',
                   onTap: () => context.go('/chat'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 _buildMenuCard(
                   context,
@@ -68,7 +55,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   title: 'Store Location',
                   onTap: () => context.go('/location'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 _buildMenuCard(
                   context,
@@ -76,7 +63,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   title: 'About Us',
                   onTap: () => context.go('/about'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 _buildMenuCard(
                   context,
@@ -84,7 +71,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   title: 'Contact',
                   onTap: () => context.go('/feedback'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 _buildMenuCard(
                   context,
@@ -92,7 +79,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   title: 'FAQ',
                   onTap: () => context.go('/faq'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 _buildMenuCard(
                   context,
@@ -100,7 +87,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   title: 'Policy',
                   onTap: () => context.go('/policy'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 // Logout Button - Only show if user is authenticated
                 if (authProvider.isAuthenticated) _buildLogoutCard(context),
@@ -116,7 +103,7 @@ class _MoreScreenState extends State<MoreScreen> {
     return GestureDetector(
       onTap: () => _logout(context),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.red.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16),
@@ -128,7 +115,7 @@ class _MoreScreenState extends State<MoreScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -136,15 +123,15 @@ class _MoreScreenState extends State<MoreScreen> {
               child: const Icon(
                 Icons.logout,
                 color: Colors.red,
-                size: 24,
+                size: 20,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Logout',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.red,
                 ),
@@ -153,7 +140,7 @@ class _MoreScreenState extends State<MoreScreen> {
             const Icon(
               Icons.arrow_forward_ios,
               color: Colors.red,
-              size: 16,
+              size: 14,
             ),
           ],
         ),
@@ -169,7 +156,7 @@ class _MoreScreenState extends State<MoreScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -188,7 +175,7 @@ class _MoreScreenState extends State<MoreScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -196,15 +183,15 @@ class _MoreScreenState extends State<MoreScreen> {
               child: Icon(
                 icon,
                 color: AppColors.primary,
-                size: 24,
+                size: 20,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),
@@ -213,7 +200,7 @@ class _MoreScreenState extends State<MoreScreen> {
             Icon(
               Icons.arrow_forward_ios,
               color: AppColors.textSecondary,
-              size: 16,
+              size: 14,
             ),
           ],
         ),

@@ -429,7 +429,9 @@ class _DeliveryInfoStepState extends State<DeliveryInfoStep> {
             DeliveryTimeSelector(
               selectedDateTime: widget.formData['deliveryTime'],
               onTimeSelected: (dateTime) {
+                print('DeliveryInfoStep: onTimeSelected called with: $dateTime');
                 widget.onFormDataChanged('deliveryTime', dateTime);
+                print('DeliveryInfoStep: formData updated, current deliveryTime: ${widget.formData['deliveryTime']}');
               },
             ),
 
@@ -962,6 +964,7 @@ class _DeliveryInfoStepState extends State<DeliveryInfoStep> {
               ),
             ),
 
+          const SizedBox(height: 16),
           // Notes
           CustomTextField(
             controller: _noteController,

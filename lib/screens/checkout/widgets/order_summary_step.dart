@@ -10,12 +10,14 @@ class OrderSummaryStep extends StatefulWidget {
   final Map<String, dynamic> formData;
   final Function(String, dynamic) onFormDataChanged;
   final VoidCallback onNext;
+  final VoidCallback onBack;
 
   const OrderSummaryStep({
     super.key,
     required this.formData,
     required this.onFormDataChanged,
     required this.onNext,
+    required this.onBack,
   });
 
   @override
@@ -58,7 +60,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
         final total = subtotal + shippingFee - membershipDiscount - couponDiscount;
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -67,11 +69,11 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
               const SizedBox(height: 16),
               _buildOrderItems(cartItems),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Coupon Section
               _buildSectionHeader('Coupon Code'),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               CouponSelector(
                 selectedCoupon: widget.formData['selectedCoupon'],
                 onCouponSelected: (coupon) {
@@ -95,21 +97,21 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
                 },
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Payment Method Section
               _buildSectionHeader('Payment Method'),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               PaymentMethodSelector(
                 selectedMethod: _paymentMethod,
                 onMethodChanged: _handlePaymentMethodChanged,
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Price Summary Section
               _buildSectionHeader('Order Summary'),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               _buildPriceSummary(
                 subtotal: subtotal,
                 shippingFee: shippingFee,
@@ -118,30 +120,54 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
                 total: total,
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Next Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              // Action buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: widget.onBack,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(color: AppColors.inputBorder),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Back',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
-                    elevation: 0,
                   ),
-                  onPressed: widget.onNext,
-                  child: const Text(
-                    'Confirm Order',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: widget.onNext,
+                      child: const Text(
+                        'Confirm Order',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
 
               const SizedBox(height: 20),
@@ -165,7 +191,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
 
   Widget _buildOrderItems(List<CartItem> cartItems) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -181,7 +207,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
         children: cartItems.map((item) {
           final itemTotal = item.unitPrice * item.quantity;
           return Container(
-            margin: const EdgeInsets.only(bottom: 16),
+            margin: const EdgeInsets.only(bottom: 12),
             child: Row(
               children: [
                 // Item Image
@@ -199,7 +225,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
 
                 // Item Details
                 Expanded(
@@ -251,7 +277,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
     required double total,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

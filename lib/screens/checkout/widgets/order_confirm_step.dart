@@ -58,7 +58,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
     final paymentMethod = widget.formData['paymentMethod'] ?? 'cash';
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -67,21 +67,21 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
           const SizedBox(height: 16),
           _buildOrderSummary(),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Delivery Information Section
           _buildSectionHeader('Delivery Information'),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           _buildDeliveryInfo(selectedStore),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Payment Information Section
           _buildSectionHeader('Payment Information'),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           _buildPaymentInfo(paymentMethod, selectedCoupon),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // Navigation Buttons
           Row(
@@ -152,7 +152,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
 
   Widget _buildOrderSummary() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -168,7 +168,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
         children: [
           // Order Items
           ...widget.cart.cartItems.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               children: [
                 Container(
@@ -222,7 +222,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
 
   Widget _buildDeliveryInfo(Store? selectedStore) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -242,7 +242,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
           _buildInfoRow('Phone Number', widget.formData['phone'] ?? ''),
           _buildInfoRow('Email', widget.formData['email'] ?? ''),
 
-          const Divider(height: 20),
+          const Divider(height: 16),
 
           // Delivery Address
           _buildInfoRow('Address', widget.formData['address'] ?? ''),
@@ -251,11 +251,11 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
           _buildInfoRow('Province/City', widget.formData['city'] ?? ''),
 
           if (widget.formData['note']?.isNotEmpty ?? false) ...[
-            const Divider(height: 20),
+            const Divider(height: 16),
             _buildInfoRow('Note', widget.formData['note']),
           ],
 
-          const Divider(height: 20),
+          const Divider(height: 16),
 
           // Store Info
           if (selectedStore != null) ...[
@@ -302,7 +302,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
 
   Widget _buildPaymentInfo(String paymentMethod, Map<String, dynamic>? selectedCoupon) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -322,12 +322,12 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
 
           // Coupon
           if (selectedCoupon != null && selectedCoupon.isNotEmpty) ...[
-            const Divider(height: 20),
+            const Divider(height: 16),
             _buildInfoRow('Coupon Code', selectedCoupon['code']),
             _buildInfoRow('Discount', '-${_formatDiscount(selectedCoupon)}'),
           ],
 
-          const Divider(height: 20),
+          const Divider(height: 16),
 
           // Order Totals
           _buildTotalRow('Subtotal', '${widget.cart.totalAmount.toStringAsFixed(0)}đ'),
@@ -342,7 +342,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
             ),
           ],
 
-          const Divider(height: 16),
+          const Divider(height: 12),
           _buildTotalRow(
             'Total',
             '${_calculateTotal(selectedCoupon).toStringAsFixed(0)}đ',
@@ -355,12 +355,12 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
+            width: 100,
             child: Text(
               label,
               style: TextStyle(
@@ -369,7 +369,7 @@ class _OrderConfirmStepState extends State<OrderConfirmStep> {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,

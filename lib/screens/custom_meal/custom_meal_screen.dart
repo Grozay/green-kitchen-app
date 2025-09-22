@@ -125,31 +125,68 @@ class _CustomMealScreenState extends State<CustomMealScreen>
                 const SizedBox(height: 16),
                 // TabBarView with grids
                 Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      // Protein tab
-                      _buildIngredientGrid(
-                        customMealProvider.availableProteins,
-                        customMealProvider,
-                      ),
-                      // Carbs tab
-                      _buildIngredientGrid(
-                        customMealProvider.availableCarbs,
-                        customMealProvider,
-                      ),
-                      // Side tab
-                      _buildIngredientGrid(
-                        customMealProvider.availableSides,
-                        customMealProvider,
-                      ),
-                      // Sauce tab
-                      _buildIngredientGrid(
-                        customMealProvider.availableSauces,
-                        customMealProvider,
-                      ),
-                    ],
-                  ),
+                  child: customMealProvider.isLoadingIngredients
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : customMealProvider.ingredientsError != null
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.error_outline,
+                                      size: 48,
+                                      color: Colors.red,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Failed to load ingredients',
+                                      style: Theme.of(context).textTheme.headlineSmall,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      customMealProvider.ingredientsError!,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(color: Colors.grey),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    ElevatedButton(
+                                      onPressed: () => customMealProvider.loadAvailableItems(),
+                                      child: const Text('Retry'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : TabBarView(
+                              controller: _tabController,
+                              children: [
+                                // Protein tab
+                                _buildIngredientGrid(
+                                  customMealProvider.availableProteins,
+                                  customMealProvider,
+                                ),
+                                // Carbs tab
+                                _buildIngredientGrid(
+                                  customMealProvider.availableCarbs,
+                                  customMealProvider,
+                                ),
+                                // Side tab
+                                _buildIngredientGrid(
+                                  customMealProvider.availableSides,
+                                  customMealProvider,
+                                ),
+                                // Sauce tab
+                                _buildIngredientGrid(
+                                  customMealProvider.availableSauces,
+                                  customMealProvider,
+                                ),
+                              ],
+                            ),
                 ),
                 // Nutrition info and button
                 Container(
@@ -253,6 +290,22 @@ class _CustomMealScreenState extends State<CustomMealScreen>
     List<Ingredient> ingredients,
     CustomMealProvider provider,
   ) {
+    if (ingredients.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'No ingredients available for this category.\nPlease add ingredients through the admin panel.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      );
+    }
+
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -275,107 +328,9 @@ class _CustomMealScreenState extends State<CustomMealScreen>
     );
   }
 
-  void _showSauceSuggestionDialog(
-    BuildContext context,
-    CustomMealProvider provider,
-  ) {
-    final suggestedSauces = provider.getSuggestedSauces();
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Suggested Sauces'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: suggestedSauces.length,
-              itemBuilder: (context, index) {
-                final sauce = suggestedSauces[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(sauce.image),
-                  ),
-                  title: Text(sauce.title),
-                  subtitle: Text('\$${sauce.price.toStringAsFixed(2)}'),
-                  onTap: () {
-                    provider.selectMealItem(sauce);
-                    Navigator.of(context).pop();
-                    _showOrderConfirmation(context, provider);
-                  },
-                );
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  void _showOrderConfirmation(
-    BuildContext context,
-    CustomMealProvider provider,
-  ) {
-    if (!provider.isComplete) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select all meal components'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Order'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Protein: ${provider.selection.protein?.item.title ?? 'None'}',
-              ),
-              Text('Carbs: ${provider.selection.carbs?.item.title ?? 'None'}'),
-              Text('Side: ${provider.selection.side?.item.title ?? 'None'}'),
-              Text('Sauce: ${provider.selection.sauce?.item.title ?? 'None'}'),
-              const SizedBox(height: 16),
-              Text('Total: \$${provider.totalPrice.toStringAsFixed(2)}'),
-              Text('Calories: ${provider.totalCalories.toStringAsFixed(0)}'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Custom meal added to cart!'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                provider.clearSelection();
-              },
-              child: const Text('Add to Cart'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   void _showLoginPrompt(BuildContext context) {
     showDialog(

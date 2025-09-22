@@ -25,6 +25,11 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
     final defaultDateTime = _calculateDefaultDeliveryTime();
     _selectedDate = DateTime(defaultDateTime.year, defaultDateTime.month, defaultDateTime.day);
     _selectedTime = TimeOfDay.fromDateTime(defaultDateTime);
+    
+    // Gọi _updateDateTime để set giá trị mặc định vào formData
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateDateTime();
+    });
   }
 
   DateTime _calculateDefaultDeliveryTime() {
@@ -174,6 +179,7 @@ class _DeliveryTimeSelectorState extends State<DeliveryTimeSelector> {
       _selectedTime.hour,
       _selectedTime.minute,
     );
+    print('DeliveryTimeSelector: _updateDateTime called with: $dateTime');
     widget.onTimeSelected(dateTime);
   }
 

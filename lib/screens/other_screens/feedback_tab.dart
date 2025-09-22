@@ -69,7 +69,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Cảm ơn phản hồi của bạn! Chúng tôi sẽ xử lý trong thời gian sớm nhất.'),
+            content: Text('Thank you for your feedback! We will process it as soon as possible.'),
             backgroundColor: AppColors.secondary,
           ),
         );
@@ -87,7 +87,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại.'),
+          content: Text('Error occurred while sending feedback. Please try again.'),
           backgroundColor: AppColors.accent,
         ),
       );
@@ -118,7 +118,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Yêu cầu hỗ trợ đã được gửi! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.'),
+            content: Text('Support request sent! We will contact you as soon as possible.'),
             backgroundColor: AppColors.secondary,
           ),
         );
@@ -136,7 +136,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Có lỗi xảy ra khi gửi yêu cầu hỗ trợ. Vui lòng thử lại.'),
+          content: Text('Error occurred while sending support request. Please try again.'),
           backgroundColor: AppColors.accent,
         ),
       );
@@ -150,7 +150,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
         if (Navigator.of(context).canPop()) {
           return true;
         }
-        context.go('/profile');
+        context.go('/more');
         return false;
       },
       child: Scaffold(
@@ -163,10 +163,10 @@ class _FeedbackTabState extends State<FeedbackTab> {
               Icons.arrow_back_rounded,
               color: AppColors.textPrimary,
             ),
-            onPressed: () => context.go('/profile'),
+            onPressed: () => context.go('/more'),
           ),
           title: Text(
-            'Hỗ trợ & Phản hồi',
+            'Support & Feedback',
             style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -220,7 +220,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Hỗ trợ & Phản hồi',
+                          'Support & Feedback',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -237,7 +237,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7',
+                          'We are always ready to support you 24/7',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white.withOpacity(0.9),
@@ -261,27 +261,27 @@ class _FeedbackTabState extends State<FeedbackTab> {
                     children: [
                       _buildQuickActionCard(
                         icon: Icons.support,
-                        title: 'Yêu cầu hỗ trợ',
-                        subtitle: 'Gặp vấn đề? Chúng tôi sẽ giúp bạn giải quyết nhanh chóng',
+                        title: 'Request Support',
+                        subtitle: 'Having issues? We will help you resolve them quickly',
                         color: AppColors.primary,
                         onTap: () => setState(() => _supportDialogOpen = true),
                       ),
                       _buildQuickActionCard(
                         icon: Icons.feedback,
-                        title: 'Gửi phản hồi',
-                        subtitle: 'Chia sẻ ý kiến để chúng tôi cải thiện dịch vụ tốt hơn',
+                        title: 'Send Feedback',
+                        subtitle: 'Share your opinion to help us improve our service',
                         color: AppColors.accent,
                         onTap: () => setState(() => _feedbackDialogOpen = true),
                       ),
                       _buildQuickActionCard(
                         icon: Icons.chat,
-                        title: 'Chat trực tuyến',
-                        subtitle: 'Trò chuyện trực tiếp với nhân viên hỗ trợ',
+                        title: 'Online Chat',
+                        subtitle: 'Chat directly with support staff',
                         color: Colors.green,
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Tính năng chat sẽ sớm có mặt!'),
+                              content: Text('Chat feature coming soon!'),
                               backgroundColor: Colors.green,
                             ),
                           );
@@ -311,7 +311,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '📞 Thông tin liên hệ',
+                          '📞 Contact Information',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -336,7 +336,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                                 icon: Icons.email,
                                 title: 'Email',
                                 value: 'support@greenkitchen.com',
-                                subtitle: 'Phản hồi trong 24h',
+                                subtitle: 'Response within 24h',
                                 color: AppColors.accent,
                               ),
                             ),
@@ -348,7 +348,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                             Expanded(
                               child: _buildContactInfo(
                                 icon: Icons.location_on,
-                                title: 'Văn phòng',
+                                title: 'Office',
                                 value: 'TP. Hồ Chí Minh',
                                 subtitle: '123 Đường ABC, Quận 1',
                                 color: Colors.purple,
@@ -391,7 +391,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '❓ Câu hỏi thường gặp',
+                          '❓ Frequently Asked Questions',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -400,18 +400,18 @@ class _FeedbackTabState extends State<FeedbackTab> {
                         ),
                         const SizedBox(height: 20),
                         _buildFaqItem(
-                          question: 'Làm thế nào để đặt hàng?',
-                          answer: 'Bạn có thể đặt hàng qua website, ứng dụng mobile hoặc gọi điện trực tiếp đến hotline của chúng tôi.',
+                          question: 'How to place an order?',
+                          answer: 'You can order through our website, mobile app or call our hotline directly.',
                         ),
                         const Divider(height: 32),
                         _buildFaqItem(
-                          question: 'Thời gian giao hàng là bao lâu?',
-                          answer: 'Thời gian giao hàng từ 30-60 phút tùy thuộc vào khoảng cách và tình trạng giao thông.',
+                          question: 'What is the delivery time?',
+                          answer: 'Delivery time is 30-60 minutes depending on distance and traffic conditions.',
                         ),
                         const Divider(height: 32),
                         _buildFaqItem(
-                          question: 'Có thể thanh toán bằng cách nào?',
-                          answer: 'Chúng tôi chấp nhận thanh toán tiền mặt, thẻ tín dụng, ví điện tử và chuyển khoản ngân hàng.',
+                          question: 'What payment methods are available?',
+                          answer: 'We accept cash, credit cards, e-wallets and bank transfers.',
                         ),
                       ],
                     ),
@@ -638,7 +638,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'Gửi phản hồi',
+                          'Send Feedback',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -734,8 +734,8 @@ class _FeedbackTabState extends State<FeedbackTab> {
                       TextFormField(
                         controller: _feedbackEmailController,
                         decoration: InputDecoration(
-                          labelText: 'Email liên hệ (tùy chọn)',
-                          hintText: 'Để nhận phản hồi từ chúng tôi',
+                          labelText: 'Contact Email (optional)',
+                          hintText: 'To receive feedback from us',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -777,7 +777,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Gửi phản hồi'),
+                      child: const Text('Send Feedback'),
                     ),
                   ],
                 ),
@@ -917,8 +917,8 @@ class _FeedbackTabState extends State<FeedbackTab> {
                         controller: _supportDescriptionController,
                         maxLines: 4,
                         decoration: InputDecoration(
-                          labelText: 'Mô tả chi tiết vấn đề',
-                          hintText: 'Vui lòng mô tả chi tiết vấn đề bạn gặp phải...',
+                          labelText: 'Detailed problem description',
+                          hintText: 'Please describe in detail the problem you are experiencing...',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

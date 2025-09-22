@@ -15,85 +15,85 @@ class _FaqTabState extends State<FaqTab> {
   final List<Map<String, dynamic>> faqs = [
     {
       'id': 'panel1',
-      'title': '🛒 Đặt hàng & Thanh toán',
+      'title': '🛒 Order & Payment',
       'icon': Icons.shopping_cart,
       'color': AppColors.accent,
       'questions': [
         {
-          'q': 'Làm thế nào để đặt hàng?',
-          'a': 'Bạn có thể đặt hàng qua website, ứng dụng mobile hoặc gọi điện trực tiếp đến hotline của chúng tôi. Chỉ cần chọn món ăn từ menu, thêm vào giỏ hàng và tiến hành thanh toán.'
+          'q': 'How to place an order?',
+          'a': 'You can order through our website, mobile app or call our hotline directly. Simply select items from the menu, add to cart and proceed to checkout.'
         },
         {
-          'q': 'Thời gian giao hàng là bao lâu?',
-          'a': 'Thời gian giao hàng từ 30-60 phút tùy thuộc vào khoảng cách và tình trạng giao thông. Chúng tôi sẽ thông báo trước 10 phút khi đến giao hàng.'
+          'q': 'What is the delivery time?',
+          'a': 'Delivery time is 30-60 minutes depending on distance and traffic conditions. We will notify you 10 minutes before arrival.'
         },
         {
-          'q': 'Có thể thanh toán bằng cách nào?',
-          'a': 'Chúng tôi chấp nhận thanh toán tiền mặt, thẻ tín dụng, ví điện tử (MoMo, ZaloPay, VNPay) và chuyển khoản ngân hàng. Mọi giao dịch đều được mã hóa SSL 256-bit.'
+          'q': 'What payment methods are available?',
+          'a': 'We accept cash, credit cards, e-wallets (MoMo, ZaloPay, VNPay) and bank transfers. All transactions are encrypted with SSL 256-bit.'
         },
         {
-          'q': 'Có thể hủy đơn hàng không?',
-          'a': 'Bạn có thể hủy đơn hàng trong vòng 5 phút sau khi đặt. Sau thời gian này, đơn hàng sẽ được xử lý và không thể hủy. Vui lòng liên hệ hotline để được hỗ trợ.'
+          'q': 'Can I cancel my order?',
+          'a': 'You can cancel your order within 5 minutes after placing it. After this time, the order will be processed and cannot be cancelled. Please contact our hotline for support.'
         }
       ]
     },
     {
       'id': 'panel2',
-      'title': '🍽️ Món ăn & Chất lượng',
+      'title': '🍽️ Food & Quality',
       'icon': Icons.restaurant,
       'color': AppColors.secondary,
       'questions': [
         {
-          'q': 'Món ăn có nóng khi giao đến không?',
-          'a': 'Chúng tôi sử dụng túi giữ nhiệt chuyên dụng để đảm bảo món ăn giữ được độ nóng tối ưu trong suốt quá trình giao hàng.'
+          'q': 'Is the food hot when delivered?',
+          'a': 'We use specialized thermal bags to ensure food maintains optimal temperature throughout delivery.'
         },
         {
-          'q': 'Có thể thay đổi thành phần món ăn không?',
-          'a': 'Bạn có thể yêu cầu điều chỉnh một số món ăn khi đặt hàng. Vui lòng ghi chú chi tiết trong phần "Ghi chú đặc biệt" khi đặt hàng.'
+          'q': 'Can I modify food ingredients?',
+          'a': 'You can request adjustments for some dishes when ordering. Please add detailed notes in the "Special Notes" section.'
         },
         {
-          'q': 'Món ăn có đảm bảo vệ sinh an toàn thực phẩm?',
-          'a': 'Tất cả nguyên liệu đều được kiểm tra nghiêm ngặt, chế biến trong môi trường đạt chuẩn HACCP và tuân thủ quy định ATTP của Bộ Y tế.'
+          'q': 'Is food safety guaranteed?',
+          'a': 'All ingredients are strictly inspected, processed in HACCP-standard environment and comply with food safety regulations.'
         }
       ]
     },
     {
       'id': 'panel3',
-      'title': '👤 Tài khoản & Thành viên',
+      'title': '👤 Account & Membership',
       'icon': Icons.account_circle,
       'color': Colors.purple,
       'questions': [
         {
-          'q': 'Làm sao để trở thành thành viên?',
-          'a': 'Chỉ cần đặt hàng một lần, bạn sẽ tự động trở thành thành viên và nhận được nhiều ưu đãi hấp dẫn từ chương trình khách hàng thân thiết.'
+          'q': 'How to become a member?',
+          'a': 'Simply place one order and you will automatically become a member with access to exclusive benefits from our loyalty program.'
         },
         {
-          'q': 'Quên mật khẩu, làm thế nào để lấy lại?',
-          'a': 'Click vào "Quên mật khẩu" trên trang đăng nhập, nhập email đã đăng ký. Chúng tôi sẽ gửi link đặt lại mật khẩu trong vòng 5 phút.'
+          'q': 'Forgot password, how to recover?',
+          'a': 'Click "Forgot Password" on the login page, enter your registered email. We will send a password reset link within 5 minutes.'
         },
         {
-          'q': 'Ưu đãi cho thành viên là gì?',
-          'a': 'Thành viên được tích điểm thưởng, giảm giá theo hạng, ưu tiên giao hàng và nhiều ưu đãi đặc biệt khác tùy theo cấp độ thành viên.'
+          'q': 'What are member benefits?',
+          'a': 'Members earn reward points, tier-based discounts, priority delivery and many other special benefits based on membership level.'
         }
       ]
     },
     {
       'id': 'panel4',
-      'title': '📞 Hỗ trợ & Phản hồi',
+      'title': '📞 Support & Feedback',
       'icon': Icons.support,
       'color': Colors.blue,
       'questions': [
         {
-          'q': 'Làm sao để liên hệ hỗ trợ?',
-          'a': 'Bạn có thể liên hệ qua hotline 1900-xxxx, email support@greenkitchen.com hoặc chat trực tuyến 24/7 trên website và ứng dụng.'
+          'q': 'How to contact support?',
+          'a': 'You can contact us via hotline 1900-xxxx, email support@greenkitchen.com or 24/7 online chat on website and app.'
         },
         {
-          'q': 'Thời gian phản hồi hỗ trợ?',
-          'a': 'Đội ngũ hỗ trợ hoạt động 24/7. Chúng tôi cam kết phản hồi trong vòng 5 phút cho chat trực tuyến và 24h cho email.'
+          'q': 'Support response time?',
+          'a': 'Support team operates 24/7. We commit to respond within 5 minutes for online chat and 24 hours for email.'
         },
         {
-          'q': 'Có thể phản hồi về chất lượng dịch vụ không?',
-          'a': 'Chúng tôi rất trân trọng mọi phản hồi từ khách hàng. Bạn có thể gửi phản hồi qua ứng dụng, website hoặc trực tiếp cho nhân viên giao hàng.'
+          'q': 'Can I provide service quality feedback?',
+          'a': 'We highly value all customer feedback. You can provide feedback through the app, website or directly to delivery staff.'
         }
       ]
     }
@@ -106,7 +106,7 @@ class _FaqTabState extends State<FaqTab> {
         if (Navigator.of(context).canPop()) {
           return true;
         }
-        context.go('/profile');
+        context.go('/more');
         return false;
       },
       child: Scaffold(
@@ -119,10 +119,10 @@ class _FaqTabState extends State<FaqTab> {
               Icons.arrow_back_rounded,
               color: AppColors.textPrimary,
             ),
-            onPressed: () => context.go('/profile'),
+            onPressed: () => context.go('/more'),
           ),
           title: Text(
-            'Câu hỏi thường gặp',
+            'FAQ',
             style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -174,7 +174,7 @@ class _FaqTabState extends State<FaqTab> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Câu hỏi thường gặp',
+                      'Frequently Asked Questions',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -191,7 +191,7 @@ class _FaqTabState extends State<FaqTab> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Tìm câu trả lời cho những thắc mắc phổ biến',
+                      'Find answers to common questions',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),

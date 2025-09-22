@@ -43,6 +43,8 @@ class CustomMealProvider extends ChangeNotifier {
   List<Ingredient> availableCarbs = [];
   List<Ingredient> availableSides = [];
   List<Ingredient> availableSauces = [];
+  bool isLoadingIngredients = false;
+  String? ingredientsError;
 
   // Initial state
   Map<String, List<IngredientWithQuantity>> selectedItems = {
@@ -232,12 +234,31 @@ class CustomMealProvider extends ChangeNotifier {
 
   // Add method to load available items
   Future<void> loadAvailableItems() async {
-    final categorizedIngredients = await IngredientService.getIngredients();
-    availableProteins = categorizedIngredients['protein'] ?? [];
-    availableCarbs = categorizedIngredients['carbs'] ?? [];
-    availableSides = categorizedIngredients['side'] ?? [];
-    availableSauces = categorizedIngredients['sauce'] ?? [];
-    notifyListeners();
+    try {
+      isLoadingIngredients = true;
+      ingredientsError = null;
+      notifyListeners();
+      
+      final categorizedIngredients = await IngredientService.getIngredients();
+      
+      availableProteins = categorizedIngredients['protein'] ?? [];
+      availableCarbs = categorizedIngredients['carbs'] ?? [];
+      availableSides = categorizedIngredients['side'] ?? [];
+      availableSauces = categorizedIngredients['sauce'] ?? [];
+      
+      notifyListeners();
+    } catch (e) {
+      ingredientsError = e.toString();
+      // Set empty lists on error
+      availableProteins = [];
+      availableCarbs = [];
+      availableSides = [];
+      availableSauces = [];
+      notifyListeners();
+    } finally {
+      isLoadingIngredients = false;
+      notifyListeners();
+    }
   }
 
   // Add getter for flat list (for your request to remove categories)

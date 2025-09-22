@@ -12,11 +12,11 @@ import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/save_cust
 import 'package:green_kitchen_app/screens/custom_meal/save_custom_meal/your_custom_meal_screen.dart';
 import 'package:green_kitchen_app/screens/home_screen/home_screen.dart';
 import 'package:green_kitchen_app/screens/profile/profile_screen.dart';
-import 'package:green_kitchen_app/screens/profile/tabs/faq_tab.dart';
-import 'package:green_kitchen_app/screens/profile/tabs/location_tab.dart';
-import 'package:green_kitchen_app/screens/profile/tabs/feedback_tab.dart';
-import 'package:green_kitchen_app/screens/profile/tabs/about_tab.dart';
-import 'package:green_kitchen_app/screens/profile/tabs/policy_tab.dart';
+import 'package:green_kitchen_app/screens/other_screens/faq_tab.dart';
+import 'package:green_kitchen_app/screens/other_screens/location_tab.dart';
+import 'package:green_kitchen_app/screens/other_screens/feedback_tab.dart';
+import 'package:green_kitchen_app/screens/other_screens/about_tab.dart';
+import 'package:green_kitchen_app/screens/other_screens/policy_tab.dart';
 import 'package:green_kitchen_app/screens/profile/membership_screen.dart';
 import 'package:green_kitchen_app/screens/profile/order_history_screen.dart';
 import 'package:green_kitchen_app/screens/menu_screen/menu_screen.dart';
