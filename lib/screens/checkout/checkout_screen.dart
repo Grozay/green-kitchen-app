@@ -4,11 +4,12 @@ import 'package:provider/provider.dart';
 import '../../provider/cart_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../services/order_service.dart';
+import '../../services/customer_coupon_service.dart';
 import '../../models/create_order_request.dart';
 import '../../theme/app_colors.dart';
 import 'widgets/delivery_info_step.dart';
 import 'widgets/order_summary_step.dart';
-import 'widgets/order_confirmation_dialog.dart';
+import 'widgets/order_confirmation_step.dart';
 
 enum CheckoutStep {
   deliveryInfo,
@@ -114,16 +115,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         formData: _formData,
                         onFormDataChanged: _onFormDataChanged,
                         onNext: _nextStep,
+                        onBack: () {
+                          setState(() {
+                            _currentStep = CheckoutStep.deliveryInfo;
+                          });
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
                       ),
-                      OrderConfirmationDialog(
-                        deliveryInfo: _formData,
-                        paymentMethod: _formData['paymentMethod'] ?? 'cod',
+                      OrderConfirmationStep(
+                        formData: _formData,
                         orderSummary: {
                           'items': cart.cartItems.map((item) => {
                             'name': item.title,
                             'quantity': item.quantity,
                             'price': item.unitPrice,
                             'totalPrice': item.totalPrice,
+                            'image': item.image,
+                            'imageUrl': item.image,
                           }).toList(),
                           'subtotal': cart.totalAmount,
                           'shippingFee': (_formData['shippingFee'] as dynamic)?.toDouble() ?? 0.0,
@@ -133,11 +144,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                    ((_formData['membershipDiscount'] as dynamic)?.toDouble() ?? 0.0) -
                                    ((_formData['couponDiscount'] as dynamic)?.toDouble() ?? 0.0),
                         },
-                        onConfirm: () {
-                          Navigator.of(context).pop();
-                          _placeOrder(cartProvider);
+                        onConfirm: () => _placeOrder(cartProvider),
+                        onBack: () {
+                          setState(() {
+                            _currentStep = CheckoutStep.summary;
+                          });
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
                         },
-                        onCancel: () => Navigator.of(context).pop(),
                       ),
                     ],
                   ),
@@ -313,7 +329,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         return; // Exit early since order was created but payment failed
       }
 
-      // Step 3: Clear cart (only if both order creation and payment succeeded)
+      // Step 3: Update customer coupon if used (only if order creation succeeded)
+      final selectedCoupon = _formData['selectedCoupon'] as Map<String, dynamic>?;
+      if (selectedCoupon != null && selectedCoupon.isNotEmpty && selectedCoupon['id'] != null) {
+        try {
+          await CustomerCouponService.useCoupon(
+            couponId: selectedCoupon['id'].toString(),
+            orderId: order.id.toString(),
+          );
+          print('✅ Customer coupon updated to USED successfully');
+        } catch (couponError) {
+          // Don't fail the entire order if coupon update fails
+          print('⚠️ Failed to update customer coupon: $couponError');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Order successful! Code: ${order.orderCode}. Coupon update failed: $couponError'),
+                backgroundColor: Colors.orange,
+                duration: const Duration(seconds: 5),
+              ),
+            );
+          }
+        }
+      }
+
+      // Step 4: Clear cart (only if both order creation and payment succeeded)
       try {
         await cartProvider.clearCartFromServer(customerId);
       } catch (cartError) {
@@ -329,7 +369,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         }
       }
 
-      // Step 4: Show success and navigate to tracking
+      // Step 5: Show success and navigate to tracking
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

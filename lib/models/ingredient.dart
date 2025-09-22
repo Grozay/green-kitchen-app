@@ -9,7 +9,7 @@ class Ingredient {
   final String description;
   final String image;
   final double price;
-  final int stock;
+  final int? stock;
 
   Ingredient({
     required this.id,
@@ -22,7 +22,7 @@ class Ingredient {
     required this.description,
     required this.image,
     required this.price,
-    required this.stock,
+    this.stock,
   });
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
@@ -37,7 +37,7 @@ class Ingredient {
       description: json['description'],
       image: json['image'],
       price: json['price'],
-      stock: json['stock'],
+      stock: json['stock'] != null ? json['stock'] as int : null,
     );
   }
 

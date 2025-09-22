@@ -413,6 +413,24 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Add new coupon to customer coupons list
+  void addCustomerCoupon(Map<String, dynamic> newCoupon) {
+    if (_customerDetails != null) {
+      final customerCoupons = List<Map<String, dynamic>>.from(_customerDetails!['customerCoupons'] ?? []);
+      customerCoupons.add(newCoupon);
+      _customerDetails!['customerCoupons'] = customerCoupons;
+      
+      // Update available points by subtracting points required
+      final membershipInfo = _customerDetails!['membership'] ?? {};
+      final currentPoints = membershipInfo['availablePoints'] ?? 0;
+      final pointsRequired = newCoupon['pointsRequired'] ?? 0;
+      membershipInfo['availablePoints'] = currentPoints - pointsRequired;
+      _customerDetails!['membership'] = membershipInfo;
+      
+      notifyListeners();
+    }
+  }
+
   // Fetch customer details from backend
   Future<void> _fetchCustomerDetails(String email) async {
     try {

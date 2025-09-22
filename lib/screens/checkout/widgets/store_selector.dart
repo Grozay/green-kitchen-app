@@ -64,7 +64,10 @@ class StoreSelector extends StatefulWidget {
 
 class _StoreSelectorState extends State<StoreSelector> {
   List<Store> _stores = [];
+  List<Store> _allStores = [];
   bool _isLoading = true;
+  bool _showAllStores = false;
+  int _currentDisplayCount = 1; // Start with 1 store (nearest)
   String? _error;
 
   @override
@@ -100,11 +103,11 @@ class _StoreSelectorState extends State<StoreSelector> {
         _error = null;
       });
 
-      // Get nearest stores from StoreService using user coordinates
+      // Get all stores from StoreService using user coordinates
       final storesData = await StoreService.findNearestStores(
         widget.userLatitude!,
         widget.userLongitude!,
-        limit: 3,
+        limit: 10, // Get more stores for "view more" option
       );
 
       final stores = storesData.map((storeData) {
@@ -112,15 +115,47 @@ class _StoreSelectorState extends State<StoreSelector> {
       }).toList();
 
       setState(() {
-        _stores = stores;
+        _allStores = stores;
+        _stores = stores.isNotEmpty ? [stores.first] : []; // Show only nearest store initially
+        _currentDisplayCount = 1;
         _isLoading = false;
       });
+
+      // Auto-select nearest store if no store is selected
+      if (widget.selectedStore == null && stores.isNotEmpty) {
+        widget.onStoreSelected(stores.first);
+      }
     } catch (e) {
       setState(() {
         _error = 'Unable to load store list: $e';
         _isLoading = false;
       });
     }
+  }
+
+  void _toggleShowMoreStores() {
+    setState(() {
+      _showAllStores = !_showAllStores;
+      if (_showAllStores) {
+        // Show all stores
+        _stores = _allStores;
+        _currentDisplayCount = _allStores.length;
+      } else {
+        // Show only nearest store
+        _stores = _allStores.isNotEmpty ? [_allStores.first] : [];
+        _currentDisplayCount = 1;
+      }
+    });
+  }
+
+  void _showMoreStores() {
+    setState(() {
+      _currentDisplayCount += 2; // Show 2 more stores each time
+      if (_currentDisplayCount > _allStores.length) {
+        _currentDisplayCount = _allStores.length;
+      }
+      _stores = _allStores.take(_currentDisplayCount).toList();
+    });
   }
 
   @override
@@ -207,7 +242,7 @@ class _StoreSelectorState extends State<StoreSelector> {
           Row(
             children: [
               Text(
-                'Select Nearest Store',
+                _showAllStores ? 'Select Store' : 'Nearest Store',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -224,6 +259,99 @@ class _StoreSelectorState extends State<StoreSelector> {
           ),
           const SizedBox(height: 16),
           ..._stores.map((store) => _buildStoreOption(store)),
+          
+          // Show "View more stores" button if there are more stores to show
+          if (!_showAllStores && _currentDisplayCount < _allStores.length) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _showMoreStores,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.expand_more,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'View more stores (${_allStores.length - _currentDisplayCount} more)',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          
+          // Show "View all stores" button when showing some but not all
+          if (_currentDisplayCount < _allStores.length && _currentDisplayCount > 1) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: _toggleShowMoreStores,
+                child: Text(
+                  'View all stores',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ],
+          
+          // Show "Show less" button when showing all stores
+          if (_showAllStores && _allStores.length > 1) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _toggleShowMoreStores,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: AppColors.textSecondary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.expand_less,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Show less',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

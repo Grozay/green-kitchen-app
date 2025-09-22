@@ -189,23 +189,48 @@ class VoucherService {
     }
   }
 
-  // Exchange points for voucher
-  static Future<bool> exchangeVoucher({
+  // Exchange points for coupon
+  static Future<Map<String, dynamic>?> exchangePointsForCoupon({
     required int customerId,
-    required String voucherId,
+    required int couponId,
   }) async {
     try {
-      // In real app, this would call the API
-      // final response = await http.post(
-      //   Uri.parse('${ApiEndpoints.baseUrl}/customers/$customerId/exchange-voucher'),
-      //   body: jsonEncode({'voucherId': voucherId}),
-      // );
+      final url = Uri.parse(ApiEndpoints.exchangeCoupon);
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'customerId': customerId,
+          'couponId': couponId,
+        }),
+      );
 
-      // For demo, simulate success
-      await Future.delayed(const Duration(milliseconds: 500));
-      return true;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'id': data['id'].toString(),
+          'code': data['code'] as String,
+          'name': data['name'] as String,
+          'description': data['description'] as String? ?? '',
+          'discountType': data['type'] as String,
+          'discountValue': (data['discountValue'] as num).toDouble(),
+          'pointsRequired': (data['pointsRequired'] as num?)?.toDouble() ?? 0.0,
+          'expiresAt': data['validUntil'] as String,
+          'status': 'AVAILABLE',
+          'couponName': data['name'] as String,
+          'couponCode': data['code'] as String,
+          'couponDiscountValue': (data['discountValue'] as num).toDouble(),
+          'couponType': data['type'] as String,
+        };
+      } else {
+        final errorData = jsonDecode(response.body);
+        final errorMessage = errorData['error'] ?? 'Failed to exchange coupon';
+        throw Exception(errorMessage);
+      }
     } catch (e) {
-      throw Exception('Failed to exchange voucher: $e');
+      throw Exception('Failed to exchange coupon: $e');
     }
   }
 

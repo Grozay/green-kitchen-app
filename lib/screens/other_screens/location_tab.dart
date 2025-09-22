@@ -44,13 +44,13 @@ class _LocationTabState extends State<LocationTab> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        throw Exception('Không thể mở Google Maps');
+        throw Exception('Cannot open Google Maps');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Không thể mở Google Maps. Vui lòng cài đặt ứng dụng Google Maps.'),
+            content: Text('Cannot open Google Maps. Please install Google Maps app.'),
             backgroundColor: AppColors.accent,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -265,7 +265,7 @@ class _LocationTabState extends State<LocationTab> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Không thể tải danh sách cửa hàng',
+              'Cannot load store list',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -286,7 +286,7 @@ class _LocationTabState extends State<LocationTab> {
             ElevatedButton.icon(
               onPressed: _fetchStores,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Thử lại'),
+              label: const Text('Retry'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accent,
                 foregroundColor: Colors.white,
@@ -325,7 +325,7 @@ class _LocationTabState extends State<LocationTab> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Chưa có cửa hàng nào',
+              'No stores available',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -355,7 +355,7 @@ class _LocationTabState extends State<LocationTab> {
         if (Navigator.of(context).canPop()) {
           return true;
         }
-        context.go('/profile');
+        context.go('/more');
         return false;
       },
       child: Scaffold(
@@ -368,10 +368,10 @@ class _LocationTabState extends State<LocationTab> {
               Icons.arrow_back_rounded,
               color: AppColors.textPrimary,
             ),
-            onPressed: () => context.go('/profile'),
+            onPressed: () => context.go('/more'),
           ),
           title: Text(
-            'Cửa hàng',
+            'Stores',
             style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,

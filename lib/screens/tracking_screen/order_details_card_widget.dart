@@ -138,7 +138,7 @@ class OrderDetailsCardWidget extends StatelessWidget {
               _buildInfoRow('Phone', order.recipientPhone),
               _buildInfoRow(
                 'Address',
-                '${order.street}, ${order.ward}, ${order.district}, ${order.city}'
+                '${order.street}'
               ),
             ],
           ),

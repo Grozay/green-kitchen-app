@@ -280,49 +280,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     ),
                   ],
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(status).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        status,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(status).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    status,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: _getStatusColor(status),
                     ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getPaymentStatusColor(
-                          paymentStatus,
-                        ).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        paymentStatus,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: _getPaymentStatusColor(paymentStatus),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -394,7 +368,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           ),
                         ),
                         Text(
-                          fullAddress,
+                          street,
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -445,13 +419,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   if (membershipDiscount > 0)
                     _buildPriceRow(
                       'Membership Discount',
-                      -membershipDiscount,
+                      membershipDiscount,
                       isDiscount: true,
                     ),
                   if (couponDiscount > 0)
                     _buildPriceRow(
                       'Coupon Discount',
-                      -couponDiscount,
+                      couponDiscount,
                       isDiscount: true,
                     ),
                   const Divider(),
@@ -478,9 +452,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Order #$orderCode details')),
-                  );
+                  context.go('/tracking/$orderCode');
                 },
                 child: Text(
                   'View Details',
@@ -499,38 +471,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
+      case 'pending':
+        return Colors.orange;
+      case 'confirmed':
+        return Colors.blue;
+      case 'preparing':
+        return Colors.purple;
+      case 'shipping':
+        return Colors.deepOrange;
       case 'delivered':
         return Colors.green;
-      case 'processing':
-      case 'preparing':
-        return Colors.orange;
       case 'cancelled':
         return Colors.red;
-      case 'pending':
-        return Colors.blue;
-      case 'shipping':
-        return Colors.purple;
       default:
         return AppColors.primary;
     }
   }
 
-  Color _getPaymentStatusColor(String paymentStatus) {
-    switch (paymentStatus.toLowerCase()) {
-      case 'paid':
-      case 'completed':
-        return Colors.green;
-      case 'pending':
-        return Colors.orange;
-      case 'failed':
-      case 'cancelled':
-        return Colors.red;
-      case 'processing':
-        return Colors.blue;
-      default:
-        return AppColors.textSecondary;
-    }
-  }
 
   String _formatDateTime(String dateTimeString) {
     if (dateTimeString == 'N/A' || dateTimeString.isEmpty) return 'N/A';
@@ -655,7 +612,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             ),
           ),
           Text(
-            '${isDiscount && amount > 0 ? '-' : ''}\$${amount.abs().toStringAsFixed(2)}',
+            '${isDiscount ? '-' : ''}\$${amount.abs().toStringAsFixed(2)}',
             style: TextStyle(
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,

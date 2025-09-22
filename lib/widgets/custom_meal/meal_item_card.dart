@@ -167,7 +167,7 @@ class _MealItemCardState extends State<MealItemCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   // Out of stock text
-                  if (widget.item.stock == 0)
+                  if (widget.item.stock != null && widget.item.stock == 0)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
@@ -254,10 +254,10 @@ class _MealItemCardState extends State<MealItemCard> {
           IconButton(
             icon: Icon(
               Icons.add,
-              color: widget.item.stock > widget.quantity ? Color(0xFF4B0036) : Colors.grey,
+              color: (widget.item.stock == null || widget.item.stock! > widget.quantity) ? Color(0xFF4B0036) : Colors.grey,
               size: 24,
             ),
-            onPressed: widget.item.stock > widget.quantity ? widget.onIncrease : null,
+            onPressed: (widget.item.stock == null || widget.item.stock! > widget.quantity) ? widget.onIncrease : null,
             padding: EdgeInsets.zero,
             constraints: BoxConstraints(
               minWidth: 24,

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/app_layout.dart';
 import '../../services/menu_meal_service.dart';
 import '../../models/menu_meal.dart';
+import '../../provider/cart_provider.dart';
+import '../../provider/auth_provider.dart';
+import '../../constants/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -359,13 +364,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMenuMealCard(MenuMeal menuMeal) {
     return GestureDetector(
       onTap: () {
-        // Navigate to food detail screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Selected: ${menuMeal.title}'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        // Navigate to menu detail screen
+        context.go('/menu-meal/${menuMeal.slug}');
       },
       child: Container(
         width: 200, // Fixed width for horizontal scroll
@@ -521,16 +521,72 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: AppColors.primary,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            color: AppColors.primary,
-                            size: 18,
+                        GestureDetector(
+                          onTap: () async {
+                            // Add to cart (không cần login)
+                            final cartProvider = Provider.of<CartProvider>(context, listen: false);
+                            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                            final customerId = authProvider.customerDetails?['id'] ?? 0;
+                            
+                            final itemData = {
+                              'isCustom': false,
+                              'menuMealId': menuMeal.id,
+                              'quantity': 1,
+                              'unitPrice': menuMeal.price ?? 0.0,
+                              'totalPrice': (menuMeal.price ?? 0.0) * 1,
+                              'title': menuMeal.title,
+                              'description': menuMeal.description,
+                              'image': menuMeal.image,
+                              'itemType': ORDER_TYPE_MENU_MEAL,
+                              'calories': menuMeal.calories,
+                              'protein': menuMeal.protein,
+                              'carbs': menuMeal.carbs,
+                              'fat': menuMeal.fat,
+                            };
+                            
+                            try {
+                              await cartProvider.addMealToCart(customerId, itemData);
+                              
+                              if (mounted) {
+                                if (cartProvider.error != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error: ${cartProvider.error}'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('${menuMeal.title} added to cart!'),
+                                      duration: const Duration(seconds: 2),
+                                      backgroundColor: AppColors.primary,
+                                    ),
+                                  );
+                                }
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Failed to add ${menuMeal.title} to cart'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: AppColors.primary,
+                              size: 18,
+                            ),
                           ),
                         ),
                       ],

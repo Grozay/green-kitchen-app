@@ -12,7 +12,7 @@ class AboutTab extends StatelessWidget {
         if (Navigator.of(context).canPop()) {
           return true;
         }
-        context.go('/profile');
+        context.go('/more');
         return false;
       },
       child: Scaffold(
@@ -25,10 +25,10 @@ class AboutTab extends StatelessWidget {
               Icons.arrow_back_rounded,
               color: AppColors.textPrimary,
             ),
-            onPressed: () => context.go('/profile'),
+            onPressed: () => context.go('/more'),
           ),
           title: Text(
-            'Về chúng tôi',
+            'About Us',
             style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -97,7 +97,7 @@ class AboutTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Mang đến những bữa ăn ngon và lành mạnh cho mọi nhà',
+                      'Delivering delicious and healthy meals to every home',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),
@@ -144,7 +144,7 @@ class AboutTab extends StatelessWidget {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          'Sứ mệnh của chúng tôi',
+                          'Our Mission',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -155,7 +155,7 @@ class AboutTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Green Kitchen cam kết mang đến những bữa ăn tươi ngon, bổ dưỡng và thân thiện với môi trường. Chúng tôi tin rằng việc ăn uống lành mạnh không chỉ tốt cho sức khỏe mà còn góp phần bảo vệ hành tinh xanh.',
+                      'Green Kitchen is committed to delivering fresh, nutritious and environmentally friendly meals. We believe that healthy eating is not only good for health but also contributes to protecting our green planet.',
                       style: TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
@@ -202,7 +202,7 @@ class AboutTab extends StatelessWidget {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          'Giá trị cốt lõi',
+                          'Core Values',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -214,29 +214,29 @@ class AboutTab extends StatelessWidget {
                     const SizedBox(height: 20),
                     _buildValueItem(
                       icon: Icons.eco,
-                      title: 'Bảo vệ môi trường',
-                      description: 'Sử dụng nguyên liệu hữu cơ, giảm thiểu rác thải nhựa, đóng góp cho sự phát triển bền vững.',
+                      title: 'Environmental Protection',
+                      description: 'Using organic ingredients, minimizing plastic waste, contributing to sustainable development.',
                       color: Colors.green,
                     ),
                     const SizedBox(height: 16),
                     _buildValueItem(
                       icon: Icons.health_and_safety,
-                      title: 'Sức khỏe là trên hết',
-                      description: 'Mọi món ăn đều được chế biến từ nguyên liệu tươi sạch, đảm bảo an toàn thực phẩm.',
+                      title: 'Health comes first',
+                      description: 'All dishes are prepared from fresh, clean ingredients, ensuring food safety.',
                       color: Colors.blue,
                     ),
                     const SizedBox(height: 16),
                     _buildValueItem(
                       icon: Icons.people,
-                      title: 'Khách hàng là trung tâm',
-                      description: 'Lắng nghe và phục vụ nhu cầu của khách hàng với sự nhiệt tình và chuyên nghiệp.',
+                      title: 'Customer-centric',
+                      description: 'Listening and serving customer needs with enthusiasm and professionalism.',
                       color: Colors.purple,
                     ),
                     const SizedBox(height: 16),
                     _buildValueItem(
                       icon: Icons.lightbulb,
-                      title: 'Không ngừng cải tiến',
-                      description: 'Luôn cập nhật xu hướng ẩm thực và công nghệ để mang đến trải nghiệm tốt nhất.',
+                      title: 'Continuous improvement',
+                      description: 'Always updating culinary trends and technology to deliver the best experience.',
                       color: Colors.orange,
                     ),
                   ],
@@ -279,7 +279,7 @@ class AboutTab extends StatelessWidget {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          'Đội ngũ của chúng tôi',
+                          'Our Team',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -290,7 +290,7 @@ class AboutTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Green Kitchen được xây dựng bởi đội ngũ đầu bếp chuyên nghiệp, chuyên gia dinh dưỡng và kỹ thuật viên công nghệ. Chúng tôi không chỉ tạo ra những món ăn ngon mà còn xây dựng một cộng đồng yêu thích ẩm thực lành mạnh.',
+                      'Green Kitchen is built by a team of professional chefs, nutritionists and technology specialists. We not only create delicious dishes but also build a community that loves healthy cuisine.',
                       style: TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
@@ -334,7 +334,7 @@ class AboutTab extends StatelessWidget {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          'Liên hệ với chúng tôi',
+                          'Contact Us',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -411,7 +411,7 @@ class AboutTab extends StatelessWidget {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          'Kết nối với chúng tôi',
+                          'Connect With Us',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -422,48 +422,54 @@ class AboutTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildSocialButton(
-                          icon: Icons.facebook,
-                          label: 'Facebook',
-                          color: Colors.blue,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Sẽ mở trang Facebook...'),
-                                backgroundColor: Colors.blue,
-                              ),
-                            );
-                          },
+                        Flexible(
+                          child: _buildSocialButton(
+                            icon: Icons.facebook,
+                            label: 'Facebook',
+                            color: Colors.blue,
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Will open Facebook...'),
+                                  backgroundColor: Colors.blue,
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                        const SizedBox(width: 16),
-                        _buildSocialButton(
-                          icon: Icons.camera_alt,
-                          label: 'Instagram',
-                          color: Colors.pink,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Sẽ mở trang Instagram...'),
-                                backgroundColor: Colors.pink,
-                              ),
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: _buildSocialButton(
+                            icon: Icons.camera_alt,
+                            label: 'Instagram',
+                            color: Colors.pink,
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Will open Instagram...'),
+                                  backgroundColor: Colors.pink,
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                        const SizedBox(width: 16),
-                        _buildSocialButton(
-                          icon: Icons.smartphone,
-                          label: 'Zalo',
-                          color: Colors.blue.shade700,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Sẽ mở Zalo...'),
-                                backgroundColor: Colors.blue.shade700,
-                              ),
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: _buildSocialButton(
+                            icon: Icons.smartphone,
+                            label: 'Zalo',
+                            color: Colors.blue.shade700,
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Will open Zalo...'),
+                                  backgroundColor: Colors.blue.shade700,
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -476,11 +482,13 @@ class AboutTab extends StatelessWidget {
               // Footer
               Container(
                 padding: const EdgeInsets.all(20),
+                width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       '© 2024 Green Kitchen',
@@ -493,7 +501,7 @@ class AboutTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Mang đến những bữa ăn ngon và lành mạnh cho mọi nhà',
+                      'Bring healthy meals to everyone',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
@@ -503,6 +511,7 @@ class AboutTab extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -617,7 +626,7 @@ class AboutTab extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
@@ -632,13 +641,13 @@ class AboutTab extends StatelessWidget {
             Icon(
               icon,
               color: color,
-              size: 20,
+              size: 16,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: color,
               ),
