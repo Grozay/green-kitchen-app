@@ -659,6 +659,21 @@ class _PolicyTabState extends State<PolicyTab> {
           ),
         ],
       ),
+      trailing: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: (policy['color'] as Color).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          Icons.expand_more,
+          color: policy['color'] as Color,
+          size: 20,
+        ),
+      ),
+      onExpansionChanged: (expanded) {
+        // Handle expansion state if needed
+      },
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -737,21 +752,6 @@ class _PolicyTabState extends State<PolicyTab> {
           ],
         ),
       ],
-      trailing: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: (policy['color'] as Color).withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          Icons.expand_more,
-          color: policy['color'] as Color,
-          size: 20,
-        ),
-      ),
-      onExpansionChanged: (expanded) {
-        // Handle expansion state if needed
-      },
     );
   }
 }

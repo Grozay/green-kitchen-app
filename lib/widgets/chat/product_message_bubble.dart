@@ -7,10 +7,10 @@ class ProductMessageBubble extends StatefulWidget {
   final bool isMine;
 
   const ProductMessageBubble({
-    Key? key,
+    super.key,
     required this.message,
     required this.isMine,
-  }) : super(key: key);
+  });
 
   @override
   State<ProductMessageBubble> createState() => _ProductMessageBubbleState();

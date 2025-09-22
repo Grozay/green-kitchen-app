@@ -38,8 +38,8 @@ class Store {
       address: map['address'] as String,
       distance: double.parse(distance.toStringAsFixed(1)),
       estimatedTime: estimatedTime,
-      latitude: map['latitude'] as double,
-      longitude: map['longitude'] as double,
+      latitude: (map['latitude'] as num).toDouble(),
+      longitude: (map['longitude'] as num).toDouble(),
     );
   }
 }
@@ -47,11 +47,15 @@ class Store {
 class StoreSelector extends StatefulWidget {
   final Store? selectedStore;
   final Function(Store) onStoreSelected;
+  final double? userLatitude;
+  final double? userLongitude;
 
   const StoreSelector({
     super.key,
     this.selectedStore,
     required this.onStoreSelected,
+    this.userLatitude,
+    this.userLongitude,
   });
 
   @override
@@ -63,32 +67,48 @@ class _StoreSelectorState extends State<StoreSelector> {
   bool _isLoading = true;
   String? _error;
 
-  // Mock user location (TP.HCM center for demo)
-  final double _userLat = 10.762622;
-  final double _userLon = 106.660172;
-
   @override
   void initState() {
     super.initState();
     _loadStores();
   }
 
+  @override
+  void didUpdateWidget(StoreSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload stores if user coordinates changed
+    if (oldWidget.userLatitude != widget.userLatitude ||
+        oldWidget.userLongitude != widget.userLongitude) {
+      _loadStores();
+    }
+  }
+
   Future<void> _loadStores() async {
+    // Don't load if no user coordinates
+    if (widget.userLatitude == null || widget.userLongitude == null) {
+      setState(() {
+        _stores = [];
+        _isLoading = false;
+        _error = 'Please confirm your address to find the nearest store';
+      });
+      return;
+    }
+
     try {
       setState(() {
         _isLoading = true;
         _error = null;
       });
 
-      // Get nearest stores from StoreService
+      // Get nearest stores from StoreService using user coordinates
       final storesData = await StoreService.findNearestStores(
-        _userLat,
-        _userLon,
+        widget.userLatitude!,
+        widget.userLongitude!,
         limit: 3,
       );
 
       final stores = storesData.map((storeData) {
-        return Store.fromMap(storeData, _userLat, _userLon);
+        return Store.fromMap(storeData, widget.userLatitude!, widget.userLongitude!);
       }).toList();
 
       setState(() {
@@ -97,7 +117,7 @@ class _StoreSelectorState extends State<StoreSelector> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Không thể tải danh sách cửa hàng: $e';
+        _error = 'Unable to load store list: $e';
         _isLoading = false;
       });
     }
@@ -124,7 +144,7 @@ class _StoreSelectorState extends State<StoreSelector> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Đang tải danh sách cửa hàng...'),
+              Text('Loading store list...'),
             ],
           ),
         ),
@@ -161,7 +181,7 @@ class _StoreSelectorState extends State<StoreSelector> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadStores,
-              child: const Text('Thử lại'),
+              child: const Text('Try Again'),
             ),
           ],
         ),
@@ -187,7 +207,7 @@ class _StoreSelectorState extends State<StoreSelector> {
           Row(
             children: [
               Text(
-                'Chọn cửa hàng gần nhất',
+                'Select Nearest Store',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -198,7 +218,7 @@ class _StoreSelectorState extends State<StoreSelector> {
               IconButton(
                 onPressed: _loadStores,
                 icon: const Icon(Icons.refresh),
-                tooltip: 'Làm mới',
+                tooltip: 'Refresh',
               ),
             ],
           ),

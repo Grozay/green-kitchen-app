@@ -1,10 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/service.dart';
-import '../apis/endpoint.dart';
 
 class PhoneAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final ApiService _apiService = ApiService();
 
   String? _verificationId;
   String? _phoneNumber; // Will store the original phone number
@@ -55,11 +52,14 @@ class PhoneAuthService {
     }
   }
 
-  // Verify OTP and sign in
+  // Verify OTP and sign in (simplified - just Firebase verification)
   Future<Map<String, dynamic>> verifyOTP(String smsCode) async {
     try {
       if (_verificationId == null) {
-        throw Exception('Verification ID is null. Please request OTP again.');
+        return {
+          'success': false,
+          'message': 'Verification ID is null. Please request OTP again.',
+        };
       }
 
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
@@ -67,50 +67,26 @@ class PhoneAuthService {
         smsCode: smsCode,
       );
 
-      return await _signInWithCredential(credential);
-    } catch (e) {
-      throw Exception('Failed to verify OTP: $e');
-    }
-  }
-
-  // Sign in with credential and authenticate with backend
-  Future<Map<String, dynamic>> _signInWithCredential(PhoneAuthCredential credential) async {
-    try {
       UserCredential userCredential = await _auth.signInWithCredential(credential);
 
       if (userCredential.user == null) {
-        throw Exception('User is null after sign in');
+        return {
+          'success': false,
+          'message': 'User is null after sign in',
+        };
       }
 
-      // Get Firebase ID Token
-      String? firebaseIdToken = await userCredential.user!.getIdToken();
-
-      if (firebaseIdToken == null) {
-        throw Exception('Failed to get Firebase ID token');
-      }
-
-      // Prepare data for backend
-      Map<String, dynamic> phoneLoginData = {
-        'firebaseIdToken': firebaseIdToken,
-        'phoneNumber': _phoneNumber ?? userCredential.user!.phoneNumber,
-      };
-
-      // Call backend phone-login endpoint
-      final response = await _apiService.post(
-        ApiEndpoints.phoneLogin,
-        body: phoneLoginData,
-        includeAuth: false, // Phone login doesn't need existing auth token
-      );
-
+      // Return success with phone number - no backend call here
       return {
         'success': true,
-        'user': userCredential.user,
-        'backendResponse': response,
-        'firebaseIdToken': firebaseIdToken,
-        'phoneNumber': _phoneNumber,
+        'phoneNumber': _phoneNumber ?? userCredential.user!.phoneNumber,
+        'firebaseUser': userCredential.user,
       };
     } catch (e) {
-      throw Exception('Failed to authenticate with backend: $e');
+      return {
+        'success': false,
+        'message': 'Failed to verify OTP: ${e.toString()}',
+      };
     }
   }
 

@@ -72,8 +72,12 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Phone login successful!')),
       );
-      // Navigate to home screen
-      context.go('/');
+      // Add a small delay to ensure state is updated before navigation
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          context.go('/');
+        }
+      });
     }
   }
 

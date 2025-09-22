@@ -25,7 +25,7 @@ class ChatApiService {
         attempt++;
         if (e is ApiError) {
           final code = e.statusCode;
-          if (code != null && code >= 400 && code < 500) {
+          if (code >= 400 && code < 500) {
             // Lỗi 4xx không retry
             rethrow;
           }
@@ -57,8 +57,8 @@ class ChatApiService {
       } else {
         throw ApiError(message: 'Unexpected response format from init-guest API', statusCode: 500);
       }
-    } on ApiError catch (e) {
-      throw e;
+    } on ApiError {
+      rethrow;
     } catch (e) {
       throw ApiError(message: 'Failed to initialize guest conversation: ${e.toString()}', statusCode: 500);
     }
@@ -93,8 +93,8 @@ class ChatApiService {
           ));
 
       return ChatResponse.fromJson(response as Map<String, dynamic>);
-    } on ApiError catch (e) {
-      throw e;
+    } on ApiError {
+      rethrow;
     } catch (e) {
       throw ApiError(message: 'Failed to send message: ${e.toString()}', statusCode: 500);
     }
@@ -138,8 +138,8 @@ class ChatApiService {
 
       final response = await _withRetry(() => _apiService.get(uri.toString()));
       return ChatPagingResponse.chatFromJson(response as Map<String, dynamic>);
-    } on ApiError catch (e) {
-      throw e;
+    } on ApiError {
+      rethrow;
     } catch (e) {
       throw ApiError(message: 'Failed to get messages: ${e.toString()}', statusCode: 500);
     }
@@ -165,8 +165,8 @@ class ChatApiService {
       } else {
         throw ApiError(message: 'Unexpected response format from messages API', statusCode: 500);
       }
-    } on ApiError catch (e) {
-      throw e;
+    } on ApiError {
+      rethrow;
     } catch (e) {
       throw ApiError(message: 'Failed to get messages: ${e.toString()}', statusCode: 500);
     }
@@ -190,8 +190,8 @@ class ChatApiService {
       } else {
         throw ApiError(message: 'Unexpected response format from conversations API', statusCode: 500);
       }
-    } on ApiError catch (e) {
-      throw e;
+    } on ApiError {
+      rethrow;
     } catch (e) {
       throw ApiError(message: 'Failed to get conversations: ${e.toString()}', statusCode: 500);
     }
@@ -209,8 +209,8 @@ class ChatApiService {
       );
 
       await _withRetry(() => _apiService.post(uri.toString()));
-    } on ApiError catch (e) {
-      throw e;
+    } on ApiError {
+      rethrow;
     } catch (e) {
       throw ApiError(message: 'Failed to mark messages as read: ${e.toString()}', statusCode: 500);
     }
@@ -234,8 +234,8 @@ class ChatApiService {
       } else {
         throw ApiError(message: 'Unexpected response format from status API', statusCode: 500);
       }
-    } on ApiError catch (e) {
-      throw e;
+    } on ApiError {
+      rethrow;
     } catch (e) {
       throw ApiError(message: 'Failed to get conversation status: ${e.toString()}', statusCode: 500);
     }

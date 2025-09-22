@@ -52,9 +52,9 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
       builder: (context, cartProvider, child) {
         final cartItems = cartProvider.cart?.cartItems ?? [];
         final subtotal = cartProvider.cart?.totalAmount ?? 0.0;
-        final shippingFee = widget.formData['shippingFee'] ?? 0.0;
-        final membershipDiscount = widget.formData['membershipDiscount'] ?? 0.0;
-        final couponDiscount = widget.formData['couponDiscount'] ?? 0.0;
+        final shippingFee = (widget.formData['shippingFee'] as num?)?.toDouble() ?? 0.0;
+        final membershipDiscount = (widget.formData['membershipDiscount'] as num?)?.toDouble() ?? 0.0;
+        final couponDiscount = (widget.formData['couponDiscount'] as num?)?.toDouble() ?? 0.0;
         final total = subtotal + shippingFee - membershipDiscount - couponDiscount;
 
         return SingleChildScrollView(
@@ -63,14 +63,14 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Order Items Section
-              _buildSectionHeader('Món ăn đã chọn'),
+              _buildSectionHeader('Selected Items'),
               const SizedBox(height: 16),
               _buildOrderItems(cartItems),
 
               const SizedBox(height: 24),
 
               // Coupon Section
-              _buildSectionHeader('Mã giảm giá'),
+              _buildSectionHeader('Coupon Code'),
               const SizedBox(height: 16),
               CouponSelector(
                 selectedCoupon: widget.formData['selectedCoupon'],
@@ -98,7 +98,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
               const SizedBox(height: 24),
 
               // Payment Method Section
-              _buildSectionHeader('Phương thức thanh toán'),
+              _buildSectionHeader('Payment Method'),
               const SizedBox(height: 16),
               PaymentMethodSelector(
                 selectedMethod: _paymentMethod,
@@ -108,7 +108,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
               const SizedBox(height: 24),
 
               // Price Summary Section
-              _buildSectionHeader('Tóm tắt đơn hàng'),
+              _buildSectionHeader('Order Summary'),
               const SizedBox(height: 16),
               _buildPriceSummary(
                 subtotal: subtotal,
@@ -134,7 +134,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
                   ),
                   onPressed: widget.onNext,
                   child: const Text(
-                    'Xác nhận đơn hàng',
+                    'Confirm Order',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -216,7 +216,7 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Số lượng: ${item.quantity}',
+                        'Quantity: ${item.quantity}',
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.textSecondary,
@@ -265,19 +265,19 @@ class _OrderSummaryStepState extends State<OrderSummaryStep> {
       ),
       child: Column(
         children: [
-          _buildPriceRow('Tạm tính:', _formatPrice(subtotal)),
+          _buildPriceRow('Subtotal:', _formatPrice(subtotal)),
           const SizedBox(height: 8),
-          _buildPriceRow('Phí vận chuyển:', shippingFee > 0 ? _formatPrice(shippingFee) : 'Miễn phí'),
+          _buildPriceRow('Shipping Fee:', shippingFee > 0 ? _formatPrice(shippingFee) : 'Free'),
           if (membershipDiscount > 0) ...[
             const SizedBox(height: 8),
-            _buildPriceRow('Giảm giá thành viên:', '-${_formatPrice(membershipDiscount)}', isDiscount: true),
+            _buildPriceRow('Membership Discount:', '-${_formatPrice(membershipDiscount)}', isDiscount: true),
           ],
           if (couponDiscount > 0) ...[
             const SizedBox(height: 8),
-            _buildPriceRow('Giảm giá coupon:', '-${_formatPrice(couponDiscount)}', isDiscount: true),
+            _buildPriceRow('Coupon Discount:', '-${_formatPrice(couponDiscount)}', isDiscount: true),
           ],
           const Divider(height: 24),
-          _buildPriceRow('Tổng cộng:', _formatPrice(total), isTotal: true),
+          _buildPriceRow('Total:', _formatPrice(total), isTotal: true),
         ],
       ),
     );

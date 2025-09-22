@@ -293,6 +293,23 @@ class _FaqTabState extends State<FaqTab> {
           color: AppColors.textPrimary,
         ),
       ),
+      trailing: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          Icons.expand_more,
+          color: color,
+          size: 20,
+        ),
+      ),
+      onExpansionChanged: (expanded) {
+        setState(() {
+          _expandedPanelId = expanded ? faq['q'] : null;
+        });
+      },
       children: [
         Container(
           padding: const EdgeInsets.all(16),
@@ -314,23 +331,6 @@ class _FaqTabState extends State<FaqTab> {
           ),
         ),
       ],
-      trailing: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          Icons.expand_more,
-          color: color,
-          size: 20,
-        ),
-      ),
-      onExpansionChanged: (expanded) {
-        setState(() {
-          _expandedPanelId = expanded ? faq['q'] : null;
-        });
-      },
     );
   }
 }

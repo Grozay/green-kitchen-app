@@ -71,7 +71,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Checkout',
@@ -126,12 +126,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             'totalPrice': item.totalPrice,
                           }).toList(),
                           'subtotal': cart.totalAmount,
-                          'shippingFee': _formData['shippingFee'] ?? 0.0,
-                          'membershipDiscount': _formData['membershipDiscount'] ?? 0.0,
-                          'couponDiscount': _formData['couponDiscount'] ?? 0.0,
-                          'total': (cart.totalAmount + (_formData['shippingFee'] ?? 0.0)) -
-                                   (_formData['membershipDiscount'] ?? 0.0) -
-                                   (_formData['couponDiscount'] ?? 0.0),
+                          'shippingFee': (_formData['shippingFee'] as dynamic)?.toDouble() ?? 0.0,
+                          'membershipDiscount': (_formData['membershipDiscount'] as dynamic)?.toDouble() ?? 0.0,
+                          'couponDiscount': (_formData['couponDiscount'] as dynamic)?.toDouble() ?? 0.0,
+                          'total': ((cart.totalAmount as dynamic).toDouble()) + ((_formData['shippingFee'] as dynamic)?.toDouble() ?? 0.0) -
+                                   ((_formData['membershipDiscount'] as dynamic)?.toDouble() ?? 0.0) -
+                                   ((_formData['couponDiscount'] as dynamic)?.toDouble() ?? 0.0),
                         },
                         onConfirm: () {
                           Navigator.of(context).pop();
@@ -155,11 +155,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: [
-          _buildStepCircle(CheckoutStep.deliveryInfo, 'Địa chỉ'),
+          _buildStepCircle(CheckoutStep.deliveryInfo, 'Address'),
           _buildStepLine(),
-          _buildStepCircle(CheckoutStep.summary, 'Tóm tắt'),
+          _buildStepCircle(CheckoutStep.summary, 'Summary'),
           _buildStepLine(),
-          _buildStepCircle(CheckoutStep.confirmation, 'Xác nhận'),
+          _buildStepCircle(CheckoutStep.confirmation, 'Confirmation'),
         ],
       ),
     );
@@ -236,9 +236,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       final paymentMethod = _formData['paymentMethod'] ?? 'cod';
       final subtotal = cart.totalAmount;
-      final shippingFee = _formData['shippingFee'] ?? 0.0;
-      final membershipDiscount = _formData['membershipDiscount'] ?? 0.0;
-      final couponDiscount = _formData['couponDiscount'] ?? 0.0;
+      final shippingFee = (_formData['shippingFee'] as num?)?.toDouble() ?? 0.0;
+      final membershipDiscount = (_formData['membershipDiscount'] as num?)?.toDouble() ?? 0.0;
+      final couponDiscount = (_formData['couponDiscount'] as num?)?.toDouble() ?? 0.0;
       final totalAmount = subtotal + shippingFee - membershipDiscount - couponDiscount;
 
       final orderItems = cart.cartItems.map((item) {
@@ -302,25 +302,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Đơn hàng đã được tạo thành công! Mã: ${order.orderCode}. Lỗi thanh toán: $paymentError'),
+              content: Text('Order created successfully! Code: ${order.orderCode}. Payment error: $paymentError'),
               backgroundColor: Colors.orange,
               duration: const Duration(seconds: 5),
             ),
           );
           context.go('/tracking/${order.orderCode}');
         }
+        // Don't clear cart if payment failed
         return; // Exit early since order was created but payment failed
       }
 
       // Step 3: Clear cart (only if both order creation and payment succeeded)
       try {
-        await cartProvider.clearCart();
+        await cartProvider.clearCartFromServer(customerId);
       } catch (cartError) {
         // Cart clearing failed, but order was created and payment processed
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Đơn hàng thành công! Mã: ${order.orderCode}. Lỗi xóa giỏ hàng: $cartError'),
+              content: Text('Order successful! Code: ${order.orderCode}. Cart clearing error: $cartError'),
               backgroundColor: Colors.orange,
               duration: const Duration(seconds: 5),
             ),
@@ -332,7 +333,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Đặt hàng thành công! Mã đơn hàng: ${order.orderCode}'),
+            content: Text('Order placed successfully! Order code: ${order.orderCode}'),
             backgroundColor: Colors.green,
           ),
         );
@@ -342,7 +343,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Có lỗi xảy ra khi tạo đơn hàng: $e'),
+            content: Text('Failed to create order: $e'),
             backgroundColor: Colors.red,
           ),
         );

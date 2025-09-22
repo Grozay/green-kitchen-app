@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'package:flutter/foundation.dart';
 import '../models/chat_response.dart';
 import '../models/chat_request.dart';
 import '../services/chat_api_service.dart';
