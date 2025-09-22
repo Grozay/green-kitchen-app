@@ -4,10 +4,9 @@ class ApiEndpoints {
 
   // static const String baseUrl = 'http://172.16.2.9:8080/apis/v1'; //Trung
 
-  // static const String baseUrl = 'http://192.168.1.23:8080/apis/v1'; //Quyen
+  static const String baseUrl = 'http://192.168.1.23:8080/apis/v1'; //Quyen
 
-  static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
-
+  // static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
 
   // Authentication endpoints
   static const String login = '$baseUrl/auth/login';
@@ -25,12 +24,17 @@ class ApiEndpoints {
   static const String updateProfile = '$baseUrl/customers/update';
   static const String changePassword = '$baseUrl/customers/updatePassword';
 
-  static String trackOrder(String orderCode) => '$baseUrl/orders/search/$orderCode';
-  static String createOrder() => '$baseUrl/orders'; //post
+  static String trackOrder(String orderCode) =>
+      '$baseUrl/orders/search/$orderCode';
 
   // MenuMeal endpoints
   var menuMeals = '$baseUrl/menu-meals/customers';
   var menuMealBySlug = '$baseUrl/menu-meals/customers/slug/:slug';
+
+  //reivew menu meal
+  var getMenuMealReviews = '$baseUrl/menu-meal-reviews/menu-meal/:menuMealId';
+  var createMenuMealReview = '$baseUrl/menu-meal-reviews';
+  var updateMenuMealReview = '$baseUrl/menu-meal-reviews/:reviewId';
 
   // CustomMeal endpoints
   var createCustomMeal = '$baseUrl/custom-meals';
@@ -71,15 +75,17 @@ class ApiEndpoints {
   }
 
   // Week Meal Plan endpoints
-  var getWeekMealPlan = '$baseUrl/week-meals';
-  var getByIdWeekMeal = '$baseUrl/week-meals/:id';
-  var getWeekMealDays = '$baseUrl/week-meals/:weekMealId/days';
-  var getWeekMealDayById = '$baseUrl/week-meals/:weekMealId/days/:dayId';
+  // var getWeekMealPlan = '$baseUrl/week-meals';
+  // var getByIdWeekMeal = '$baseUrl/week-meals/:id';
+  // var getWeekMealDays = '$baseUrl/week-meals/:weekMealId/days';
+  // var getWeekMealDayById = '$baseUrl/week-meals/:weekMealId/days/:dayId';
+
+  static const String submitFeedback = '$baseUrl/feedback';
+  static const String submitSupportRequest = '$baseUrl/support-request';
 
   // Timeout configurations
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
-
 
   // Feedback endpoints
   static const String submitFeedback = '$baseUrl/support/feedback';
