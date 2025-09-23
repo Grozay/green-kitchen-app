@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../models/menu_meal.dart';
 import '../../theme/app_colors.dart';
 
@@ -47,16 +48,22 @@ class MealCard extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
-                        child: Image.network(
-                          item.image,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(
+                        child: item.image.isNotEmpty
+                            ? Image.network(
+                                item.image,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(
+                                      Icons.fastfood,
+                                      color: Colors.white,
+                                      size: 50,
+                                    ),
+                              )
+                            : const Icon(
                                 Icons.fastfood,
                                 color: Colors.white,
-                                size: 18,
+                                size: 50,
                               ),
-                        ),
                       ),
                     ),
                     Positioned(
@@ -164,7 +171,7 @@ class MealCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                   Text(
-                    '${item.price?.toStringAsFixed(0)} VND',
+                    '${NumberFormat('#,###', 'vi_VN').format(item.price ?? 0)} VND',
                     style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

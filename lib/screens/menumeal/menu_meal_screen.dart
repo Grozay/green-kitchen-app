@@ -91,7 +91,7 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
                 color: AppColors.textPrimary,
               ),
               onPressed: () {
-                GoRouter.of(context).push('/');
+                GoRouter.of(context).pop();
               },
             ),
             title: Text(

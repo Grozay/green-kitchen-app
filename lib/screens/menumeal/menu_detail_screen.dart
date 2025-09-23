@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating/flutter_rating.dart';
 import 'package:go_router/go_router.dart';
-import 'package:green_kitchen_app/constants/constants.dart';
+import 'package:intl/intl.dart';
 import 'package:green_kitchen_app/models/menu_meal.dart';
 import 'package:green_kitchen_app/models/menu_meal_review.dart';
 import 'package:provider/provider.dart';
 import '../../provider/cart_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../theme/app_colors.dart';
-import 'package:flutter_rating/flutter_rating.dart';
 import '../../services/review_menu_meal_service.dart';
 import '../../services/menu_meal_service.dart';
 import '../../widgets/menu_detail/average_rating_widget.dart';
@@ -38,6 +38,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
   // Thêm state cho form create
   double rating = 0.0;
   TextEditingController commentController = TextEditingController();
+
 
   bool get hasAlreadyReviewed {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -130,13 +131,118 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
     }
   }
 
+  // Method để handle edit review - hiện modal dialog
+  void _handleEditReview(MenuMealReview review) {
+    // Tạo controller cho dialog
+    final tempCommentController = TextEditingController(text: review.comment);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Review'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Your Rating:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    StarRating(
+                      rating: review.rating.toDouble(),
+                      onRatingChanged: null, // Disable khi edit
+                      starCount: 5,
+                      size: 24.0,
+                      color: Colors.amber,
+                      borderColor: Colors.grey,
+                      allowHalfRating: true,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${review.rating.toStringAsFixed(1)}/5.0',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber,
+                      ),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text(
+                    'Rating cannot be changed when editing review',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: tempCommentController,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: 'Update your comment...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Đóng dialog
+
+                setState(() => submittingReview = true);
+
+                try {
+                  await ReviewMenuMealService().updateMenuMealReview(review.id, {
+                    'menuMealId': menuMeal!.id,
+                    'customerId': review.customerId,
+                    'rating': review.rating, // Giữ nguyên rating cũ
+                    'comment': tempCommentController.text.trim(),
+                  });
+
+                  await _fetchReviews();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Review updated successfully!')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error updating review: $e')),
+                  );
+                } finally {
+                  setState(() => submittingReview = false);
+                }
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   // Thêm method để submit create review
   Future<void> _submitReview() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final customerIdStr = authProvider.currentUser?.id;
     if (customerIdStr == null || menuMeal == null) return;
     final customerId = int.tryParse(customerIdStr) ?? 0;
-    if (customerId == 0 || rating == 0 || commentController.text.trim().isEmpty) return;
+    if (customerId == 0 || commentController.text.trim().isEmpty) return;
     if (!hasPurchased) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('You must purchase this item to review')),
@@ -148,18 +254,21 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
       final reviewData = {
         'menuMealId': menuMeal!.id,
         'customerId': customerId,
-        'rating': rating.toInt(),
+        'rating': rating > 0 ? rating.toInt() : 5, // Mặc định 5 sao nếu không chọn
         'comment': commentController.text.trim(),
       };
+
+      // Create new review
       await ReviewMenuMealService().createMenuMealReview(reviewData);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Review submitted successfully!')),
+      );
+
       setState(() {
         rating = 0.0;
         commentController.clear();
       });
       await _fetchReviews(); // Refresh reviews
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Review submitted!')),
-      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
@@ -343,6 +452,16 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
+                          // Price
+                          Text(
+                            'Price: ${NumberFormat('#,###', 'vi_VN').format(menuMeal!.price ?? 0)}đ',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           // Nutritional Info
                           const Text(
                             'Nutritional Information',
@@ -376,50 +495,147 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          // Chỉ hiện form nếu chưa review và đã mua
-                          if (!hasAlreadyReviewed)
-                            ReviewFormWidget(
-                              hasPurchased: hasPurchased,
-                              submittingReview: submittingReview,
-                              rating: rating, // Truyền state
-                              commentController: commentController, // Truyền controller
-                              onRatingChanged: (r) => setState(() => rating = r), // Cập nhật rating
-                              onSubmit: _submitReview, // Gọi method submit
-                              onCancel: () => setState(() {
-                                rating = 0.0;
-                                commentController.clear();
-                              }), // Reset
-                              hasAlreadyReviewed: hasAlreadyReviewed,
-                            ),
+                          // Review form - tương tự logic React
+                          Consumer<AuthProvider>(
+                            builder: (context, authProvider, child) {
+                              final isLoggedIn = authProvider.isAuthenticated;
+
+                              if (!isLoggedIn) {
+                                // Chưa đăng nhập
+                                return Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.backgroundAlt,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      'Please login to write a review',
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              // Đã đăng nhập - chỉ hiển thị form tạo review mới
+                              if (!hasAlreadyReviewed) {
+                                // Chưa review
+                                if (checkingPurchase) {
+                                  // Đang kiểm tra purchase
+                                  return Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.backgroundAlt,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        'Checking purchase history...',
+                                        style: TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                } else if (hasPurchased) {
+                                  // Đã mua, hiển thị form
+                                  return ReviewFormWidget(
+                                    hasPurchased: hasPurchased,
+                                    submittingReview: submittingReview,
+                                    rating: rating,
+                                    commentController: commentController,
+                                    onRatingChanged: (r) => setState(() => rating = r),
+                                    onSubmit: _submitReview,
+                                    onCancel: () => setState(() {
+                                      rating = 0.0;
+                                      commentController.clear();
+                                    }),
+                                    hasAlreadyReviewed: hasAlreadyReviewed,
+                                    editingReview: null, // Không còn edit inline
+                                  );
+                                } else {
+                                  // Chưa mua, hiển thị thông báo
+                                  return Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[100],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        const Text(
+                                          'Purchase this item first to leave a review',
+                                          style: TextStyle(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 16,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            // Thêm vào giỏ hàng với quantity = 1
+                                            final cartProvider = Provider.of<CartProvider>(context, listen: false);
+                                            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                                            final customerId = int.tryParse(authProvider.currentUser?.id ?? '') ?? 0;
+
+                                            final requestData = {
+                                              'isCustom': false,
+                                              'menuMealId': menuMeal!.id,
+                                              'quantity': 1,
+                                              'unitPrice': menuMeal!.price ?? 0.0,
+                                              'totalPrice': (menuMeal!.price ?? 0.0) * 1,
+                                              'title': menuMeal!.title,
+                                              'description': menuMeal!.description,
+                                              'image': menuMeal!.image,
+                                              'itemType': 'MENU_MEAL',
+                                              'calories': menuMeal!.calories,
+                                              'protein': menuMeal!.protein,
+                                              'carbs': menuMeal!.carbs,
+                                              'fat': menuMeal!.fat,
+                                            };
+
+                                            try {
+                                              await cartProvider.addMealToCart(customerId, requestData);
+                                              await cartProvider.fetchCart(customerId);
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text('Added ${menuMeal!.title} to cart!')),
+                                              );
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(content: Text('Failed to add to cart')),
+                                              );
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: AppColors.secondary,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          child: const Text('Add to Cart'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              }
+
+                              // Fallback return (should not reach here)
+                              return const SizedBox.shrink();
+                            },
+                          ),
                           const SizedBox(height: 16),
                           // Review List
                           ReviewListWidget(
                             reviews: reviews,
                             reviewsLoading: reviewsLoading,
-                            onEdit: (updatedReview) async {
-                              setState(() => submittingReview = true);
-                              try {
-                                await ReviewMenuMealService().updateMenuMealReview(
-                                  updatedReview.id,
-                                  {
-                                    'menuMealId': menuMeal!.id,
-                                    'customerId': updatedReview.customerId,
-                                    'rating': updatedReview.rating,
-                                    'comment': updatedReview.comment,
-                                  },
-                                );
-                                await _fetchReviews();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Review updated!')),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error: $e')),
-                                );
-                              } finally {
-                                setState(() => submittingReview = false);
-                              }
-                            },
+                            onEdit: _handleEditReview, // Sử dụng method mới
                           ),
                           const SizedBox(height: 100),
                         ],

@@ -6,7 +6,7 @@ import '../../provider/cart_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../constants/app_constants.dart';
 
-class AppLayout extends StatelessWidget {
+class AppLayout extends StatefulWidget {
   final Widget body;
   final String title;
   final int currentIndex;
@@ -19,6 +19,30 @@ class AppLayout extends StatelessWidget {
     this.currentIndex = 0,
     this.showFloatingChat = true,
   });
+
+  @override
+  State<AppLayout> createState() => _AppLayoutState();
+}
+
+class _AppLayoutState extends State<AppLayout> {
+  bool _cartLoaded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    // Load cart when user is authenticated and cart hasn't been loaded yet
+    if (authProvider.isAuthenticated &&
+        authProvider.currentUser?.id != null &&
+        !_cartLoaded) {
+      final customerId = int.tryParse(authProvider.currentUser!.id) ?? 0;
+      cartProvider.fetchCart(customerId);
+      _cartLoaded = true;
+    }
+  }
 
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
@@ -44,7 +68,6 @@ class AppLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: PreferredSize(
@@ -92,7 +115,7 @@ class AppLayout extends StatelessWidget {
                   ),
                 ),
                 title: Text(
-                  title,
+                  widget.title,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -166,7 +189,7 @@ class AppLayout extends StatelessWidget {
               ),
             ),
           ),
-          body: body,
+          body: widget.body,
           // floatingActionButton: showFloatingChat ? _buildFloatingChat(context) : null,
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
@@ -180,7 +203,7 @@ class AppLayout extends StatelessWidget {
               ],
             ),
             child: BottomNavigationBar(
-              currentIndex: currentIndex,
+              currentIndex: widget.currentIndex,
               onTap: (index) => _onItemTapped(index, context),
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.white,
