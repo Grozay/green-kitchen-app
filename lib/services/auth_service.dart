@@ -4,6 +4,7 @@ import '../services/service.dart';
 import '../services/google_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 // AuthService handles authentication logic
 class AuthService {
@@ -21,36 +22,180 @@ class AuthService {
   // Login with email and password
   Future<AuthResponse> login(String email, String password) async {
     try {
-      final loginRequest = LoginRequest(email: email, password: password);
-      final response = await _apiService.post(
-        ApiEndpoints.login,
-        body: loginRequest.toJson(),
-        includeAuth: false, // No auth token needed for login
+      final loginRequest = {
+        'email': email,
+        'password': password,
+      };
+      print('DEBUG: Email login request: $loginRequest');
+
+      // Use direct HTTP call like Google login for consistency
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.login),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(loginRequest),
       );
 
-      final authResponse = AuthResponse.fromJson(response);
+      print('DEBUG: Email login HTTP response status: ${response.statusCode}');
+      print('DEBUG: Email login HTTP response body: ${response.body}');
 
-      // Store token if login successful
-      if (authResponse.success && authResponse.token != null) {
-        await _apiService.setAuthToken(authResponse.token!);
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final authResponse = AuthResponse.fromJson(responseData);
+        print('DEBUG: Email AuthResponse parsed successfully');
+
+        // Store token if login successful
+        if (authResponse.success && authResponse.token != null) {
+          await _apiService.setAuthToken(authResponse.token!);
+          print('DEBUG: Email login token stored successfully');
+        }
+
+        return authResponse;
+      } else {
+        // Handle error response
+        try {
+          final errorData = jsonDecode(response.body);
+          final errorMessage = errorData['message'] ?? errorData['msg'] ?? 'Login failed';
+          print('DEBUG: Email login failed with error: $errorMessage');
+          return AuthResponse(
+            success: false,
+            message: errorMessage,
+          );
+        } catch (e) {
+          print('DEBUG: Failed to parse email login error response: ${response.body}');
+          return AuthResponse(
+            success: false,
+            message: 'Login failed: HTTP ${response.statusCode}',
+          );
+        }
       }
-
-      return authResponse;
     } catch (e) {
-      if (e is ApiError) {
-        return AuthResponse(
-          success: false,
-          message: e.message,
-        );
-      }
+      print('DEBUG: Email login network error: $e');
       return AuthResponse(
         success: false,
-        message: 'Login failed: ${e.toString()}',
+        message: 'Network error: ${e.toString()}',
       );
     }
   }
 
-  // Register new user
+  // Login with phone number (mobile version - just phone, no Firebase token)
+  Future<AuthResponse> phoneLoginMobile(String phone) async {
+    try {
+      final phoneLoginRequest = {
+        'phone': phone,
+      };
+      print('DEBUG: Phone login mobile request: $phoneLoginRequest');
+
+      // Use direct HTTP call
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.phoneLoginMobile),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(phoneLoginRequest),
+      );
+
+      print('DEBUG: Phone login mobile HTTP response status: ${response.statusCode}');
+      print('DEBUG: Phone login mobile HTTP response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final authResponse = AuthResponse.fromJson(responseData);
+        print('DEBUG: Phone login mobile AuthResponse parsed successfully - user email: ${authResponse.user?.email}');
+
+        // Store token if login successful
+        if (authResponse.success && authResponse.token != null) {
+          await _apiService.setAuthToken(authResponse.token!);
+          print('DEBUG: Phone login mobile token stored successfully');
+        }
+
+        return authResponse;
+      } else {
+        // Handle error response
+        try {
+          final errorData = jsonDecode(response.body);
+          final errorMessage = errorData['message'] ?? errorData['msg'] ?? 'Phone login failed';
+          print('DEBUG: Phone login mobile failed with error: $errorMessage');
+          return AuthResponse(
+            success: false,
+            message: errorMessage,
+          );
+        } catch (e) {
+          print('DEBUG: Failed to parse phone login mobile error response: ${response.body}');
+          return AuthResponse(
+            success: false,
+            message: 'Phone login failed: HTTP ${response.statusCode}',
+          );
+        }
+      }
+    } catch (e) {
+      print('DEBUG: Phone login mobile network error: $e');
+      return AuthResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+      );
+    }
+  }
+
+  // Login with phone number
+  Future<AuthResponse> phoneLogin(String phone) async {
+    try {
+      final phoneLoginRequest = {
+        'phone': phone,
+      };
+      print('DEBUG: Phone login request: $phoneLoginRequest');
+
+      // Use direct HTTP call like Google login for consistency
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.phoneLogin),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(phoneLoginRequest),
+      );
+
+      print('DEBUG: Phone login HTTP response status: ${response.statusCode}');
+      print('DEBUG: Phone login HTTP response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final authResponse = AuthResponse.fromJson(responseData);
+        print('DEBUG: Phone AuthResponse parsed successfully');
+
+        // Store token if login successful
+        if (authResponse.success && authResponse.token != null) {
+          await _apiService.setAuthToken(authResponse.token!);
+          print('DEBUG: Phone login token stored successfully');
+        }
+
+        return authResponse;
+      } else {
+        // Handle error response
+        try {
+          final errorData = jsonDecode(response.body);
+          final errorMessage = errorData['message'] ?? errorData['msg'] ?? 'Phone login failed';
+          print('DEBUG: Phone login failed with error: $errorMessage');
+          return AuthResponse(
+            success: false,
+            message: errorMessage,
+          );
+        } catch (e) {
+          print('DEBUG: Failed to parse phone login error response: ${response.body}');
+          return AuthResponse(
+            success: false,
+            message: 'Phone login failed: HTTP ${response.statusCode}',
+          );
+        }
+      }
+    } catch (e) {
+      print('DEBUG: Phone login network error: $e');
+      return AuthResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+      );
+    }
+  }
   Future<AuthResponse> register(String email, String password, {String? firstName, String? lastName}) async {
     try {
       final registerRequest = RegisterRequest(

@@ -12,6 +12,7 @@ class MenuMeal {
   final double? price;
   final String slug;
   final int stock;
+  final int soldCount;
   final String type;
   final List<String> menuIngredients;
   final List<MenuMealReview> reviews;  // Giữ nguyên, giờ dùng từ menu_meal_review.dart
@@ -28,6 +29,7 @@ class MenuMeal {
     required this.price,
     required this.slug,
     required this.stock,
+    required this.soldCount,
     required this.type,
     required this.menuIngredients,
     required this.reviews,
@@ -46,6 +48,7 @@ class MenuMeal {
       price: json['price'] != null ? (json['price'] as num).toDouble() : null,
       slug: json['slug'] ?? '',
       stock: json['stock'] ?? 0,
+      soldCount: json['soldCount'] ?? 0,
       type: json['type'] ?? '',
       menuIngredients: json['menuIngredients'] != null ? List<String>.from(json['menuIngredients']) : [],
       reviews: json['reviews'] != null ? (json['reviews'] as List).map((e) => MenuMealReview.fromJson(e)).toList() : [],
@@ -65,6 +68,7 @@ class MenuMeal {
       'price': price,
       'slug': slug,
       'stock': stock,
+      'soldCount': soldCount,
       'type': type,
       'menuIngredients': menuIngredients,
       'reviews': reviews.map((e) => e.toJson()).toList(),

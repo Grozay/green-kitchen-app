@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:green_kitchen_app/constants/constants.dart';
-import 'package:green_kitchen_app/models/cart.dart'
-    hide CustomMeal; // Hide CustomMeal from cart.dart
+// Hide CustomMeal from cart.dart
 import 'package:green_kitchen_app/models/custom_meal.dart'; // Import CustomMeal from custom_meal.dart
 import 'package:green_kitchen_app/provider/custom_meal_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:green_kitchen_app/provider/cart_provider.dart';
 import 'package:intl/intl.dart'; // Add this import for NumberFormat
 import 'package:green_kitchen_app/services/custom_meal_service.dart';
 import 'package:green_kitchen_app/provider/auth_provider.dart';

@@ -38,8 +38,8 @@ class Store {
       address: map['address'] as String,
       distance: double.parse(distance.toStringAsFixed(1)),
       estimatedTime: estimatedTime,
-      latitude: map['latitude'] as double,
-      longitude: map['longitude'] as double,
+      latitude: (map['latitude'] as num).toDouble(),
+      longitude: (map['longitude'] as num).toDouble(),
     );
   }
 }
@@ -47,11 +47,15 @@ class Store {
 class StoreSelector extends StatefulWidget {
   final Store? selectedStore;
   final Function(Store) onStoreSelected;
+  final double? userLatitude;
+  final double? userLongitude;
 
   const StoreSelector({
     super.key,
     this.selectedStore,
     required this.onStoreSelected,
+    this.userLatitude,
+    this.userLongitude,
   });
 
   @override
@@ -60,12 +64,11 @@ class StoreSelector extends StatefulWidget {
 
 class _StoreSelectorState extends State<StoreSelector> {
   List<Store> _stores = [];
+  List<Store> _allStores = [];
   bool _isLoading = true;
+  bool _showAllStores = false;
+  int _currentDisplayCount = 1; // Start with 1 store (nearest)
   String? _error;
-
-  // Mock user location (TP.HCM center for demo)
-  final double _userLat = 10.762622;
-  final double _userLon = 106.660172;
 
   @override
   void initState() {
@@ -73,34 +76,86 @@ class _StoreSelectorState extends State<StoreSelector> {
     _loadStores();
   }
 
+  @override
+  void didUpdateWidget(StoreSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload stores if user coordinates changed
+    if (oldWidget.userLatitude != widget.userLatitude ||
+        oldWidget.userLongitude != widget.userLongitude) {
+      _loadStores();
+    }
+  }
+
   Future<void> _loadStores() async {
+    // Don't load if no user coordinates
+    if (widget.userLatitude == null || widget.userLongitude == null) {
+      setState(() {
+        _stores = [];
+        _isLoading = false;
+        _error = 'Please confirm your address to find the nearest store';
+      });
+      return;
+    }
+
     try {
       setState(() {
         _isLoading = true;
         _error = null;
       });
 
-      // Get nearest stores from StoreService
+      // Get all stores from StoreService using user coordinates
       final storesData = await StoreService.findNearestStores(
-        _userLat,
-        _userLon,
-        limit: 3,
+        widget.userLatitude!,
+        widget.userLongitude!,
+        limit: 10, // Get more stores for "view more" option
       );
 
       final stores = storesData.map((storeData) {
-        return Store.fromMap(storeData, _userLat, _userLon);
+        return Store.fromMap(storeData, widget.userLatitude!, widget.userLongitude!);
       }).toList();
 
       setState(() {
-        _stores = stores;
+        _allStores = stores;
+        _stores = stores.isNotEmpty ? [stores.first] : []; // Show only nearest store initially
+        _currentDisplayCount = 1;
         _isLoading = false;
       });
+
+      // Auto-select nearest store if no store is selected
+      if (widget.selectedStore == null && stores.isNotEmpty) {
+        widget.onStoreSelected(stores.first);
+      }
     } catch (e) {
       setState(() {
-        _error = 'Không thể tải danh sách cửa hàng: $e';
+        _error = 'Unable to load store list: $e';
         _isLoading = false;
       });
     }
+  }
+
+  void _toggleShowMoreStores() {
+    setState(() {
+      _showAllStores = !_showAllStores;
+      if (_showAllStores) {
+        // Show all stores
+        _stores = _allStores;
+        _currentDisplayCount = _allStores.length;
+      } else {
+        // Show only nearest store
+        _stores = _allStores.isNotEmpty ? [_allStores.first] : [];
+        _currentDisplayCount = 1;
+      }
+    });
+  }
+
+  void _showMoreStores() {
+    setState(() {
+      _currentDisplayCount += 2; // Show 2 more stores each time
+      if (_currentDisplayCount > _allStores.length) {
+        _currentDisplayCount = _allStores.length;
+      }
+      _stores = _allStores.take(_currentDisplayCount).toList();
+    });
   }
 
   @override
@@ -124,7 +179,7 @@ class _StoreSelectorState extends State<StoreSelector> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Đang tải danh sách cửa hàng...'),
+              Text('Loading store list...'),
             ],
           ),
         ),
@@ -161,7 +216,7 @@ class _StoreSelectorState extends State<StoreSelector> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadStores,
-              child: const Text('Thử lại'),
+              child: const Text('Try Again'),
             ),
           ],
         ),
@@ -187,7 +242,7 @@ class _StoreSelectorState extends State<StoreSelector> {
           Row(
             children: [
               Text(
-                'Chọn cửa hàng gần nhất',
+                _showAllStores ? 'Select Store' : 'Nearest Store',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -198,12 +253,105 @@ class _StoreSelectorState extends State<StoreSelector> {
               IconButton(
                 onPressed: _loadStores,
                 icon: const Icon(Icons.refresh),
-                tooltip: 'Làm mới',
+                tooltip: 'Refresh',
               ),
             ],
           ),
           const SizedBox(height: 16),
           ..._stores.map((store) => _buildStoreOption(store)),
+          
+          // Show "View more stores" button if there are more stores to show
+          if (!_showAllStores && _currentDisplayCount < _allStores.length) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _showMoreStores,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.expand_more,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'View more stores (${_allStores.length - _currentDisplayCount} more)',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          
+          // Show "View all stores" button when showing some but not all
+          if (_currentDisplayCount < _allStores.length && _currentDisplayCount > 1) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: _toggleShowMoreStores,
+                child: Text(
+                  'View all stores',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ],
+          
+          // Show "Show less" button when showing all stores
+          if (_showAllStores && _allStores.length > 1) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _toggleShowMoreStores,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: AppColors.textSecondary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.expand_less,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Show less',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

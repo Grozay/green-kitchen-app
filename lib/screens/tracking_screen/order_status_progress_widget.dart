@@ -20,6 +20,12 @@ class _OrderStatusProgressWidgetState extends State<OrderStatusProgressWidget>
   late Animation<double> _progressAnimation;
 
   final Map<String, dynamic> _statusConfig = {
+    'pending': {
+      'label': 'Pending',
+      'icon': Icons.access_time,
+      'color': Colors.orange,
+      'description': 'Staff will call customer for confirmation'
+    },
     'confirmed': {
       'label': 'Confirmed',
       'icon': Icons.check_circle,

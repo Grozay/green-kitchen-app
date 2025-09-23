@@ -20,6 +20,7 @@ class MenuMealLiteResponse {
   final String title;               // title từ BE
   final String slug;                // slug từ BE
   final String? image;              // image từ BE
+  final String? description;        // description từ BE (chứa nguyên liệu)
   final double? carb;               // carbs từ BE
   final double? calo;               // calories từ BE
   final double? protein;            // protein từ BE
@@ -32,6 +33,7 @@ class MenuMealLiteResponse {
     required this.title,
     required this.slug,
     this.image,
+    this.description,
     this.carb,
     this.calo,
     this.protein,
@@ -46,6 +48,7 @@ class MenuMealLiteResponse {
       title: json['title'] ?? '',
       slug: json['slug'] ?? '',
       image: json['image'],
+      description: json['description'],
       carb: json['carb']?.toDouble(),
       calo: json['calo']?.toDouble(),
       protein: json['protein']?.toDouble(),
@@ -68,6 +71,7 @@ class MenuMealLiteResponse {
       'title': title,
       'slug': slug,
       if (image != null) 'image': image,
+      if (description != null) 'description': description,
       if (carb != null) 'carb': carb,
       if (calo != null) 'calo': calo,
       if (protein != null) 'protein': protein,

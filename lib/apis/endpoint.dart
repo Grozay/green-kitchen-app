@@ -5,8 +5,8 @@ class ApiEndpoints {
   // static const String baseUrl = 'http://172.16.2.9:8080/apis/v1'; //Trung
 
   static const String baseUrl = 'http://192.168.1.119:8080/apis/v1'; //Quyen
-
-  // static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
+  
+//   static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
 
   // Authentication endpoints
   static const String login = '$baseUrl/auth/login';
@@ -17,6 +17,7 @@ class ApiEndpoints {
   static const String googleLogin = '$baseUrl/auth/google-login';
   static const String googleLoginMobile = '$baseUrl/auth/google-login-mobile';
   static const String phoneLogin = '$baseUrl/auth/phone-login';
+  static const String phoneLoginMobile = '$baseUrl/auth/phone-login-mobile';
 
   // User endpoints
   static String getProfile(String email) => '$baseUrl/customers/email/$email';
@@ -25,9 +26,6 @@ class ApiEndpoints {
 
   static String trackOrder(String orderCode) =>
       '$baseUrl/orders/search/$orderCode';
-
-  //endpoint
-  // static const String baseUrl = 'http://192.168.1.23:8080';
 
   // MenuMeal endpoints
   var menuMeals = '$baseUrl/menu-meals/customers';
@@ -46,7 +44,7 @@ class ApiEndpoints {
 
   // Ingredient endpoints
   var ingredients = '$baseUrl/ingredients';
-  // var ingredientById = '$baseUrl/ingredients/:id';
+  var ingredientById = '$baseUrl/ingredients/:id';
 
   // Store endpoints
   var stores = '$baseUrl/stores';
@@ -70,6 +68,16 @@ class ApiEndpoints {
   var decreaseMealQuantityInCart =
       '$baseUrl/carts/customer/:customerId/items/:cartItemId/decrease';
 
+  // Customer coupons
+  static String getAvailableCustomerCoupons(int customerId) => '$baseUrl/customer-coupons/customer/$customerId/available';
+  static String validateVoucherCode(String code, int customerId, {double? orderValue}) {
+    final params = orderValue != null ? '?orderValue=$orderValue' : '';
+    return '$baseUrl/coupons/validate/$code?customerId=$customerId$params';
+  }
+  
+  // Coupon exchange
+  static const String exchangeCoupon = '$baseUrl/coupons/exchange';
+
   // Week Meal Plan endpoints
   // var getWeekMealPlan = '$baseUrl/week-meals';
   // var getByIdWeekMeal = '$baseUrl/week-meals/:id';
@@ -79,12 +87,11 @@ class ApiEndpoints {
   static const String submitFeedback = '$baseUrl/feedback';
   static const String submitSupportRequest = '$baseUrl/support-request';
 
+  // Customer Coupon endpoints
+  static const String customerUseCoupon = '$baseUrl/customer-coupons/use-coupon';
+
   // Timeout configurations
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
-  //profile
 }
-
-// //endpoint
-// var baseUrl = 'http://192.168.1.172:8080';

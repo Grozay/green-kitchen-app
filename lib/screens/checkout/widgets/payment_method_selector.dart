@@ -30,17 +30,17 @@ class PaymentMethodSelector extends StatelessWidget {
         children: [
           _buildPaymentOption(
             'cod',
-            'Thanh toán khi nhận hàng (COD)',
+            'Cash on Delivery (COD)',
             Icons.local_shipping,
-            'Thanh toán bằng tiền mặt khi nhận hàng',
+            'Pay with cash when you receive your order',
             AppColors.primary,
           ),
           const SizedBox(height: 12),
           _buildPaymentOption(
             'paypal',
-            'Thanh toán qua PayPal',
+            'PayPal Payment',
             Icons.payment,
-            'Thanh toán an toàn qua PayPal với thẻ hoặc tài khoản PayPal',
+            'Secure payment via PayPal with card or PayPal account',
             const Color(0xFF0070ba),
           ),
         ],

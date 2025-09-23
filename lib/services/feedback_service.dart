@@ -43,7 +43,7 @@ class FeedbackService {
       return false;
     } catch (e) {
       print('Error submitting feedback: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -86,7 +86,7 @@ class FeedbackService {
       return false;
     } catch (e) {
       print('Error submitting support request: $e');
-      throw e;
+      rethrow;
     }
   }
 }

@@ -14,25 +14,25 @@ class _PolicyTabState extends State<PolicyTab> {
   final List<Map<String, dynamic>> policies = [
     {
       'id': 'panel1',
-      'title': '📋 Điều khoản sử dụng',
+      'title': '📋 Terms of Service',
       'icon': Icons.policy,
       'color': Colors.purple,
       'content': {
         'sections': [
           {
-            'title': 'Điều khoản chung',
+            'title': 'General Terms',
             'items': [
-              'Bằng việc sử dụng dịch vụ, bạn đồng ý tuân thủ các điều khoản này',
-              'Chúng tôi có quyền thay đổi điều khoản mà không cần báo trước',
-              'Mọi tranh chấp sẽ được giải quyết theo luật pháp Việt Nam'
+              'By using the service, you agree to comply with these terms',
+              'We have the right to change terms without prior notice',
+              'All disputes will be resolved according to Vietnamese law'
             ]
           },
           {
-            'title': 'Quyền và nghĩa vụ',
+            'title': 'Rights and Obligations',
             'items': [
-              'Bạn có quyền sử dụng dịch vụ một cách hợp pháp',
-              'Không được sử dụng dịch vụ cho mục đích bất hợp pháp',
-              'Bảo mật thông tin tài khoản của mình'
+              'You have the right to use the service legally',
+              'Do not use the service for illegal purposes',
+              'Keep your account information secure'
             ]
           }
         ]
@@ -40,33 +40,33 @@ class _PolicyTabState extends State<PolicyTab> {
     },
     {
       'id': 'panel2',
-      'title': '🔒 Chính sách bảo mật',
+      'title': '🔒 Privacy Policy',
       'icon': Icons.security,
       'color': Colors.blue,
       'content': {
         'sections': [
           {
-            'title': 'Thu thập thông tin',
+            'title': 'Information Collection',
             'items': [
-              'Thông tin cá nhân: tên, email, số điện thoại, địa chỉ',
-              'Thông tin đơn hàng: món ăn, thời gian, địa điểm giao hàng',
-              'Thông tin thanh toán: phương thức, số tiền (không lưu thông tin thẻ)'
+              'Personal information: name, email, phone number, address',
+              'Order information: dishes, time, delivery location',
+              'Payment information: method, amount (card information not stored)'
             ]
           },
           {
-            'title': 'Sử dụng thông tin',
+            'title': 'Use of Information',
             'items': [
-              'Xử lý đơn hàng và giao hàng',
-              'Gửi thông báo và cập nhật dịch vụ',
-              'Cải thiện chất lượng dịch vụ và trải nghiệm người dùng'
+              'Process orders and delivery',
+              'Send notifications and service updates',
+              'Improve service quality and user experience'
             ]
           },
           {
-            'title': 'Bảo vệ thông tin',
+            'title': 'Information Protection',
             'items': [
-              'Mã hóa SSL/TLS cho mọi giao dịch',
-              'Không chia sẻ thông tin với bên thứ ba',
-              'Tuân thủ quy định GDPR và Luật Bảo vệ dữ liệu cá nhân'
+              'SSL/TLS encryption for all transactions',
+              'Do not share information with third parties',
+              'Comply with GDPR and Personal Data Protection laws'
             ]
           }
         ]
@@ -74,33 +74,33 @@ class _PolicyTabState extends State<PolicyTab> {
     },
     {
       'id': 'panel3',
-      'title': '🍽️ Chính sách đặt hàng',
+      'title': '🍽️ Order Policy',
       'icon': Icons.verified_user,
       'color': Colors.green,
       'content': {
         'sections': [
           {
-            'title': 'Quy trình đặt hàng',
+            'title': 'Order Process',
             'items': [
-              'Chọn món ăn từ menu và thêm vào giỏ hàng',
-              'Xác nhận địa chỉ giao hàng và thông tin thanh toán',
-              'Nhận xác nhận đơn hàng qua email/SMS'
+              'Select dishes from menu and add to cart',
+              'Confirm delivery address and payment information',
+              'Receive order confirmation via email/SMS'
             ]
           },
           {
-            'title': 'Chính sách hủy đơn',
+            'title': 'Order Cancellation Policy',
             'items': [
-              'Có thể hủy đơn hàng trong vòng 5 phút sau khi đặt',
-              'Sau 5 phút, đơn hàng sẽ được xử lý và không thể hủy',
-              'Liên hệ hotline để được hỗ trợ trong trường hợp đặc biệt'
+              'Can cancel order within 5 minutes after placing',
+              'After 5 minutes, order will be processed and cannot be cancelled',
+              'Contact hotline for support in special cases'
             ]
           },
           {
-            'title': 'Thời gian giao hàng',
+            'title': 'Delivery Time',
             'items': [
-              'Giao hàng trong vòng 30-60 phút tùy thuộc khoảng cách',
-              'Thông báo trước 10 phút khi đến giao hàng',
-              'Bồi thường nếu giao hàng trễ quá 15 phút so với cam kết'
+              'Delivery within 30-60 minutes depending on distance',
+              'Notify 10 minutes before delivery arrival',
+              'Compensation if delivery is more than 15 minutes late',
             ]
           }
         ]
@@ -108,34 +108,34 @@ class _PolicyTabState extends State<PolicyTab> {
     },
     {
       'id': 'panel4',
-      'title': '💰 Chính sách thanh toán',
+      'title': '💰 Payment Policy',
       'icon': Icons.gavel,
       'color': Colors.orange,
       'content': {
         'sections': [
           {
-            'title': 'Phương thức thanh toán',
+            'title': 'Payment Methods',
             'items': [
-              'Tiền mặt khi nhận hàng',
-              'Chuyển khoản ngân hàng',
-              'Ví điện tử (MoMo, ZaloPay, VNPay)',
-              'Thẻ tín dụng/ghi nợ (Visa, Mastercard)'
+              'Cash on delivery',
+              'Bank transfer',
+              'E-wallet (MoMo, ZaloPay, VNPay)',
+              'Credit/debit cards (Visa, Mastercard)'
             ]
           },
           {
-            'title': 'Bảo mật thanh toán',
+            'title': 'Payment Security',
             'items': [
-              'Mã hóa SSL 256-bit cho mọi giao dịch',
-              'Không lưu trữ thông tin thẻ tín dụng',
-              'Tuân thủ tiêu chuẩn PCI DSS'
+              'SSL 256-bit encryption for all transactions',
+              'Do not store credit card information',
+              'Compliant with PCI DSS standards'
             ]
           },
           {
-            'title': 'Hoàn tiền và bồi thường',
+            'title': 'Refund and Compensation',
             'items': [
-              'Hoàn tiền 100% nếu món ăn không đúng chất lượng',
-              'Bồi thường nếu giao hàng trễ hoặc sai địa chỉ',
-              'Xử lý hoàn tiền trong vòng 3-5 ngày làm việc'
+              '100% refund if food quality is not correct',
+              'Compensation if delivery is late or wrong address',
+              'Process refund within 3-5 business days'
             ]
           }
         ]
@@ -143,33 +143,33 @@ class _PolicyTabState extends State<PolicyTab> {
     },
     {
       'id': 'panel5',
-      'title': '🌟 Chính sách thành viên',
+      'title': '🌟 Membership Policy',
       'icon': Icons.privacy_tip,
       'color': Colors.teal,
       'content': {
         'sections': [
           {
-            'title': 'Tích điểm thưởng',
+            'title': 'Reward Points',
             'items': [
-              'Tích 1 điểm cho mỗi 10,000 VNĐ chi tiêu',
-              'Điểm có hiệu lực trong 12 tháng',
-              'Đổi điểm lấy coupon giảm giá hoặc món ăn miễn phí'
+              'Earn 1 point for every 10,000 VND spent',
+              'Points are valid for 12 months',
+              'Exchange points for discount coupons or free meals'
             ]
           },
           {
-            'title': 'Hạng thành viên',
+            'title': 'Membership Tiers',
             'items': [
-              'ENERGY: Chi tiêu 0-2 triệu VNĐ/6 tháng',
-              'VITALITY: Chi tiêu 2-5 triệu VNĐ/6 tháng',
-              'RADIANCE: Chi tiêu trên 5 triệu VNĐ/6 tháng'
+              'ENERGY: Spend 0-2 million VND/6 months',
+              'VITALITY: Spend 2-5 million VND/6 months',
+              'RADIANCE: Spend over 5 million VND/6 months'
             ]
           },
           {
-            'title': 'Ưu đãi đặc biệt',
+            'title': 'Special Offers',
             'items': [
-              'Giảm giá theo hạng thành viên',
-              'Ưu tiên giao hàng cho hạng cao',
-              'Tặng món khai vị miễn phí cho hạng RADIANCE'
+              'Discounts based on membership tier',
+              'Priority delivery for high-tier members',
+              'Free appetizer for RADIANCE tier members'
             ]
           }
         ]
@@ -184,7 +184,7 @@ class _PolicyTabState extends State<PolicyTab> {
         if (Navigator.of(context).canPop()) {
           return true;
         }
-        context.go('/profile');
+        context.go('/more');
         return false;
       },
       child: Scaffold(
@@ -197,10 +197,10 @@ class _PolicyTabState extends State<PolicyTab> {
               Icons.arrow_back_rounded,
               color: AppColors.textPrimary,
             ),
-            onPressed: () => context.go('/profile'),
-          ),
+            onPressed: () => context.go('/more'),
+           ),
           title: Text(
-            'Chính sách sử dụng',
+            'Terms & Policy',
             style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -252,7 +252,7 @@ class _PolicyTabState extends State<PolicyTab> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Chính Sách Sử Dụng',
+                      'Terms of Service',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -269,7 +269,7 @@ class _PolicyTabState extends State<PolicyTab> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Thông tin chi tiết về quyền lợi và nghĩa vụ khi sử dụng dịch vụ',
+                      'Detailed information about rights and obligations when using the service',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),
@@ -301,7 +301,7 @@ class _PolicyTabState extends State<PolicyTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '📋 Tóm tắt chính sách',
+                      '📋 Policy Summary',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -319,26 +319,26 @@ class _PolicyTabState extends State<PolicyTab> {
                       children: [
                         _buildPolicySummaryCard(
                           icon: Icons.check_circle,
-                          title: 'Đặt hàng dễ dàng',
-                          desc: 'Quy trình đơn giản, nhanh chóng',
+                          title: 'Easy Ordering',
+                          desc: 'Simple and fast process',
                           color: Colors.green,
                         ),
                         _buildPolicySummaryCard(
                           icon: Icons.security,
-                          title: 'Bảo mật tuyệt đối',
-                          desc: 'Thông tin được mã hóa SSL/TLS',
+                          title: 'Absolute Security',
+                          desc: 'Information encrypted with SSL/TLS',
                           color: Colors.blue,
                         ),
                         _buildPolicySummaryCard(
                           icon: Icons.verified_user,
-                          title: 'Giao hàng đúng giờ',
-                          desc: 'Cam kết 30-60 phút',
+                          title: 'On-time Delivery',
+                          desc: '30-60 minute commitment',
                           color: Colors.orange,
                         ),
                         _buildPolicySummaryCard(
                           icon: Icons.policy,
-                          title: 'Hoàn tiền 100%',
-                          desc: 'Nếu không hài lòng về chất lượng',
+                          title: '100% Refund',
+                          desc: 'If not satisfied with quality',
                           color: Colors.purple,
                         ),
                       ],
@@ -368,7 +368,7 @@ class _PolicyTabState extends State<PolicyTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '📖 Chi tiết chính sách',
+                      '📖 Policy Details',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -423,7 +423,7 @@ class _PolicyTabState extends State<PolicyTab> {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          'Lưu ý quan trọng',
+                          'Important Notice',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -451,7 +451,7 @@ class _PolicyTabState extends State<PolicyTab> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '⚠️ Điều khoản thay đổi',
+                                  '⚠️ Terms of Change',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -460,7 +460,7 @@ class _PolicyTabState extends State<PolicyTab> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Chúng tôi có quyền cập nhật chính sách này bất cứ lúc nào. Những thay đổi sẽ có hiệu lực ngay khi được đăng tải trên website.',
+                                  'We have the right to update this policy at any time. Changes will take effect immediately when posted on the website.',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.amber.shade700,
@@ -487,7 +487,7 @@ class _PolicyTabState extends State<PolicyTab> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'ℹ️ Liên hệ hỗ trợ',
+                                  'ℹ️ Contact Support',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -496,7 +496,7 @@ class _PolicyTabState extends State<PolicyTab> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Nếu bạn có thắc mắc về chính sách này, vui lòng liên hệ với chúng tôi qua: Email: policy@greenkitchen.com hoặc Hotline: 1900-xxxx',
+                                  'If you have questions about this policy, please contact us at: Email: policy@greenkitchen.com or Hotline: 1900-xxxx',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.blue.shade700,
@@ -533,7 +533,7 @@ class _PolicyTabState extends State<PolicyTab> {
                 child: Column(
                   children: [
                     Text(
-                      '📄 Phiên bản chính sách: v2.1',
+                      '📄 Policy Version: v1.1',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -543,7 +543,7 @@ class _PolicyTabState extends State<PolicyTab> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '📅 Cập nhật lần cuối: 15/12/2024',
+                      '📅 Last Updated: 23/09/2025',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
@@ -552,7 +552,7 @@ class _PolicyTabState extends State<PolicyTab> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '© 2024 Green Kitchen. Tất cả quyền được bảo lưu.',
+                      '© 2025 Green Kitchen. All rights reserved.',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
@@ -659,6 +659,21 @@ class _PolicyTabState extends State<PolicyTab> {
           ),
         ],
       ),
+      trailing: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: (policy['color'] as Color).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          Icons.expand_more,
+          color: policy['color'] as Color,
+          size: 20,
+        ),
+      ),
+      onExpansionChanged: (expanded) {
+        // Handle expansion state if needed
+      },
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -737,21 +752,6 @@ class _PolicyTabState extends State<PolicyTab> {
           ],
         ),
       ],
-      trailing: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: (policy['color'] as Color).withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          Icons.expand_more,
-          color: policy['color'] as Color,
-          size: 20,
-        ),
-      ),
-      onExpansionChanged: (expanded) {
-        // Handle expansion state if needed
-      },
     );
   }
 }
