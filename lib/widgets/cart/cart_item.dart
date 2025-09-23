@@ -100,7 +100,7 @@ class CartItemWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${cartItem.calories.toStringAsFixed(0)} Cal',
+                  '${NumberFormat('#,###', 'vi_VN').format(cartItem.calories)} Cal',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -110,7 +110,7 @@ class CartItemWidget extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '${cartItem.protein.toStringAsFixed(1)}g Protein',
+                  '${NumberFormat('#,###.#').format(cartItem.protein)}g Protein',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -120,7 +120,7 @@ class CartItemWidget extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '${cartItem.carbs.toStringAsFixed(1)}g Carbs',
+                  '${NumberFormat('#,###.#').format(cartItem.carbs)}g Carbs',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -130,7 +130,7 @@ class CartItemWidget extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '${cartItem.fat.toStringAsFixed(1)}g Fat',
+                  '${NumberFormat('#,###.#').format(cartItem.fat)}g Fat',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,

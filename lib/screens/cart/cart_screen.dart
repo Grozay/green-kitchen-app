@@ -138,7 +138,7 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      'Your cart is empty',
+                                      'Không có cart',
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: AppColors.textSecondary,
@@ -146,7 +146,7 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'Add some products to your cart',
+                                      'Thêm sản phẩm vào cart của bạn',
                                       style: TextStyle(
                                         color: AppColors.textSecondary,
                                       ),
@@ -169,7 +169,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ),
                                       child: const Text(
-                                        'View Menu',
+                                        'Xem Menu',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,

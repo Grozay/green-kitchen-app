@@ -46,6 +46,21 @@ class CustomMealService {
     }
   }
 
+  // Delete a custom meal
+  Future<void> deleteCustomMeal(int id) async {
+    try {
+      final endpoints = ApiEndpoints();
+      final url = endpoints.deleteCustomMeal.replaceFirst(':id', id.toString());
+      await _apiService.delete(url);
+    } catch (e) {
+      print('Error in deleteCustomMeal: $e');
+      if (e is ApiError) {
+        throw Exception('Failed to delete custom meal: ${e.message}');
+      }
+      throw Exception('Failed to delete custom meal: ${e.toString()}');
+    }
+  }
+
   // Get all custom meals for a customer
   Future<List<CustomMeal>> getCustomMealsForCustomer(int customerId) async {
     try {

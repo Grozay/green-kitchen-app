@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../constants/constants.dart';
 import '../../models/menu_meal.dart';
@@ -90,7 +91,7 @@ class _BottomBarWidgetState extends State<BottomBarWidget> {
                     style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                   ),
                   Text(
-                    '${(widget.menuMeal.price! * widget.quantity).toStringAsFixed(0)}đ',
+                    '${NumberFormat('#,###', 'vi_VN').format(widget.menuMeal.price! * widget.quantity)}VNĐ',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

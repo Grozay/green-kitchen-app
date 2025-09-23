@@ -9,6 +9,7 @@ import 'package:green_kitchen_app/provider/auth_provider.dart';
 import 'package:green_kitchen_app/theme/app_colors.dart';
 import 'package:green_kitchen_app/models/custom_meal.dart';
 import 'package:green_kitchen_app/widgets/custom_meal/nutrition_info.dart'; // Reuse nutrition_info widget
+import 'package:green_kitchen_app/services/custom_meal_service.dart'; // Import CustomMealService
 import 'package:intl/intl.dart'; // Import intl package for NumberFormat
 
 class SavedCustomMealsScreen extends StatefulWidget {
@@ -130,14 +131,42 @@ class _SavedCustomMealsScreenState extends State<SavedCustomMealsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (meal.image.isNotEmpty)
-              Center(
-                child: Image.network(
-                  meal.image,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-              ),
+            Center(
+              child: meal.image.isNotEmpty
+                  ? Image.network(
+                      meal.image,
+                      height: 100,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 100,
+                          height: 100,
+                          decoration: const BoxDecoration(
+                            color: AppColors.secondary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.restaurant,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      width: 100,
+                      height: 100,
+                      decoration: const BoxDecoration(
+                        color: AppColors.secondary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.restaurant,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    ),
+            ),
             const SizedBox(height: 8),
             // Title and Price
             Row(
@@ -228,35 +257,106 @@ class _SavedCustomMealsScreenState extends State<SavedCustomMealsScreen> {
                 ),
               ),
             const SizedBox(height: 12),
-            // Action Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
+
+            // 2 nút trên: Adjust và Delete
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      // Load the meal into CustomMealProvider for editing
+                      final customMealProvider = Provider.of<CustomMealProvider>(
+                        context,
+                        listen: false,
+                      );
+                      customMealProvider.loadFromCustomMeal(meal);
+                      // Navigate to custom meal screen for editing
+                      GoRouter.of(context).push(
+                        '/saved-custom-meal/create',
+                      ); // Change to '/custom-meal/create'
+                    },
+                    child: const Text(
+                      'Adjust',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                onPressed: () {
-                  // Load the meal into CustomMealProvider for editing
-                  final customMealProvider = Provider.of<CustomMealProvider>(
-                    context,
-                    listen: false,
-                  );
-                  customMealProvider.loadFromCustomMeal(meal);
-                  // Navigate to custom meal screen for editing
-                  GoRouter.of(context).push(
-                    '/saved-custom-meal/create',
-                  ); // Change to '/custom-meal/create'
-                },
-                child: const Text(
-                  'Adjust your custom meal',
-                  style: TextStyle(color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () async {
+                      // Show confirmation dialog
+                      final shouldDelete = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Delete Custom Meal'),
+                            content: Text('Are you sure you want to delete "${meal.title}"?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(true),
+                                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (shouldDelete == true) {
+                        try {
+                          // Import service and call delete
+                          final customMealService = CustomMealService();
+                          await customMealService.deleteCustomMeal(meal.id);
+
+                          // Reload data
+                          final authProvider = context.read<AuthProvider>();
+                          if (authProvider.isAuthenticated &&
+                              authProvider.currentUser?.id != null) {
+                            final customerId = int.tryParse(authProvider.currentUser!.id) ?? 0;
+                            context.read<SavedCustomMealsProvider>().loadSavedMeals(customerId);
+                          }
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Deleted successfully')),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to delete: $e')),
+                          );
+                        }
+                      }
+                    },
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
+
+            const SizedBox(height: 8),
+
+            // Nút Add to Cart chiếm hết width
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

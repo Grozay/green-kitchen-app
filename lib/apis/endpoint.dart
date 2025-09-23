@@ -4,9 +4,9 @@ class ApiEndpoints {
 
   // static const String baseUrl = 'http://172.16.2.9:8080/apis/v1'; //Trung
 
-  // static const String baseUrl = 'http://192.168.1.23:8080/apis/v1'; //Quyen
-
-  static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
+  static const String baseUrl = 'http://192.168.1.119:8080/apis/v1'; //Quyen
+  
+//   static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
 
   // Authentication endpoints
   static const String login = '$baseUrl/auth/login';
@@ -40,6 +40,7 @@ class ApiEndpoints {
   var createCustomMeal = '$baseUrl/custom-meals';
   var getCustomMealsForCustomer = '$baseUrl/custom-meals/customer/:customerId';
   var updateCustomMeal = '$baseUrl/custom-meals/:id';
+  var deleteCustomMeal = '$baseUrl/custom-meals/:id';
 
   // Ingredient endpoints
   var ingredients = '$baseUrl/ingredients';

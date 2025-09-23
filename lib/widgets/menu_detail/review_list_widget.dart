@@ -37,122 +37,69 @@ class _ReviewListWidgetState extends State<ReviewListWidget> {
       children: widget.reviews
           .map<Widget>(
             (review) => Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: review.customer?.avatar != null
-                              ? NetworkImage(review.customer!.avatar!)
-                              : null,
-                          child: review.customer?.avatar == null
-                              ? Text(review.customerName[0])
-                              : null,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                review.customerName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              StarRating(
-                                rating: review.rating.toDouble(),
-                                onRatingChanged: null,
-                                starCount: 5,
-                                size: 16.0,
-                                color: Colors.amber,
-                                borderColor: Colors.grey,
-                                allowHalfRating: true,
-                              ),
-                            ],
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: review.customer?.avatar != null
+                                ? NetworkImage(review.customer!.avatar!)
+                                : null,
+                            child: review.customer?.avatar == null
+                                ? Text(review.customerName[0])
+                                : null,
                           ),
-                        ),
-                        if (review.customerId ==
-                            int.tryParse(authProvider.currentUser?.id ?? ''))
-                          const Text(
-                            ' (Your review)',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        const SizedBox(width: 8),
-                        if (review.customerId ==
-                            int.tryParse(authProvider.currentUser?.id ?? ''))
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              double tempRating = review.rating.toDouble();
-                              TextEditingController commentController =
-                                  TextEditingController(text: review.comment);
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Edit Review'),
-                                  content: SizedBox(
-                                    height: 300,
-                                    child: Column(
-                                      children: [
-                                        StarRating(
-                                          rating: tempRating,
-                                          onRatingChanged: (newRating) {
-                                            setState(() => tempRating = newRating);
-                                          },
-                                          starCount: 5,
-                                          size: 24.0,
-                                          color: Colors.amber,
-                                          borderColor: Colors.grey,
-                                          allowHalfRating: true,
-                                        ),
-                                        TextField(
-                                          controller: commentController,
-                                          maxLines: 4,
-                                          decoration: const InputDecoration(
-                                              hintText: 'Your comment...'),
-                                        ),
-                                      ],
-                                    ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  review.customerName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        final updatedReview = MenuMealReview(
-                                          id: review.id,
-                                          customerId: review.customerId,
-                                          customerName: review.customerName,
-                                          rating: tempRating.toInt(),
-                                          comment: commentController.text,
-                                          createdAt: review.createdAt,
-                                          menuMealId: review.menuMealId,
-                                          menuMealTitle: review.menuMealTitle, // Thêm tham số này
-                                        );
-                                        widget.onEdit(updatedReview);
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Update'),
-                                    ),
-                                  ],
                                 ),
-                              );
-                            },
+                                StarRating(
+                                  rating: review.rating.toDouble(),
+                                  onRatingChanged: null,
+                                  starCount: 5,
+                                  size: 16.0,
+                                  color: Colors.amber,
+                                  borderColor: Colors.grey,
+                                  allowHalfRating: true,
+                                ),
+                              ],
+                            ),
                           ),
-                      ],
-                    ),
-                    Text(review.comment),
-                    Text(
-                      review.createdAt ?? '',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ],
+                          if (review.customerId ==
+                              int.tryParse(authProvider.currentUser?.id ?? ''))
+                            const Text(
+                              ' (Your review)',
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          const SizedBox(width: 8),
+                          if (review.customerId ==
+                              int.tryParse(authProvider.currentUser?.id ?? ''))
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () => widget.onEdit(review),
+                            ),
+                        ],
+                      ),
+                      Text(review.comment),
+                      Text(
+                        review.createdAt ?? '',
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
