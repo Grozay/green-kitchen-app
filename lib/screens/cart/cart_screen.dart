@@ -185,7 +185,7 @@ class _CartScreenState extends State<CartScreen> {
                           if (!isLoading &&
                               cart != null &&
                               cart.cartItems.isNotEmpty)
-                            ...cart.cartItems.map(
+                            ...cart.cartItems.reversed.map(
                               (cartItem) => Padding(
                                 padding: const EdgeInsets.only(bottom: 16),
                                 child: _CartItemWidget(

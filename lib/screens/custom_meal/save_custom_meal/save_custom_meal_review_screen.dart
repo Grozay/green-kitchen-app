@@ -170,8 +170,8 @@ class _SaveCustomMealReviewScreenState
                       .toList();
 
                   // Debug logs
-                  print('DEBUG: selectedItems before save: $selectedItems');
-                  print('DEBUG: selectedItems length: ${selectedItems.length}');
+                  // print('DEBUG: selectedItems before save: $selectedItems');
+                  // print('DEBUG: selectedItems length: ${selectedItems.length}');
 
                   // Prepare data (adjusted for update API, including missing fields)
                   final mealData = {

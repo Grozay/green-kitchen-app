@@ -113,7 +113,8 @@ class _SavedCustomMealsScreenState extends State<SavedCustomMealsScreen> {
                     padding: const EdgeInsets.all(16),
                     itemCount: provider.savedMeals.length,
                     itemBuilder: (context, index) {
-                      final meal = provider.savedMeals[index];
+                      // Reverse order so newest items appear first
+                      final meal = provider.savedMeals.reversed.toList()[index];
                       return _buildMealCard(meal);
                     },
                   ),

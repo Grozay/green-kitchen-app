@@ -143,7 +143,7 @@ class _CustomMealReviewScreenState extends State<CustomMealReviewScreen> {
                     'carb': provider.totalCarbs.round(),
                     'fat': provider.totalFat.round(),
                     'price': provider.totalPrice,
-                    'image': 'default_image_url', // Replace with actual default image
+                    'image': imageCustomMealDefault, // Replace with actual default image
                     'proteins': provider.selection.protein != null
                         ? [{'ingredientId': provider.selection.protein!.item.id, 'quantity': provider.selection.protein!.quantity}]
                         : [],
