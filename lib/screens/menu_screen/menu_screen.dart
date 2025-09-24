@@ -133,7 +133,7 @@ class MenuScreen extends StatelessWidget {
                       );
                       if (shouldOpenWeb == true) {
                         final Uri url = Uri.parse(
-                          'http://12.0.0.1:5173/week-meal-planner',
+                          'http://10.0.2.2:5173/week-meal-planner',
                         );
                         if (await canLaunchUrl(url)) {
                           await launchUrl(url);
