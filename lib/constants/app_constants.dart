@@ -10,12 +10,12 @@ class ChatSocketConfig {
   static const Duration heartbeatOutgoing = Duration(seconds: 10);
   static const Duration heartbeatIncoming = Duration(seconds: 10);
 
-  // Reconnect backoff base (client sẽ dùng giá trị riêng)
+  // Reconnect backoff base (client will use separate value)
   static const Duration reconnectDelay = Duration(milliseconds: 5000);
 }
 
 class ChatBubbleConfig {
-  // Các route prefix mà chat bubble sẽ ẩn
+  // Route prefixes where chat bubble will be hidden
   static const List<String> hiddenRoutePrefixes = <String>[
     '/auth',
     '/payment',

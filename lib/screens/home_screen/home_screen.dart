@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/app_layout.dart';
 import '../../services/menu_meal_service.dart';
@@ -94,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Welcome Section
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -209,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          // Navigate to menu
+                          GoRouter.of(context).push('/menu-meal');
                         },
                         child: Text(
                           'View All',
@@ -334,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.restaurant_menu,
                           label: 'Browse Menu',
                           onTap: () {
-                            // Navigate to menu
+                            GoRouter.of(context).push('/menu-meal');
                           },
                         ),
                       ),
@@ -344,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.track_changes,
                           label: 'Track Order',
                           onTap: () {
-                            // Navigate to tracking
+                            GoRouter.of(context).push('/tracking'); 
                           },
                         ),
                       ),
@@ -365,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         // Navigate to menu detail screen
-        context.go('/menu-meal/${menuMeal.slug}');
+        GoRouter.of(context).push('/menu-meal/${menuMeal.slug}');
       },
       child: Container(
         width: 200, // Fixed width for horizontal scroll
@@ -514,7 +516,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${menuMeal.price?.toStringAsFixed(2) ?? 'N/A'}',
+                          '${NumberFormat('#,###').format(menuMeal.price ?? 0)} VND',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
