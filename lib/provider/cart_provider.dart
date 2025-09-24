@@ -42,7 +42,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  // Lưu cart vào local storage (sau khi update từ API)
+  // Save cart to local storage (after update from API)
   Future<void> _saveCartToLocal() async {
     if (_prefs == null) {
       await initialize();
