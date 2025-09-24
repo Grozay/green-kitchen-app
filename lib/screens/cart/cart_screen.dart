@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-// import 'package:green_kitchen_app/models/cartItem.dart'; // Bỏ import này
-import 'package:green_kitchen_app/provider/cart_provider.dart'; // Giữ import CartProvider
-import 'package:green_kitchen_app/widgets/cart/cart_item.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../models/cart.dart'; // Thay cartv2.dart bằng cart.dart
+
+import '../../models/cart.dart';
 import '../../theme/app_colors.dart';
-import 'package:green_kitchen_app/provider/auth_provider.dart'; // Thêm import AuthProvider
-import 'package:intl/intl.dart'; // Thêm import này
+import 'package:green_kitchen_app/provider/auth_provider.dart';
+import 'package:green_kitchen_app/provider/cart_provider.dart';
+import 'package:green_kitchen_app/widgets/cart/cart_item.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -20,11 +20,9 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    // Load cart data when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cartProvider = Provider.of<CartProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      // Fix: Parse String to int safely
       final customerId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
       cartProvider.fetchCart(customerId);
     });
@@ -37,10 +35,7 @@ class _CartScreenState extends State<CartScreen> {
         final cart = cartProvider.cart;
         final isLoading = cartProvider.isLoading;
         final error = cartProvider.error;
-
-        // Fix: Parse String to int safely
-        final customerId =
-            int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
+        final customerId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -66,7 +61,6 @@ class _CartScreenState extends State<CartScreen> {
           body: SafeArea(
             child: Column(
               children: [
-                // Scrollable content
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
@@ -74,7 +68,6 @@ class _CartScreenState extends State<CartScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Loading indicator
                           if (isLoading)
                             const Center(
                               child: CircularProgressIndicator(
@@ -82,7 +75,6 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                             ),
 
-                          // Error message
                           if (error != null)
                             Container(
                               padding: const EdgeInsets.all(16),
@@ -109,9 +101,7 @@ class _CartScreenState extends State<CartScreen> {
                                   IconButton(
                                     onPressed: () {
                                       cartProvider.clearError();
-                                      cartProvider.fetchCart(
-                                        customerId,
-                                      ); // Thay CURRENT_CUSTOMER_ID
+                                      cartProvider.fetchCart(customerId);
                                     },
                                     icon: Icon(
                                       Icons.refresh,
@@ -122,7 +112,6 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                             ),
 
-                          // Empty cart message
                           if (!isLoading &&
                               cart != null &&
                               cart.cartItems.isEmpty)
@@ -138,7 +127,7 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      'Không có cart',
+                                      'Your cart is empty',
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: AppColors.textSecondary,
@@ -146,7 +135,7 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'Thêm sản phẩm vào cart của bạn',
+                                      'Add some meals to get started',
                                       style: TextStyle(
                                         color: AppColors.textSecondary,
                                       ),
@@ -163,13 +152,11 @@ class _CartScreenState extends State<CartScreen> {
                                           vertical: 12,
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                       ),
                                       child: const Text(
-                                        'Xem Menu',
+                                        'Browse Menu',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
@@ -181,12 +168,10 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                             ),
 
-                          // Cart items
                           if (!isLoading &&
                               cart != null &&
                               cart.cartItems.isNotEmpty)
                             ...cart.cartItems.reversed
-                                .where((cartItem) => cartItem.itemType != 'WEEK_MEAL')
                                 .map(
                               (cartItem) => Padding(
                                 padding: const EdgeInsets.only(bottom: 16),
@@ -194,25 +179,23 @@ class _CartScreenState extends State<CartScreen> {
                                   cartItem: cartItem,
                                   onIncrease: () =>
                                       cartProvider.increaseQuantity(
-                                        customerId, // Thay CURRENT_CUSTOMER_ID
+                                        customerId,
                                         cartItem.id,
                                       ),
                                   onDecrease: () =>
                                       cartProvider.decreaseQuantity(
-                                        customerId, // Thay CURRENT_CUSTOMER_ID
+                                        customerId,
                                         cartItem.id,
                                       ),
                                   onRemove: () => cartProvider.removeFromCart(
-                                    customerId, // Thay CURRENT_CUSTOMER_ID
+                                    customerId,
                                     cartItem.id,
                                   ),
                                 ),
                               ),
                             ),
 
-                          const SizedBox(
-                            height: 100,
-                          ), // Space for fixed bottom section
+                          const SizedBox(height: 100),
                         ],
                       ),
                     ),
@@ -221,7 +204,6 @@ class _CartScreenState extends State<CartScreen> {
               ],
             ),
           ),
-          // Fixed bottom section
           bottomNavigationBar:
               (!isLoading && cart != null && cart.cartItems.isNotEmpty)
               ? Container(
@@ -239,7 +221,6 @@ class _CartScreenState extends State<CartScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Total Section
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -265,7 +246,6 @@ class _CartScreenState extends State<CartScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Place Order Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -278,7 +258,6 @@ class _CartScreenState extends State<CartScreen> {
                             elevation: 0,
                           ),
                           onPressed: () {
-                            // Thêm check login
                             final authProvider = Provider.of<AuthProvider>(
                               context,
                               listen: false,
@@ -286,9 +265,7 @@ class _CartScreenState extends State<CartScreen> {
                             if (!authProvider.isAuthenticated) {
                               _showLoginPrompt(context);
                             } else {
-                              GoRouter.of(
-                                context,
-                              ).push('/checkout');
+                              GoRouter.of(context).push('/checkout');
                             }
                           },
                           child: const Text(
@@ -312,7 +289,7 @@ class _CartScreenState extends State<CartScreen> {
 }
 
 class _CartItemWidget extends StatelessWidget {
-  final CartItem cartItem; // Giờ là CartItem từ cart.dart
+  final CartItem cartItem;
   final VoidCallback onIncrease;
   final VoidCallback onDecrease;
   final VoidCallback onRemove;
@@ -327,7 +304,6 @@ class _CartItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CartItemWidget(
-      // Thay cart_item thành CartItemWidget
       cartItem: cartItem,
       onIncrease: onIncrease,
       onDecrease: onDecrease,
