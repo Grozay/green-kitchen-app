@@ -142,7 +142,7 @@ class _LocationTabState extends State<LocationTab> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          store.isActive ? 'Đang hoạt động' : 'Tạm đóng cửa',
+                          store.isActive ? 'Open now' : 'Temporarily closed',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -275,7 +275,7 @@ class _LocationTabState extends State<LocationTab> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Vui lòng kiểm tra kết nối internet và thử lại',
+              'Please check your internet connection and try again',
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14,
@@ -335,7 +335,7 @@ class _LocationTabState extends State<LocationTab> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Danh sách cửa hàng sẽ xuất hiện ở đây',
+              'The store list will appear here',
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14,

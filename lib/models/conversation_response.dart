@@ -73,11 +73,11 @@ class ConversationResponse {
   String get statusDisplayName {
     switch (status) {
       case 'AI':
-        return 'AI Tư vấn';
+        return 'AI Support';
       case 'EMP':
-        return 'Nhân viên';
+        return 'Employee';
       case 'WAITING_EMP':
-        return 'Chờ nhân viên';
+        return 'Waiting for Employee';
       default:
         return status;
     }

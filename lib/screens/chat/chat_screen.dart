@@ -267,16 +267,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       final difference = now.difference(timestamp);
 
       if (difference.inDays > 0) {
-        return '${difference.inDays} ngày trước';
+        return '${difference.inDays} days ago';
       } else if (difference.inHours > 0) {
-        return '${difference.inHours} giờ trước';
+        return '${difference.inHours} hours ago';
       } else if (difference.inMinutes > 0) {
-        return '${difference.inMinutes} phút trước';
+        return '${difference.inMinutes} minutes ago';
       } else {
-        return 'Vừa xong';
+        return 'Just now';
       }
     } catch (e) {
-      return 'Vừa xong';
+      return 'Just now';
     }
   }
 
@@ -400,28 +400,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
               onPressed: () => context.go('/'),
             ),
-            actions: [
-              IconButton(
-                icon: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.refresh,
-                    color: Colors.black54,
-                    size: 18,
-                  ),
-                ),
-                onPressed: () {
-                  context.read<ChatProvider>().startNewConversation();
-                  context.read<ChatProvider>().initAndConnect(context);
-                },
-                tooltip: 'New Chat',
-              ),
-            ],
+            actions: const [],
           ),
           body: Container(
             decoration: BoxDecoration(
@@ -484,7 +463,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           // Hiển thị snackbar thông báo
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text('Đã cuộn xuống cuối'),
+                              content: const Text('Scrolled to bottom'),
                               duration: const Duration(seconds: 1),
                               backgroundColor: AppColors.secondary,
                               behavior: SnackBarBehavior.floating,
@@ -583,7 +562,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                       ),
                                       const SizedBox(width: 12),
                                       const Text(
-                                        'AI đang trả lời...',
+                                        'AI is typing...',
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.black87,
@@ -664,7 +643,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             child: TextField(
                               controller: _controller,
                               decoration: InputDecoration(
-                                hintText: 'Nhập tin nhắn...',
+                                hintText: 'Type a message...',
                                 hintStyle: TextStyle(color: Colors.grey.shade500),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.symmetric(

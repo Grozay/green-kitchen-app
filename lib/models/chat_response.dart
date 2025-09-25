@@ -71,13 +71,13 @@ class ChatResponse {
   String get displayName {
     switch (senderRole) {
       case 'CUSTOMER':
-        return senderName ?? 'Bạn';
+        return senderName ?? 'You';
       case 'EMP':
-        return senderName ?? 'Nhân viên';
+        return senderName ?? 'Employee';
       case 'AI':
-        return 'AI Tư vấn';
+        return 'AI Support';
       case 'SYSTEM':
-        return 'Hệ thống';
+        return 'System';
       default:
         return senderName ?? 'Unknown';
     }
