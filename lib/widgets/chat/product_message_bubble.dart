@@ -225,7 +225,8 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
       onTap: () {
         // Navigate to product detail
         if (product.slug != null) {
-          context.go('/menu-meal/${product.slug}');
+
+          GoRouter.of(context).push('/menu-meal/${product.slug}');
         }
       },
       onLongPress: () {
@@ -328,7 +329,8 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
                     color: Colors.black54,
                     fontStyle: FontStyle.italic,
                   ),
-                  maxLines: 2, // Tăng từ 1 lên 2 để hiển thị đầy đủ hơn
+                  maxLines: 1,
+                  softWrap: false,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
