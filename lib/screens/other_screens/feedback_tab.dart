@@ -279,12 +279,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                         subtitle: 'Chat directly with support staff',
                         color: Colors.green,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Chat feature coming soon!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
+                           GoRouter.of(context).push('/chat');
                         },
                       ),
                     ],
@@ -326,7 +321,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                                 icon: Icons.phone,
                                 title: 'Hotline',
                                 value: '1900-xxxx',
-                                subtitle: '8:00 - 22:00 (T2-CN)',
+                                subtitle: '8:00 - 22:00 (Mon-Fri)',
                                 color: AppColors.primary,
                               ),
                             ),
@@ -349,8 +344,8 @@ class _FeedbackTabState extends State<FeedbackTab> {
                               child: _buildContactInfo(
                                 icon: Icons.location_on,
                                 title: 'Office',
-                                value: 'TP. Hồ Chí Minh',
-                                subtitle: '123 Đường ABC, Quận 1',
+                                value: 'Ho Chi Minh City',
+                                subtitle: '123 ABC Street, District 1',
                                 color: Colors.purple,
                               ),
                             ),
@@ -359,8 +354,8 @@ class _FeedbackTabState extends State<FeedbackTab> {
                               child: _buildContactInfo(
                                 icon: Icons.chat_bubble,
                                 title: 'Live Chat',
-                                value: 'Trực tuyến 24/7',
-                                subtitle: 'Hỗ trợ tức thì',
+                                value: 'Online 24/7',
+                                subtitle: 'Support 24/7',
                                 color: Colors.green,
                               ),
                             ),
@@ -668,24 +663,24 @@ class _FeedbackTabState extends State<FeedbackTab> {
                       DropdownButtonFormField<String>(
                         value: _feedbackTypeController.text,
                         decoration: InputDecoration(
-                          labelText: 'Loại phản hồi',
+                          labelText: 'Feedback Type',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'GENERAL', child: Text('Phản hồi chung')),
-                          DropdownMenuItem(value: 'FOOD_QUALITY', child: Text('Chất lượng món ăn')),
-                          DropdownMenuItem(value: 'SERVICE', child: Text('Dịch vụ')),
-                          DropdownMenuItem(value: 'DELIVERY', child: Text('Giao hàng')),
-                          DropdownMenuItem(value: 'WEBSITE', child: Text('Website/Ứng dụng')),
+                          DropdownMenuItem(value: 'GENERAL', child: Text('General Feedback')),
+                          DropdownMenuItem(value: 'FOOD_QUALITY', child: Text('Food Quality')),
+                          DropdownMenuItem(value: 'SERVICE', child: Text('Service')),
+                          DropdownMenuItem(value: 'DELIVERY', child: Text('Delivery')),
+                          DropdownMenuItem(value: 'WEBSITE', child: Text('Website/App')),
                         ],
                         onChanged: (value) => setState(() => _feedbackTypeController.text = value!),
                       ),
                       const SizedBox(height: 16),
 
                     Text(
-                        'Đánh giá tổng thể',
+                        'Overall Rating',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -711,7 +706,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                       TextFormField(
                         controller: _feedbackTitleController,
                         decoration: InputDecoration(
-                          labelText: 'Tiêu đề phản hồi',
+                          labelText: 'Feedback Title',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -723,7 +718,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                         controller: _feedbackDescriptionController,
                         maxLines: 4,
                         decoration: InputDecoration(
-                          labelText: 'Mô tả chi tiết',
+                          labelText: 'Detailed Description',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -762,7 +757,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                     TextButton(
                       onPressed: () => setState(() => _feedbackDialogOpen = false),
                       child: Text(
-                        'Hủy',
+                        'Cancel',
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ),
@@ -832,7 +827,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                         ),
                         const SizedBox(width: 12),
                     Text(
-                          'Yêu cầu hỗ trợ',
+                          'Support Request',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -864,17 +859,17 @@ class _FeedbackTabState extends State<FeedbackTab> {
                             child: DropdownButtonFormField<String>(
                               value: _supportIssueTypeController.text,
                               decoration: InputDecoration(
-                                labelText: 'Loại vấn đề',
+                                labelText: 'Issue Type',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                               items: const [
-                                DropdownMenuItem(value: 'TECHNICAL', child: Text('Vấn đề kỹ thuật')),
-                                DropdownMenuItem(value: 'ORDER', child: Text('Vấn đề đặt hàng')),
-                                DropdownMenuItem(value: 'PAYMENT', child: Text('Vấn đề thanh toán')),
-                                DropdownMenuItem(value: 'DELIVERY', child: Text('Vấn đề giao hàng')),
-                                DropdownMenuItem(value: 'ACCOUNT', child: Text('Vấn đề tài khoản')),
+                                DropdownMenuItem(value: 'TECHNICAL', child: Text('Technical Issue')),
+                                DropdownMenuItem(value: 'ORDER', child: Text('Order Issue')),
+                                DropdownMenuItem(value: 'PAYMENT', child: Text('Payment Issue')),
+                                DropdownMenuItem(value: 'DELIVERY', child: Text('Delivery Issue')),
+                                DropdownMenuItem(value: 'ACCOUNT', child: Text('Account Issue')),
                               ],
                               onChanged: (value) => setState(() => _supportIssueTypeController.text = value!),
                             ),
@@ -884,16 +879,16 @@ class _FeedbackTabState extends State<FeedbackTab> {
                             child: DropdownButtonFormField<String>(
                               value: _supportPriorityController.text,
                               decoration: InputDecoration(
-                                labelText: 'Mức độ ưu tiên',
+                                labelText: 'Priority',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                               items: const [
-                                DropdownMenuItem(value: 'LOW', child: Text('Thấp')),
-                                DropdownMenuItem(value: 'MEDIUM', child: Text('Trung bình')),
-                                DropdownMenuItem(value: 'HIGH', child: Text('Cao')),
-                                DropdownMenuItem(value: 'URGENT', child: Text('Khẩn cấp')),
+                                DropdownMenuItem(value: 'LOW', child: Text('Low')),
+                                DropdownMenuItem(value: 'MEDIUM', child: Text('Medium')),
+                                DropdownMenuItem(value: 'HIGH', child: Text('High')),
+                                DropdownMenuItem(value: 'URGENT', child: Text('Urgent')),
                               ],
                               onChanged: (value) => setState(() => _supportPriorityController.text = value!),
                             ),
@@ -905,7 +900,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
               TextFormField(
                         controller: _supportSubjectController,
                         decoration: InputDecoration(
-                          labelText: 'Tiêu đề yêu cầu',
+                          labelText: 'Subject',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -929,14 +924,14 @@ class _FeedbackTabState extends State<FeedbackTab> {
                       DropdownButtonFormField<String>(
                         value: _supportContactMethodController.text,
                         decoration: InputDecoration(
-                          labelText: 'Phương thức liên hệ',
+                          labelText: 'Contact Method',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         items: const [
                           DropdownMenuItem(value: 'EMAIL', child: Text('Email')),
-                          DropdownMenuItem(value: 'PHONE', child: Text('Điện thoại')),
+                          DropdownMenuItem(value: 'PHONE', child: Text('Phone')),
                           DropdownMenuItem(value: 'CHAT', child: Text('Live Chat')),
                         ],
                         onChanged: (value) => setState(() => _supportContactMethodController.text = value!),
@@ -962,7 +957,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                     TextButton(
                       onPressed: () => setState(() => _supportDialogOpen = false),
                       child: Text(
-                        'Hủy',
+                        'Cancel',
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ),
@@ -977,7 +972,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Gửi yêu cầu'),
+                      child: const Text('Send Request'),
                     ),
                   ],
                 ),

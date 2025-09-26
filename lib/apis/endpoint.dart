@@ -84,8 +84,8 @@ class ApiEndpoints {
   // var getWeekMealDays = '$baseUrl/week-meals/:weekMealId/days';
   // var getWeekMealDayById = '$baseUrl/week-meals/:weekMealId/days/:dayId';
 
-  static const String submitFeedback = '$baseUrl/feedback';
-  static const String submitSupportRequest = '$baseUrl/support-request';
+  static const String submitFeedback = '$baseUrl/support/feedback';
+  static const String submitSupportRequest = '$baseUrl/support/ticket';
 
   // Customer Coupon endpoints
   static const String customerUseCoupon = '$baseUrl/customer-coupons/use-coupon';
