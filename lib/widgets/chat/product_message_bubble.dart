@@ -195,7 +195,9 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        childAspectRatio: 0.99, // Giảm xuống để có đủ không gian cho 5 hàng (ảnh + title + nutrition + description + price)
+        // Tăng chiều cao mỗi tile để tránh overflow nội dung
+        // Tối ưu cho phone (1 cột) và tablet (2 cột)
+        childAspectRatio: isTablet ? 0.85 : 0.75,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
@@ -252,7 +254,8 @@ class _ProductMessageBubbleState extends State<ProductMessageBubble>
             children: [
               // Product image với AspectRatio cố định
               AspectRatio(
-                aspectRatio: 1.4, // Giảm từ 1.6 xuống 1.4 để ảnh ngắn hơn
+                // Giảm tỉ lệ ảnh để nhường chỗ cho nội dung text phía dưới
+                aspectRatio: 1.2,
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
