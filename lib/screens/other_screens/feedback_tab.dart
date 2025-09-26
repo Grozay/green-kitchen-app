@@ -49,7 +49,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
     if (_feedbackTitleController.text.isEmpty || _feedbackDescriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Vui lòng điền đầy đủ thông tin'),
+          content: Text('Please fill in all required fields'),
           backgroundColor: AppColors.accent,
         ),
       );
@@ -98,7 +98,7 @@ class _FeedbackTabState extends State<FeedbackTab> {
     if (_supportSubjectController.text.isEmpty || _supportDescriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Vui lòng điền đầy đủ thông tin'),
+          content: Text('Please fill in all required fields'),
           backgroundColor: AppColors.accent,
         ),
       );
