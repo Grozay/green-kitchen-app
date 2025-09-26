@@ -282,7 +282,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         );
       }).toList();
 
-      // Step 1: Create order
+      /// Create order
       final order = await OrderService.createOrder(
         customerId: customerId,
         street: _formData['address'] ?? '',
@@ -302,7 +302,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         notes: _formData['note'],
       );
 
-      // Step 2: Process payment (only if order creation succeeded)
+
       try {
         if (paymentMethod == 'cod') {
           await OrderService.processCodPayment(
@@ -334,17 +334,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (selectedCoupon != null && selectedCoupon.isNotEmpty && selectedCoupon['id'] != null) {
         try {
           await CustomerCouponService.useCoupon(
-            couponId: selectedCoupon['id'].toString(),
+            customerCouponId: selectedCoupon['id'].toString(),
             orderId: order.id.toString(),
           );
-          print('✅ Customer coupon updated to USED successfully');
         } catch (couponError) {
-          // Don't fail the entire order if coupon update fails
-          print('⚠️ Failed to update customer coupon: $couponError');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Order successful! Code: ${order.orderCode}. Coupon update failed: $couponError'),
+                content: Text('Order successful! Code: ${order.orderCode}.'),
                 backgroundColor: Colors.orange,
                 duration: const Duration(seconds: 5),
               ),

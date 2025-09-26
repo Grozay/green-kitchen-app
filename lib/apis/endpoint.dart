@@ -4,9 +4,9 @@ class ApiEndpoints {
 
   // static const String baseUrl = 'http://172.16.2.9:8080/apis/v1'; //Trung
 
-  static const String baseUrl = 'http://172.16.1.245:8080/apis/v1'; //Quyen
+  // static const String baseUrl = 'http://172.16.1.245:8080/apis/v1'; //Quyen
   
-//   static const String baseUrl = 'http://10.0.2.2:8080/apis/v1'; //Kiet
+  static const String baseUrl = 'http://127.0.0.1:8080/apis/v1'; //Kiet
 
   // Authentication endpoints
   static const String login = '$baseUrl/auth/login';

@@ -5,15 +5,13 @@ class CustomerCouponService {
   static final ApiService _apiService = ApiService();
 
   static Future<void> useCoupon({
-    required String couponId,
+    required String customerCouponId,
     required String orderId,
   }) async {
     try {
       final data = {
-        'id': couponId,
-        'usedAt': DateTime.now().toIso8601String(),
-        'orderId': orderId,
-        'status': 'USED',
+        'id': int.parse(customerCouponId),
+        'orderId': int.parse(orderId)
       };
       await _apiService.put(ApiEndpoints.customerUseCoupon, body: data);
     } catch (e) {
