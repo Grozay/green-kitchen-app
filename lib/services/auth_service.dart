@@ -115,6 +115,13 @@ class AuthService {
         if (authResponse.success && authResponse.token != null) {
           await _apiService.setAuthToken(authResponse.token!);
           // print('DEBUG: Phone login mobile token stored successfully');
+          
+          // Store user data for auto login
+          if (authResponse.user != null) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('current_user', json.encode(authResponse.user!.toJson()));
+            // print('DEBUG: Phone user data stored successfully');
+          }
         }
 
         return authResponse;

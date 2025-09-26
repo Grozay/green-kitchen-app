@@ -26,28 +26,35 @@ class PhoneAuthService {
   // Send OTP to phone number
   Future<void> sendOTP(String phoneNumber) async {
     try {
+      // print('DEBUG PhoneAuthService: Starting sendOTP for $phoneNumber');
       _phoneNumber = phoneNumber;
       _formattedPhoneNumber = _formatVietnamesePhoneNumber(phoneNumber);
+      // print('DEBUG PhoneAuthService: Formatted phone: $_formattedPhoneNumber');
 
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: _formattedPhoneNumber!,
         verificationCompleted: (PhoneAuthCredential credential) async {
+          // print('DEBUG PhoneAuthService: Auto verification completed');
           await FirebaseAuth.instance.signInWithCredential(credential);
           _onVerificationCompleted?.call();
         },
         verificationFailed: (FirebaseAuthException e) {
+          // print('DEBUG PhoneAuthService: Verification failed: ${e.message}');
           _onVerificationFailed?.call(e.message ?? 'Verification failed');
         },
         codeSent: (String verificationId, int? resendToken) {
+          // print('DEBUG PhoneAuthService: Code sent, verificationId: $verificationId');
           _verificationId = verificationId;
           _onCodeSent?.call();
         },
         codeAutoRetrievalTimeout: (String verificationId) {
+          // print('DEBUG PhoneAuthService: Code auto retrieval timeout');
           _verificationId = verificationId;
         },
         timeout: const Duration(seconds: 60),
       );
     } catch (e) {
+      // print('DEBUG PhoneAuthService: sendOTP exception: $e');
       _onVerificationFailed?.call('Failed to send OTP: $e');
     }
   }
@@ -55,27 +62,33 @@ class PhoneAuthService {
   // Verify OTP and sign in (simplified - just Firebase verification)
   Future<Map<String, dynamic>> verifyOTP(String smsCode) async {
     try {
+      // print('DEBUG PhoneAuthService: Starting verifyOTP with code: $smsCode');
       if (_verificationId == null) {
+        // print('DEBUG PhoneAuthService: Verification ID is null');
         return {
           'success': false,
           'message': 'Verification ID is null. Please request OTP again.',
         };
       }
 
+      // print('DEBUG PhoneAuthService: Creating credential with verificationId: $_verificationId');
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: _verificationId!,
         smsCode: smsCode,
       );
 
+      // print('DEBUG PhoneAuthService: Signing in with credential');
       UserCredential userCredential = await _auth.signInWithCredential(credential);
 
       if (userCredential.user == null) {
+        // print('DEBUG PhoneAuthService: User is null after sign in');
         return {
           'success': false,
           'message': 'User is null after sign in',
         };
       }
 
+      // print('DEBUG PhoneAuthService: Sign in successful, phone: ${userCredential.user!.phoneNumber}');
       // Return success with phone number - no backend call here
       return {
         'success': true,
@@ -83,6 +96,7 @@ class PhoneAuthService {
         'firebaseUser': userCredential.user,
       };
     } catch (e) {
+      // print('DEBUG PhoneAuthService: verifyOTP exception: $e');
       return {
         'success': false,
         'message': 'Failed to verify OTP: ${e.toString()}',

@@ -43,19 +43,26 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
   void _determineLoginType(Map<String, dynamic>? customerDetails) {
     if (customerDetails == null) return;
 
-    final oauthProvider = customerDetails['oauthProvider']?.toString();
-    if (oauthProvider != null && oauthProvider.isNotEmpty) {
-      // If OAuth provider exists, it's OAuth login
-      _isEmailLogin = true; // OAuth typically uses email
-    } else {
-      // Check if user has email or phone as primary login
-      final email = customerDetails['email']?.toString();
-      final phone = customerDetails['phone']?.toString();
-      if (email != null && email.isNotEmpty) {
-        _isEmailLogin = true;
-      }
-      if (phone != null && phone.isNotEmpty) {
-        _isPhoneLogin = true;
+    // Check the specific login type flags from customerDetails
+    _isEmailLogin = customerDetails['isEmailLogin'] == true;
+    _isPhoneLogin = customerDetails['isPhoneLogin'] == true;
+
+    // Fallback: If flags not set, determine from oauthProvider or existing data
+    if (!_isEmailLogin && !_isPhoneLogin) {
+      final oauthProvider = customerDetails['oauthProvider']?.toString();
+      if (oauthProvider != null && oauthProvider.isNotEmpty) {
+        // If OAuth provider exists, it's OAuth login
+        _isEmailLogin = true; // OAuth typically uses email
+      } else {
+        // Check if user has email or phone as primary login
+        final email = customerDetails['email']?.toString();
+        final phone = customerDetails['phone']?.toString();
+        if (email != null && email.isNotEmpty) {
+          _isEmailLogin = true;
+        }
+        if (phone != null && phone.isNotEmpty) {
+          _isPhoneLogin = true;
+        }
       }
     }
   }
@@ -223,7 +230,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             prefixIcon: const Icon(Icons.email),
-                            helperText: _isEmailLogin ? 'Cannot edit email (OAuth login)' : null,
+                            helperText: _isEmailLogin ? 'Cannot edit email (Email login)' : null,
                             helperStyle: TextStyle(color: AppColors.textSecondary),
                           ),
                           keyboardType: TextInputType.emailAddress,

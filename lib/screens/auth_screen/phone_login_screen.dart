@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -16,12 +17,54 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   final TextEditingController _otpController = TextEditingController();
   bool _showOtpField = false;
   bool _isOtpSent = false;
+  
+  // Timer variables
+  Timer? _otpTimer;
+  int _otpTimeLeft = 0;
+  static const int _otpDuration = 900; // 15 minutes in seconds
 
   @override
   void dispose() {
     _phoneController.dispose();
     _otpController.dispose();
+    _otpTimer?.cancel();
     super.dispose();
+  }
+
+  // Start OTP countdown timer
+  void _startOtpTimer() {
+    setState(() {
+      _otpTimeLeft = _otpDuration;
+    });
+    
+    _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_otpTimeLeft > 0) {
+        setState(() {
+          _otpTimeLeft--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          _showOtpField = false;
+          _isOtpSent = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('OTP has expired. Please request a new one.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  // Format time display (MM:SS)
+  String _formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   Future<void> _handleSendOTP() async {
@@ -42,8 +85,18 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
         _showOtpField = true;
         _isOtpSent = true;
       });
+      _startOtpTimer(); // Start countdown timer
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('OTP sent to your phone!')),
+      );
+    } else if (mounted) {
+      // Show error message if OTP sending failed
+      final errorMessage = authProvider.errorMessage ?? 'Failed to send OTP';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -78,13 +131,24 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
           context.go('/');
         }
       });
+    } else if (mounted) {
+      // Show error message if OTP verification failed
+      final errorMessage = authProvider.errorMessage ?? 'Failed to verify OTP';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   void _resetForm() {
+    _otpTimer?.cancel(); // Cancel timer when resetting
     setState(() {
       _showOtpField = false;
       _isOtpSent = false;
+      _otpTimeLeft = 0;
       _otpController.clear();
     });
   }
@@ -228,6 +292,38 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                         fontSize: 14,
                       ),
                       textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    // Timer display
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _otpTimeLeft > 60 ? AppColors.primary.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: _otpTimeLeft > 60 ? AppColors.primary.withOpacity(0.3) : Colors.orange.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.timer,
+                            size: 16,
+                            color: _otpTimeLeft > 60 ? AppColors.primary : Colors.orange,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Code expires in: ${_formatTime(_otpTimeLeft)}',
+                            style: TextStyle(
+                              color: _otpTimeLeft > 60 ? AppColors.primary : Colors.orange,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
