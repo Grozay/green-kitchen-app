@@ -161,6 +161,7 @@ class AuthProvider with ChangeNotifier {
 
   // Phone authentication - Send OTP
   Future<bool> sendOTP(String phoneNumber) async {
+    // print('DEBUG: Starting sendOTP for phone: $phoneNumber');
     _setLoading(true);
     _clearError();
 
@@ -168,22 +169,27 @@ class AuthProvider with ChangeNotifier {
       // Set callbacks for PhoneAuthService
       _phoneAuthService.setCallbacks(
         onVerificationCompleted: () {
+          // print('DEBUG: Auto-verification completed');
           _setLoading(false);
           _setError('Auto-verification completed');
         },
         onVerificationFailed: (String error) {
+          // print('DEBUG: Verification failed: $error');
           _setLoading(false);
           _setError(error);
         },
         onCodeSent: () {
+          // print('DEBUG: Code sent successfully');
           _setLoading(false);
           _setError('OTP sent successfully'); // Use as success message
         },
       );
 
       await _phoneAuthService.sendOTP(phoneNumber);
+      // print('DEBUG: sendOTP completed, returning true');
       return true;
     } catch (e) {
+      // print('DEBUG: sendOTP exception: $e');
       _setLoading(false);
       _setError('Failed to send OTP: ${e.toString()}');
       return false;
@@ -192,31 +198,40 @@ class AuthProvider with ChangeNotifier {
 
   // Phone authentication - Verify OTP
   Future<bool> verifyOTP(String smsCode) async {
+    // print('DEBUG: Starting verifyOTP with code: $smsCode');
     _setLoading(true);
     _clearError();
 
     try {
       // First verify OTP with Firebase
+      // print('DEBUG: Calling _phoneAuthService.verifyOTP');
       final firebaseResult = await _phoneAuthService.verifyOTP(smsCode);
+      // print('DEBUG: Firebase result: $firebaseResult');
 
       if (firebaseResult['success'] == true) {
         // Get phone number from Firebase result
         final phoneNumber = firebaseResult['phoneNumber'];
+        // print('DEBUG: Phone number from Firebase: $phoneNumber');
 
-        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty) {
+          // print('DEBUG: Phone number is null or empty');
           _setError('Phone number not found from Firebase verification');
           return false;
         }
 
         // Now call our backend API to get user data and JWT token
+        // print('DEBUG: Calling backend phoneLoginMobile with phone: $phoneNumber');
         final response = await _authService.phoneLoginMobile(phoneNumber);
+        // print('DEBUG: Backend response: ${response.success}, message: ${response.message}');
 
         if (response.success) {
           _currentUser = response.user;
+          // print('DEBUG: User set successfully: ${_currentUser?.email}');
 
           // Try to fetch customer details from backend using email from response
           if (_currentUser?.email != null && _currentUser!.email.isNotEmpty) {
             try {
+              // print('DEBUG: Fetching customer details for: ${_currentUser!.email}');
               // Ensure token is stored before making API call
               await Future.delayed(Duration(milliseconds: 100));
               await _fetchCustomerDetails(_currentUser!.email);
@@ -231,23 +246,29 @@ class AuthProvider with ChangeNotifier {
                       ? '${_customerDetails!['firstName']} ${_customerDetails!['lastName']}'
                       : _currentUser!.fullName,
                 );
+                // print('DEBUG: User updated with customer details');
               }
             } catch (e) {
+              // print('DEBUG: Error fetching customer details: $e');
               // Don't fail the entire login if customer details fetch fails
             }
           }
 
           notifyListeners();
+          // print('DEBUG: Login successful, returning true');
           return true;
         } else {
+          // print('DEBUG: Backend login failed: ${response.message}');
           _setError(response.message);
           return false;
         }
       } else {
+        // print('DEBUG: Firebase verification failed: ${firebaseResult['message']}');
         _setError(firebaseResult['message'] ?? 'Firebase OTP verification failed');
         return false;
       }
     } catch (e) {
+      // print('DEBUG: verifyOTP exception: $e');
       _setError('OTP verification failed: ${e.toString()}');
       return false;
     } finally {

@@ -56,6 +56,12 @@ dependencies {
 
     // Add Google Play Services Auth (cần thiết cho Phone Auth)
     implementation("com.google.android.gms:play-services-auth:21.3.0")
+    
+    // Add Google Play Services Auth Phone (specifically for phone auth)
+    implementation("com.google.android.gms:play-services-auth-api-phone:18.1.0")
+    
+    // Add Google Play Services SafetyNet (for reCAPTCHA verification)
+    implementation("com.google.android.gms:play-services-safetynet:18.1.0")
 
     // Optional: Add SafetyNet for App Check (nâng cao bảo mật)
     // implementation("com.google.firebase:firebase-appcheck-safetynet:18.0.0")

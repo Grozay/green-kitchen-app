@@ -299,7 +299,7 @@ class _MembershipScreenState extends State<MembershipScreen> {
                       Icons.support_agent,
                     ),
                     _buildBenefitItem(
-                      'Free delivery on orders over 50,000 VND',
+                      'Free delivery on orders over 200,000 VND',
                       Icons.local_shipping,
                     ),
                     _buildBenefitItem('Birthday special offers', Icons.cake),
