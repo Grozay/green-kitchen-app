@@ -246,34 +246,36 @@ class _CartScreenState extends State<CartScreen> {
 
                       const SizedBox(height: 16),
 
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                      SafeArea(
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
                             ),
-                            elevation: 0,
-                          ),
-                          onPressed: () {
-                            final authProvider = Provider.of<AuthProvider>(
-                              context,
-                              listen: false,
-                            );
-                            if (!authProvider.isAuthenticated) {
-                              _showLoginPrompt(context);
-                            } else {
-                              GoRouter.of(context).push('/checkout');
-                            }
-                          },
-                          child: const Text(
-                            'Proceed to Checkout',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                            onPressed: () {
+                              final authProvider = Provider.of<AuthProvider>(
+                                context,
+                                listen: false,
+                              );
+                              if (!authProvider.isAuthenticated) {
+                                _showLoginPrompt(context);
+                              } else {
+                                GoRouter.of(context).push('/checkout');
+                              }
+                            },
+                            child: const Text(
+                              'Proceed to Checkout',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),

@@ -222,7 +222,7 @@ class _DeliveryInfoStepState extends State<DeliveryInfoStep> {
       widget.onFormDataChanged('latitude', (latitude as num).toDouble());
       widget.onFormDataChanged('longitude', (longitude as num).toDouble());
 
-      // Mark address as verified since we have coordinates
+      // Mark address as verified and locked since we have coordinates
       setState(() {
         _isAddressVerified = true;
         _addressVerificationMessage = 'Address verified';
@@ -336,6 +336,18 @@ class _DeliveryInfoStepState extends State<DeliveryInfoStep> {
       {'code': '${districtId}04', 'name': 'Phường 4'},
       {'code': '${districtId}05', 'name': 'Phường 5'},
     ];
+  }
+
+  void _resetAddressVerification() {
+    setState(() {
+      _isAddressVerified = false;
+      _addressVerificationMessage = null;
+      _addressController.clear();
+      // Clear coordinates from form data
+      widget.onFormDataChanged('latitude', null);
+      widget.onFormDataChanged('longitude', null);
+    });
+    _updateFormData();
   }
 
   void _updateFormData() {
@@ -830,7 +842,8 @@ class _DeliveryInfoStepState extends State<DeliveryInfoStep> {
             controller: _addressController,
             labelText: 'Detailed Address',
             hintText: 'Example: 123 ABC Street, Ward XYZ',
-            onChanged: _onAddressTextChanged,
+            onChanged: _isAddressVerified ? null : _onAddressTextChanged,
+            enabled: !_isAddressVerified, // Lock field when verified
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter detailed address';
@@ -839,95 +852,97 @@ class _DeliveryInfoStepState extends State<DeliveryInfoStep> {
             },
           ),
 
-          // Address Suggestions
-          if (_isLoadingSuggestions)
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: const Row(
-                children: [
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  SizedBox(width: 12),
-                  Text('Finding addresses...'),
-                ],
-              ),
-            )
-          else if (_addressSuggestions.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              constraints: const BoxConstraints(maxHeight: 200),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: _addressSuggestions.length,
-                itemBuilder: (context, index) {
-                  final suggestion = _addressSuggestions[index];
-                  return InkWell(
-                    onTap: () => _onSuggestionSelected(suggestion),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        border: index < _addressSuggestions.length - 1
-                            ? Border(bottom: BorderSide(color: Colors.grey.shade200))
-                            : null,
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on,
-                            color: Colors.grey,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  suggestion['street'] ?? '',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                if (suggestion['address'] != null && suggestion['address'] != suggestion['street'])
+          // Address Suggestions (only show when not verified)
+          if (!_isAddressVerified) ...[
+            if (_isLoadingSuggestions)
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    SizedBox(width: 12),
+                    Text('Finding addresses...'),
+                  ],
+                ),
+              )
+            else if (_addressSuggestions.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                constraints: const BoxConstraints(maxHeight: 200),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _addressSuggestions.length,
+                  itemBuilder: (context, index) {
+                    final suggestion = _addressSuggestions[index];
+                    return InkWell(
+                      onTap: () => _onSuggestionSelected(suggestion),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: index < _addressSuggestions.length - 1
+                              ? Border(bottom: BorderSide(color: Colors.grey.shade200))
+                              : null,
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              color: Colors.grey,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
-                                    suggestion['address'],
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 12,
+                                    suggestion['street'] ?? '',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
                                     ),
                                   ),
-                              ],
+                                  if (suggestion['address'] != null && suggestion['address'] != suggestion['street'])
+                                    Text(
+                                      suggestion['address'],
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
+          ],
           const SizedBox(height: 16),
 
           // Address verification message
@@ -960,6 +975,25 @@ class _DeliveryInfoStepState extends State<DeliveryInfoStep> {
                       ),
                     ),
                   ),
+                  // Show reset button when address is verified
+                  if (_isAddressVerified) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: _resetAddressVerification,
+                      icon: const Icon(Icons.refresh),
+                      iconSize: 18,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 24,
+                        minHeight: 24,
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.green.shade100,
+                        foregroundColor: Colors.green.shade700,
+                      ),
+                      tooltip: 'Reset address to enter manually',
+                    ),
+                  ],
                 ],
               ),
             ),

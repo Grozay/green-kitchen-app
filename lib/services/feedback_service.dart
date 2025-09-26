@@ -28,21 +28,21 @@ class FeedbackService {
       );
 
       // Check if response is successful
-      print('🎯 Feedback response type: ${response.runtimeType}');
-      print('🎯 Feedback response content: $response');
+      // print('🎯 Feedback response type: ${response.runtimeType}');
+      // print('🎯 Feedback response content: $response');
 
       if (response is Map && response['success'] == true) {
-        print('✅ Feedback success: Map response with success=true');
+        // print('✅ Feedback success: Map response with success=true');
         return true;
       }
       if (response is String && response.toLowerCase().contains('submitted')) {
-        print('✅ Feedback success: String response contains "submitted"');
+        // print('✅ Feedback success: String response contains "submitted"');
         return true;
       }
-      print('❌ Feedback failed: Response does not indicate success');
+      // print('❌ Feedback failed: Response does not indicate success');
       return false;
     } catch (e) {
-      print('Error submitting feedback: $e');
+      // print('Error submitting feedback: $e');
       rethrow;
     }
   }
@@ -71,21 +71,21 @@ class FeedbackService {
       );
 
       // Check if response is successful
-      print('🎯 Support response type: ${response.runtimeType}');
-      print('🎯 Support response content: $response');
+      // print('🎯 Support response type: ${response.runtimeType}');
+      // print('🎯 Support response content: $response');
 
       if (response is Map && response['success'] == true) {
-        print('✅ Support success: Map response with success=true');
+        // print('✅ Support success: Map response with success=true');
         return true;
       }
       if (response is String && response.toLowerCase().contains('submitted')) {
-        print('✅ Support success: String response contains "submitted"');
+        // print('✅ Support success: String response contains "submitted"');
         return true;
       }
-      print('❌ Support failed: Response does not indicate success');
+      // print('❌ Support failed: Response does not indicate success');
       return false;
     } catch (e) {
-      print('Error submitting support request: $e');
+      // print('Error submitting support request: $e');
       rethrow;
     }
   }

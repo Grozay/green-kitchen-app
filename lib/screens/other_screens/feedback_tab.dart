@@ -175,252 +175,254 @@ class _FeedbackTabState extends State<FeedbackTab> {
           ),
           centerTitle: true,
         ),
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        body: SafeArea(
+          child: Stack(
             children: [
-                  // Header Section
-              Container(
-                width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.secondary,
-                          AppColors.secondary.withOpacity(0.8),
+              SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                    // Header Section
+                Container(
+                  width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.secondary,
+                            AppColors.secondary.withOpacity(0.8),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.secondary.withOpacity(0.3),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
                         ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.secondary.withOpacity(0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
+                      child: Column(
+                        children: [
+                          Container(
+                  padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(
+                              Icons.support_agent,
+                              size: 48,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Support & Feedback',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'We are always ready to support you 24/7',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+          
+                    const SizedBox(height: 24),
+          
+                    // Quick Action Cards
+                    GridView.count(
+                      crossAxisCount: 1,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 3,
+                      children: [
+                        _buildQuickActionCard(
+                          icon: Icons.support,
+                          title: 'Request Support',
+                          subtitle: 'Having issues? We will help you resolve them quickly',
+                          color: AppColors.primary,
+                          onTap: () => setState(() => _supportDialogOpen = true),
+                        ),
+                        _buildQuickActionCard(
+                          icon: Icons.feedback,
+                          title: 'Send Feedback',
+                          subtitle: 'Share your opinion to help us improve our service',
+                          color: AppColors.accent,
+                          onTap: () => setState(() => _feedbackDialogOpen = true),
+                        ),
+                        _buildQuickActionCard(
+                          icon: Icons.chat,
+                          title: 'Online Chat',
+                          subtitle: 'Chat directly with support staff',
+                          color: Colors.green,
+                          onTap: () {
+                             GoRouter.of(context).push('/chat');
+                          },
                         ),
                       ],
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(16),
+          
+                    const SizedBox(height: 32),
+          
+                    // Contact Information
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.shadow,
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
-                          child: Icon(
-                            Icons.support_agent,
-                            size: 48,
-                            color: Colors.white,
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '📞 Contact Information',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Support & Feedback',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildContactInfo(
+                                  icon: Icons.phone,
+                                  title: 'Hotline',
+                                  value: '1900-xxxx',
+                                  subtitle: '8:00 - 22:00 (Mon-Fri)',
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildContactInfo(
+                                  icon: Icons.email,
+                                  title: 'Email',
+                                  value: 'support@greenkitchen.com',
+                                  subtitle: 'Response within 24h',
+                                  color: AppColors.accent,
+                                ),
                               ),
                             ],
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'We are always ready to support you 24/7',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white.withOpacity(0.9),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildContactInfo(
+                                  icon: Icons.location_on,
+                                  title: 'Office',
+                                  value: 'Ho Chi Minh City',
+                                  subtitle: '123 ABC Street, District 1',
+                                  color: Colors.purple,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildContactInfo(
+                                  icon: Icons.chat_bubble,
+                                  title: 'Live Chat',
+                                  value: 'Online 24/7',
+                                  subtitle: 'Support 24/7',
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ],
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Quick Action Cards
-                  GridView.count(
-                    crossAxisCount: 1,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 3,
-                    children: [
-                      _buildQuickActionCard(
-                        icon: Icons.support,
-                        title: 'Request Support',
-                        subtitle: 'Having issues? We will help you resolve them quickly',
-                        color: AppColors.primary,
-                        onTap: () => setState(() => _supportDialogOpen = true),
-                      ),
-                      _buildQuickActionCard(
-                        icon: Icons.feedback,
-                        title: 'Send Feedback',
-                        subtitle: 'Share your opinion to help us improve our service',
-                        color: AppColors.accent,
-                        onTap: () => setState(() => _feedbackDialogOpen = true),
-                      ),
-                      _buildQuickActionCard(
-                        icon: Icons.chat,
-                        title: 'Online Chat',
-                        subtitle: 'Chat directly with support staff',
-                        color: Colors.green,
-                        onTap: () {
-                           GoRouter.of(context).push('/chat');
-                        },
-                      ),
+          
+                    const SizedBox(height: 32),
+          
+                    // FAQ Section
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                            color: AppColors.shadow,
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
                     ],
                   ),
-
-                  const SizedBox(height: 32),
-
-                  // Contact Information
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadow,
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '📞 Contact Information',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '❓ Frequently Asked Questions',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildContactInfo(
-                                icon: Icons.phone,
-                                title: 'Hotline',
-                                value: '1900-xxxx',
-                                subtitle: '8:00 - 22:00 (Mon-Fri)',
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _buildContactInfo(
-                                icon: Icons.email,
-                                title: 'Email',
-                                value: 'support@greenkitchen.com',
-                                subtitle: 'Response within 24h',
-                                color: AppColors.accent,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildContactInfo(
-                                icon: Icons.location_on,
-                                title: 'Office',
-                                value: 'Ho Chi Minh City',
-                                subtitle: '123 ABC Street, District 1',
-                                color: Colors.purple,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _buildContactInfo(
-                                icon: Icons.chat_bubble,
-                                title: 'Live Chat',
-                                value: 'Online 24/7',
-                                subtitle: 'Support 24/7',
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          const SizedBox(height: 20),
+                          _buildFaqItem(
+                            question: 'How to place an order?',
+                            answer: 'You can order through our website, mobile app or call our hotline directly.',
+                          ),
+                          const Divider(height: 32),
+                          _buildFaqItem(
+                            question: 'What is the delivery time?',
+                            answer: 'Delivery time is 30-60 minutes depending on distance and traffic conditions.',
+                          ),
+                          const Divider(height: 32),
+                          _buildFaqItem(
+                            question: 'What payment methods are available?',
+                            answer: 'We accept cash, credit cards, e-wallets and bank transfers.',
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // FAQ Section
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                          color: AppColors.shadow,
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
                   ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '❓ Frequently Asked Questions',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        _buildFaqItem(
-                          question: 'How to place an order?',
-                          answer: 'You can order through our website, mobile app or call our hotline directly.',
-                        ),
-                        const Divider(height: 32),
-                        _buildFaqItem(
-                          question: 'What is the delivery time?',
-                          answer: 'Delivery time is 30-60 minutes depending on distance and traffic conditions.',
-                        ),
-                        const Divider(height: 32),
-                        _buildFaqItem(
-                          question: 'What payment methods are available?',
-                          answer: 'We accept cash, credit cards, e-wallets and bank transfers.',
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ),
-            ),
-
-            // Feedback Dialog
-            if (_feedbackDialogOpen) _buildFeedbackDialog(),
-
-            // Support Dialog
-            if (_supportDialogOpen) _buildSupportDialog(),
-          ],
+          
+              // Feedback Dialog
+              if (_feedbackDialogOpen) _buildFeedbackDialog(),
+          
+              // Support Dialog
+              if (_supportDialogOpen) _buildSupportDialog(),
+            ],
+          ),
         ),
       ),
     );

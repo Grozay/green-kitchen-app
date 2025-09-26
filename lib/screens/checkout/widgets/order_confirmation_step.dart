@@ -125,7 +125,7 @@ class OrderConfirmationStep extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: const Text(
-                    'Confirm Order',
+                    'Place Order',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/env_config.dart';
 
@@ -29,7 +28,7 @@ class HereMapsService {
       }
       return null;
     } catch (e) {
-      debugPrint('Error getting coordinates: $e');
+      // debugPrint('Error getting coordinates: $e');
       return null;
     }
   }
@@ -58,13 +57,13 @@ class HereMapsService {
       };
 
       final uri = Uri.https('autosuggest.search.hereapi.com', '/v1/autosuggest', params);
-      debugPrint('HERE Maps API URL: $uri');
+      // debugPrint('HERE Maps API URL: $uri');
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
         final items = data['items'] as List<dynamic>;
-        debugPrint('HERE Maps API returned ${items.length} raw suggestions');
+        // debugPrint('HERE Maps API returned ${items.length} raw suggestions');
 
         // Filter suggestions based on district and ward if provided
         final filteredItems = items.where((item) {
@@ -87,7 +86,7 @@ class HereMapsService {
           return true;
         }).toList();
 
-        debugPrint('After filtering: ${filteredItems.length} suggestions remain');
+        // debugPrint('After filtering: ${filteredItems.length} suggestions remain');
 
         // Convert filtered HERE Maps results to our format
         return filteredItems.map((item) {
@@ -109,7 +108,7 @@ class HereMapsService {
         throw Exception('Failed to load address suggestions: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('Error in getAddressSuggestions: $e');
+      // debugPrint('Error in getAddressSuggestions: $e');
       return [];
     }
   }
@@ -131,7 +130,7 @@ class HereMapsService {
       }
       return null;
     } catch (e) {
-      debugPrint('Error getting address: $e');
+      // debugPrint('Error getting address: $e');
       return null;
     }
   }

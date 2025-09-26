@@ -55,13 +55,14 @@ class _MealItemCardState extends State<MealItemCard> {
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              padding: const EdgeInsets.all(2), // Giảm từ 4 xuống 2
+              child: ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   Container(
-                    width: 150,
-                    height: 150,
+                    width: 150, // Giảm từ 150 xuống 120
+                    height: 150, // Giảm từ 150 xuống 120
                     decoration: BoxDecoration(
                       color: Color(0xFFE8B678),
                       shape: BoxShape.circle,
@@ -75,15 +76,15 @@ class _MealItemCardState extends State<MealItemCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 2), // Giữ nguyên
                   // Item name
                   SizedBox(
-                    height: 24,
+                    height: 20, // Giảm từ 24 xuống 20
                     child: Text(
                       widget.item.title,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: 12, // Giảm từ 14 xuống 12
                         color: Color(0xFF4B0036),
                       ),
                       maxLines: 2,
@@ -100,6 +101,7 @@ class _MealItemCardState extends State<MealItemCard> {
                       fontSize: 10,
                       color: Color(0xFF4B0036).withOpacity(0.7),
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   // Out of stock text
                   // if (widget.item.stock == 0)
@@ -117,7 +119,7 @@ class _MealItemCardState extends State<MealItemCard> {
           ),
           // Quantity controls
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.only(bottom: 4), // Giảm từ 8 xuống 4
             child: _buildQuantityControls(),
           ),
         ],

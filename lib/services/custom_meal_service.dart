@@ -22,7 +22,7 @@ class CustomMealService {
       final response = await _apiService.post(endpoints.createCustomMeal, body: data);
       return CustomMeal.fromJson(response);
     } catch (e) {
-      print('Error in createCustomMeal: $e');
+      // print('Error in createCustomMeal: $e');
       if (e is ApiError) {
         throw Exception('Failed to create custom meal: ${e.message}');
       }
@@ -38,7 +38,7 @@ class CustomMealService {
       final response = await _apiService.put(url, body: data);
       return CustomMeal.fromJson(response);
     } catch (e) {
-      print('Error in updateCustomMeal: $e');
+      // print('Error in updateCustomMeal: $e');
       if (e is ApiError) {
         throw Exception('Failed to update custom meal: ${e.message}');
       }
@@ -53,7 +53,7 @@ class CustomMealService {
       final url = endpoints.deleteCustomMeal.replaceFirst(':id', id.toString());
       await _apiService.delete(url);
     } catch (e) {
-      print('Error in deleteCustomMeal: $e');
+      // print('Error in deleteCustomMeal: $e');
       if (e is ApiError) {
         throw Exception('Failed to delete custom meal: ${e.message}');
       }

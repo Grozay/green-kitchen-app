@@ -26,7 +26,7 @@ class AuthService {
         'email': email,
         'password': password,
       };
-      print('DEBUG: Email login request: $loginRequest');
+      // print('DEBUG: Email login request: $loginRequest');
 
       // Use direct HTTP call like Google login for consistency
       final response = await http.post(
@@ -37,18 +37,25 @@ class AuthService {
         body: jsonEncode(loginRequest),
       );
 
-      print('DEBUG: Email login HTTP response status: ${response.statusCode}');
-      print('DEBUG: Email login HTTP response body: ${response.body}');
+      // print('DEBUG: Email login HTTP response status: ${response.statusCode}');
+      // print('DEBUG: Email login HTTP response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final authResponse = AuthResponse.fromJson(responseData);
-        print('DEBUG: Email AuthResponse parsed successfully');
+        // print('DEBUG: Email AuthResponse parsed successfully');
 
         // Store token if login successful
         if (authResponse.success && authResponse.token != null) {
           await _apiService.setAuthToken(authResponse.token!);
-          print('DEBUG: Email login token stored successfully');
+          // print('DEBUG: Email login token stored successfully');
+          
+          // Store user data for auto login
+          if (authResponse.user != null) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('current_user', json.encode(authResponse.user!.toJson()));
+            // print('DEBUG: User data stored successfully');
+          }
         }
 
         return authResponse;
@@ -57,13 +64,13 @@ class AuthService {
         try {
           final errorData = jsonDecode(response.body);
           final errorMessage = errorData['message'] ?? errorData['msg'] ?? 'Login failed';
-          print('DEBUG: Email login failed with error: $errorMessage');
+          // print('DEBUG: Email login failed with error: $errorMessage');
           return AuthResponse(
             success: false,
             message: errorMessage,
           );
         } catch (e) {
-          print('DEBUG: Failed to parse email login error response: ${response.body}');
+          // print('DEBUG: Failed to parse email login error response: ${response.body}');
           return AuthResponse(
             success: false,
             message: 'Login failed: HTTP ${response.statusCode}',
@@ -71,7 +78,7 @@ class AuthService {
         }
       }
     } catch (e) {
-      print('DEBUG: Email login network error: $e');
+      // print('DEBUG: Email login network error: $e');
       return AuthResponse(
         success: false,
         message: 'Network error: ${e.toString()}',
@@ -85,7 +92,7 @@ class AuthService {
       final phoneLoginRequest = {
         'phone': phone,
       };
-      print('DEBUG: Phone login mobile request: $phoneLoginRequest');
+      // print('DEBUG: Phone login mobile request: $phoneLoginRequest');
 
       // Use direct HTTP call
       final response = await http.post(
@@ -96,18 +103,18 @@ class AuthService {
         body: jsonEncode(phoneLoginRequest),
       );
 
-      print('DEBUG: Phone login mobile HTTP response status: ${response.statusCode}');
-      print('DEBUG: Phone login mobile HTTP response body: ${response.body}');
+      // print('DEBUG: Phone login mobile HTTP response status: ${response.statusCode}');
+      // print('DEBUG: Phone login mobile HTTP response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final authResponse = AuthResponse.fromJson(responseData);
-        print('DEBUG: Phone login mobile AuthResponse parsed successfully - user email: ${authResponse.user?.email}');
+        // print('DEBUG: Phone login mobile AuthResponse parsed successfully - user email: ${authResponse.user?.email}');
 
         // Store token if login successful
         if (authResponse.success && authResponse.token != null) {
           await _apiService.setAuthToken(authResponse.token!);
-          print('DEBUG: Phone login mobile token stored successfully');
+          // print('DEBUG: Phone login mobile token stored successfully');
         }
 
         return authResponse;
@@ -116,13 +123,13 @@ class AuthService {
         try {
           final errorData = jsonDecode(response.body);
           final errorMessage = errorData['message'] ?? errorData['msg'] ?? 'Phone login failed';
-          print('DEBUG: Phone login mobile failed with error: $errorMessage');
+          // print('DEBUG: Phone login mobile failed with error: $errorMessage');
           return AuthResponse(
             success: false,
             message: errorMessage,
           );
         } catch (e) {
-          print('DEBUG: Failed to parse phone login mobile error response: ${response.body}');
+          // print('DEBUG: Failed to parse phone login mobile error response: ${response.body}');
           return AuthResponse(
             success: false,
             message: 'Phone login failed: HTTP ${response.statusCode}',
@@ -130,7 +137,7 @@ class AuthService {
         }
       }
     } catch (e) {
-      print('DEBUG: Phone login mobile network error: $e');
+      // print('DEBUG: Phone login mobile network error: $e');
       return AuthResponse(
         success: false,
         message: 'Network error: ${e.toString()}',
@@ -144,7 +151,7 @@ class AuthService {
       final phoneLoginRequest = {
         'phone': phone,
       };
-      print('DEBUG: Phone login request: $phoneLoginRequest');
+      // print('DEBUG: Phone login request: $phoneLoginRequest');
 
       // Use direct HTTP call like Google login for consistency
       final response = await http.post(
@@ -155,18 +162,18 @@ class AuthService {
         body: jsonEncode(phoneLoginRequest),
       );
 
-      print('DEBUG: Phone login HTTP response status: ${response.statusCode}');
-      print('DEBUG: Phone login HTTP response body: ${response.body}');
+      // print('DEBUG: Phone login HTTP response status: ${response.statusCode}');
+      // print('DEBUG: Phone login HTTP response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final authResponse = AuthResponse.fromJson(responseData);
-        print('DEBUG: Phone AuthResponse parsed successfully');
+        // print('DEBUG: Phone AuthResponse parsed successfully');
 
         // Store token if login successful
         if (authResponse.success && authResponse.token != null) {
           await _apiService.setAuthToken(authResponse.token!);
-          print('DEBUG: Phone login token stored successfully');
+          // print('DEBUG: Phone login token stored successfully');
         }
 
         return authResponse;
@@ -175,13 +182,13 @@ class AuthService {
         try {
           final errorData = jsonDecode(response.body);
           final errorMessage = errorData['message'] ?? errorData['msg'] ?? 'Phone login failed';
-          print('DEBUG: Phone login failed with error: $errorMessage');
+          // print('DEBUG: Phone login failed with error: $errorMessage');
           return AuthResponse(
             success: false,
             message: errorMessage,
           );
         } catch (e) {
-          print('DEBUG: Failed to parse phone login error response: ${response.body}');
+          // print('DEBUG: Failed to parse phone login error response: ${response.body}');
           return AuthResponse(
             success: false,
             message: 'Phone login failed: HTTP ${response.statusCode}',
@@ -189,7 +196,7 @@ class AuthService {
         }
       }
     } catch (e) {
-      print('DEBUG: Phone login network error: $e');
+      // print('DEBUG: Phone login network error: $e');
       return AuthResponse(
         success: false,
         message: 'Network error: ${e.toString()}',
@@ -305,6 +312,11 @@ class AuthService {
 
       // Clear stored token
       await _apiService.clearAuthToken();
+      
+      // Clear stored user data
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('current_user');
+      // print('DEBUG: User data cleared successfully');
 
       return AuthResponse(
         success: true,
@@ -313,6 +325,11 @@ class AuthService {
     } catch (e) {
       // Even if API call fails, clear local token
       await _apiService.clearAuthToken();
+      
+      // Clear stored user data  
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('current_user');
+      // print('DEBUG: User data cleared after error');
 
       if (e is ApiError) {
         return AuthResponse(
@@ -349,7 +366,7 @@ class AuthService {
               return updatedUser;
             }
           } catch (e) {
-            print('Error fetching fresh customer data: $e');
+            // print('Error fetching fresh customer data: $e');
             // Return stored user as fallback
             return storedUser;
           }
@@ -360,7 +377,7 @@ class AuthService {
 
       return null;
     } catch (e) {
-      print('Error getting current user: $e');
+      // print('Error getting current user: $e');
       return null;
     }
   }
@@ -380,6 +397,13 @@ class AuthService {
       // Store token if login successful
       if (authResponse.success && authResponse.token != null) {
         await _apiService.setAuthToken(authResponse.token!);
+        
+        // Store user data for auto login
+        if (authResponse.user != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('current_user', json.encode(authResponse.user!.toJson()));
+          // print('DEBUG: Google user data stored successfully');
+        }
       }
 
       return authResponse;

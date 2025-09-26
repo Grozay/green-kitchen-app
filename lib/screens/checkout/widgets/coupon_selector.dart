@@ -95,9 +95,7 @@ class _CouponSelectorState extends State<CouponSelector> {
         'pointsRequired': voucher['pointsRequired'],
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Applied voucher ${voucher['code']}')),
-      );
+      // Removed snackBar to avoid duplication
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -141,9 +139,7 @@ class _CouponSelectorState extends State<CouponSelector> {
         'pointsRequired': voucher['pointsRequired'],
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Applied voucher ${voucher['code']}')),
-      );
+      // Removed snackBar to avoid duplication
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -163,9 +159,7 @@ class _CouponSelectorState extends State<CouponSelector> {
       'pointsRequired': coupon['pointsRequired'],
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Applied coupon ${coupon['couponCode']}')),
-    );
+    // Removed snackBar to avoid duplication
   }
 
   Future<void> _showExchangeConfirmationDialog(Coupon coupon) async {
@@ -424,7 +418,7 @@ class _CouponSelectorState extends State<CouponSelector> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Available Points: ${membershipInfo?['availablePoints']?.toString() ?? '0'} pts',
+                    'Available Points: ${membershipInfo?['availablePoints']?.toInt().toString() ?? '0'} pts',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

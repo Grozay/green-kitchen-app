@@ -1,4 +1,5 @@
 import 'package:green_kitchen_app/screens/auth_screen/email_verification_screen.dart';
+import 'package:green_kitchen_app/screens/auth_screen/reset_password_web_screen.dart';
 //routers
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -106,6 +107,14 @@ final GoRouter router = GoRouter(
       pageBuilder: (context, state) => createCustomTransitionPage(
         key: state.pageKey,
         child: const EmailVerificationScreen(),
+        begin: const Offset(0.0, 1.0),
+      ),
+    ),
+    GoRoute(
+      path: '/auth/reset-password-web',
+      pageBuilder: (context, state) => createCustomTransitionPage(
+        key: state.pageKey,
+        child: const ResetPasswordWebScreen(),
         begin: const Offset(0.0, 1.0),
       ),
     ),

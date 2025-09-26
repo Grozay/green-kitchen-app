@@ -34,7 +34,7 @@ class MenuMealService {
         throw Exception('Unexpected response type: ${response.runtimeType}');
       }
     } catch (e) {
-      print('Error in getMenuMeals: $e'); // Debug error
+      // print('Error in getMenuMeals: $e'); // Debug error
       if (e is ApiError) {
         throw Exception('Failed to load menu meals: ${e.message}');
       }
@@ -76,7 +76,7 @@ class MenuMealService {
         throw Exception('Unexpected response type: ${response.runtimeType}');
       }
     } catch (e) {
-      print('Error in getPopularMenuMeals: $e'); // Debug error
+      // print('Error in getPopularMenuMeals: $e'); // Debug error
       if (e is ApiError) {
         throw Exception('Failed to load popular menu meals: ${e.message}');
       }

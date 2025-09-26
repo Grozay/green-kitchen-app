@@ -73,20 +73,37 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleGoogleLogin() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    
     final success = await authProvider.googleSignIn();
 
     if (success && mounted) {
+      // Sync cart after successful login
+      final customerId =
+          int.tryParse(
+            authProvider.customerDetails?['id']?.toString() ?? '0',
+          ) ??
+          0;
+      if (customerId != 0) {
+        await cartProvider.syncCartAfterLogin(customerId);
+      }
+      
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Google login successful!')));
       // Navigate to home screen
       context.go('/');
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authProvider.errorMessage ?? 'Google login failed'),
-        ),
-      );
+      // Check if it was cancelled by user to avoid showing error
+      final errorMessage = authProvider.errorMessage ?? 'Google login failed';
+      if (!errorMessage.toLowerCase().contains('cancelled')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -217,15 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // TODO: Implement forgot password
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Forgot password feature coming soon!',
-                            ),
-                          ),
-                        );
-                        // context.go('/custom-meal');
+                        context.push('/auth/reset-password-web');
                       },
                       child: const Text(
                         'Forgot your password?',
@@ -265,6 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                     ),
@@ -342,6 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),

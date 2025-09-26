@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
 import '../services/phone_auth_service.dart';
+import '../services/google_auth_service.dart';
 import '../services/service.dart';
 import '../apis/endpoint.dart';
 
@@ -42,9 +43,14 @@ class AuthProvider with ChangeNotifier {
       final isAuth = await _authService.isAuthenticated();
       if (isAuth) {
         _currentUser = await _authService.getCurrentUser();
+        // Tự động load customer details nếu có user
+        if (_currentUser != null) {
+          await _fetchCustomerDetails(_currentUser!.email);
+        }
       }
     } catch (e) {
       _setError('Failed to check authentication status');
+      print('Auth check error: $e');
     } finally {
       _setLoading(false);
     }
@@ -260,7 +266,13 @@ class AuthProvider with ChangeNotifier {
     try {
       await _authService.logout();
       await _phoneAuthService.signOut();
+      
+      // Also sign out from Google to ensure clean state
+      final googleAuthService = GoogleAuthService();
+      await googleAuthService.signOutFromGoogle();
+      
       _currentUser = null;
+      _customerDetails = null;
       notifyListeners();
     } catch (e) {
       _setError('Logout failed');
