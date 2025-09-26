@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class LocationService {
@@ -23,7 +22,7 @@ class LocationService {
       }
       return [];
     } catch (e) {
-      debugPrint('Error fetching districts: $e');
+      // debugPrint('Error fetching districts: $e');
       return [];
     }
   }
@@ -46,7 +45,7 @@ class LocationService {
       }
       return [];
     } catch (e) {
-      debugPrint('Error fetching wards: $e');
+      // debugPrint('Error fetching wards: $e');
       return [];
     }
   }

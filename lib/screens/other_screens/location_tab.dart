@@ -39,10 +39,12 @@ class _LocationTabState extends State<LocationTab> {
   }
 
   Future<void> _openGoogleMaps(double lat, double lng) async {
-    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving');
+    final uri = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving',
+    );
     try {
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
         throw Exception('Cannot open Google Maps');
       }
@@ -50,7 +52,9 @@ class _LocationTabState extends State<LocationTab> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Cannot open Google Maps. Please install Google Maps app.'),
+            content: Text(
+              'Cannot open Google Maps. Please install Google Maps app.',
+            ),
             backgroundColor: AppColors.accent,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -101,7 +105,9 @@ class _LocationTabState extends State<LocationTab> {
                   ),
                   child: Icon(
                     Icons.store,
-                    color: store.isActive ? AppColors.secondary : AppColors.textSecondary,
+                    color: store.isActive
+                        ? AppColors.secondary
+                        : AppColors.textSecondary,
                     size: 24,
                   ),
                 ),
@@ -134,7 +140,10 @@ class _LocationTabState extends State<LocationTab> {
                       ),
                       const SizedBox(height: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: store.isActive
                               ? AppColors.secondary.withOpacity(0.1)
@@ -146,7 +155,9 @@ class _LocationTabState extends State<LocationTab> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: store.isActive ? AppColors.secondary : AppColors.textSecondary,
+                            color: store.isActive
+                                ? AppColors.secondary
+                                : AppColors.textSecondary,
                           ),
                         ),
                       ),
@@ -154,7 +165,7 @@ class _LocationTabState extends State<LocationTab> {
                   ),
                 ),
 
-                const SizedBox(width: 12),
+                const SizedBox(width: 32),
 
                 // Direction button
                 Container(
@@ -165,7 +176,8 @@ class _LocationTabState extends State<LocationTab> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: IconButton(
-                    onPressed: () => _openGoogleMaps(store.latitude, store.longitude),
+                    onPressed: () =>
+                        _openGoogleMaps(store.latitude, store.longitude),
                     icon: Icon(
                       Icons.directions,
                       color: AppColors.accent,
@@ -276,10 +288,7 @@ class _LocationTabState extends State<LocationTab> {
             const SizedBox(height: 8),
             Text(
               'Please check your internet connection and try again',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -291,7 +300,10 @@ class _LocationTabState extends State<LocationTab> {
                 backgroundColor: AppColors.accent,
                 foregroundColor: Colors.white,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -336,10 +348,7 @@ class _LocationTabState extends State<LocationTab> {
             const SizedBox(height: 8),
             Text(
               'The store list will appear here',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ],
@@ -364,10 +373,7 @@ class _LocationTabState extends State<LocationTab> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: AppColors.textPrimary,
-            ),
+            icon: Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
             onPressed: () => context.go('/more'),
           ),
           title: Text(
@@ -380,26 +386,26 @@ class _LocationTabState extends State<LocationTab> {
           ),
           centerTitle: true,
         ),
-        body: RefreshIndicator(
-          onRefresh: _fetchStores,
-          color: AppColors.secondary,
-          child: _loading
-              ? _buildLoadingState()
-          : _error != null
-                  ? _buildErrorState()
-                  : _stores.isEmpty
-                      ? _buildEmptyState()
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _stores.length,
-                  itemBuilder: (context, index) {
-                            return _buildStoreCard(_stores[index]);
-                          },
-                        ),
+        body: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: _fetchStores,
+            color: AppColors.secondary,
+            child: _loading
+                ? _buildLoadingState()
+                : _error != null
+                ? _buildErrorState()
+                : _stores.isEmpty
+                ? _buildEmptyState()
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _stores.length,
+                    itemBuilder: (context, index) {
+                      return _buildStoreCard(_stores[index]);
+                    },
+                  ),
+          ),
         ),
       ),
     );
   }
 }
-
-

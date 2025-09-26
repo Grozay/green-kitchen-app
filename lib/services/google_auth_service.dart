@@ -97,10 +97,17 @@ class GoogleAuthService {
 
   Future<AuthResponse> signInAndAuthenticate() async {
     try {
-      // Sign in with Google
+      // Sign out first to force account selection dialog
+      await signOutFromGoogle();
+      
+      // Sign in with Google - this will show account picker
       final GoogleSignInAccount? account = await signInWithGoogle();
       if (account == null) {
-        throw Exception('Google sign in cancelled');
+        // User cancelled - return a failed response without exception
+        return AuthResponse(
+          success: false,
+          message: 'Google login cancelled',
+        );
       }
 
       // Get ID token

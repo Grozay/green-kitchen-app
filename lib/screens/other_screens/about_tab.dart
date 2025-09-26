@@ -421,55 +421,50 @@ class AboutTab extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ListView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        Flexible(
-                          child: _buildSocialButton(
-                            icon: Icons.facebook,
-                            label: 'Facebook',
-                            color: Colors.blue,
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Will open Facebook...'),
-                                  backgroundColor: Colors.blue,
-                                ),
-                              );
-                            },
-                          ),
+                        _buildSocialButton(
+                          icon: Icons.facebook,
+                          label: 'Facebook',
+                          color: Colors.blue,
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Will open Facebook...'),
+                                backgroundColor: Colors.blue,
+                              ),
+                            );
+                          },
                         ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: _buildSocialButton(
-                            icon: Icons.camera_alt,
-                            label: 'Instagram',
-                            color: Colors.pink,
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Will open Instagram...'),
-                                  backgroundColor: Colors.pink,
-                                ),
-                              );
-                            },
-                          ),
+                        const SizedBox(height: 12),
+                        _buildSocialButton(
+                          icon: Icons.camera_alt,
+                          label: 'Instagram',
+                          color: Colors.pink,
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Will open Instagram...'),
+                                backgroundColor: Colors.pink,
+                              ),
+                            );
+                          },
                         ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: _buildSocialButton(
-                            icon: Icons.smartphone,
-                            label: 'Zalo',
-                            color: Colors.blue.shade700,
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Will open Zalo...'),
-                                  backgroundColor: Colors.blue.shade700,
-                                ),
-                              );
-                            },
-                          ),
+                        const SizedBox(height: 12),
+                        _buildSocialButton(
+                          icon: Icons.smartphone,
+                          label: 'Zalo',
+                          color: Colors.blue.shade700,
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Will open Zalo...'),
+                                backgroundColor: Colors.blue.shade700,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -491,7 +486,7 @@ class AboutTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      '© 2024 Green Kitchen',
+                      '© 2025 Green Kitchen',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -511,7 +506,7 @@ class AboutTab extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 48),
             ],
           ),
         ),
@@ -626,7 +621,8 @@ class AboutTab extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
@@ -636,21 +632,26 @@ class AboutTab extends StatelessWidget {
           ),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
               color: color,
-              size: 16,
+              size: 20,
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 12),
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: color,
               ),
+            ),
+            const Spacer(),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: color.withOpacity(0.6),
+              size: 16,
             ),
           ],
         ),

@@ -47,148 +47,150 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           onPressed: () => context.go('/profile'),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header với icon và text nổi bật
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header với icon và text nổi bật
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.receipt_long,
+                      color: AppColors.primary,
+                      size: 28,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.receipt_long,
-                    color: AppColors.primary,
-                    size: 28,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Order History',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Your recent meal orders',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
+                ],
+              ),
+              const SizedBox(height: 24),
+        
+              if (orders.isEmpty)
+                Center(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Icon(
+                        Icons.receipt_long,
+                        size: 64,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(height: 16),
                       Text(
-                        'Order History',
+                        'No orders yet',
                         style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          fontSize: 18,
+                          color: AppColors.textSecondary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 8),
                       Text(
-                        'Your recent meal orders',
+                        'Your order history will appear here',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
+                )
+              else ...[
+                // Hiển thị orders
+                ...displayedOrders.map(
+                  (order) => _buildOrderCard(order, context),
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            if (orders.isEmpty)
-              Center(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.receipt_long,
-                      size: 64,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No orders yet',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: AppColors.textSecondary,
+        
+                // Nút xem thêm
+                if (hasMoreOrders) ...[
+                  const SizedBox(height: 16),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _loadMoreOrders,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 2,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Xem thêm $_loadMoreCount đơn hàng',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.expand_more, size: 20),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Your order history will appear here',
+                  ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Text(
+                      'Đang hiển thị ${displayedOrders.length}/${orders.length} đơn hàng',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
                     ),
-                  ],
-                ),
-              )
-            else ...[
-              // Hiển thị orders
-              ...displayedOrders.map(
-                (order) => _buildOrderCard(order, context),
-              ),
-
-              // Nút xem thêm
-              if (hasMoreOrders) ...[
-                const SizedBox(height: 16),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _loadMoreOrders,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
+                  ),
+                ] else if (orders.length > 2) ...[
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Text(
+                      'Đã hiển thị tất cả ${orders.length} đơn hàng',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                        fontStyle: FontStyle.italic,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Xem thêm $_loadMoreCount đơn hàng',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(Icons.expand_more, size: 20),
-                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Center(
-                  child: Text(
-                    'Đang hiển thị ${displayedOrders.length}/${orders.length} đơn hàng',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ] else if (orders.length > 2) ...[
-                const SizedBox(height: 16),
-                Center(
-                  child: Text(
-                    'Đã hiển thị tất cả ${orders.length} đơn hàng',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ),
+                ],
               ],
             ],
-          ],
+          ),
         ),
       ),
     );

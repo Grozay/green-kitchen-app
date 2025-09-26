@@ -206,6 +206,8 @@ class _FaqTabState extends State<FaqTab> {
 
               // FAQ Categories
               ...faqs.map((category) => _buildFaqCategory(category)),
+
+              const SizedBox(height: 24), // Extra spacing at the bottom
             ],
           ),
         ),

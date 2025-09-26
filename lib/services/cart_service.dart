@@ -26,7 +26,7 @@ class CartService {
       final response = await _apiService.get(url);
       return Cart.fromJson(response);
     } catch (e) {
-      print('Error in getCartByCustomerId: $e'); // Debug error
+      // print('Error in getCartByCustomerId: $e'); // Debug error
       if (e is ApiError) {
         throw Exception('Failed to load cart: ${e.message}');
       }
@@ -42,7 +42,7 @@ class CartService {
           .replaceFirst(':customerId', customerId.toString())
           .replaceFirst(':cartItemId', cartItemId.toString());
 
-      print('DEBUG: Increase quantity URL: $updateUrl');
+      // print('DEBUG: Increase quantity URL: $updateUrl');
 
       // Gọi API increase (chỉ để update)
       await _apiService.post(updateUrl);
@@ -50,7 +50,7 @@ class CartService {
       // Sau đó fetch lại full cart
       return await getCartByCustomerId(customerId);
     } catch (e) {
-      print('DEBUG: Increase quantity error: $e');
+      // print('DEBUG: Increase quantity error: $e');
       if (e is ApiError) {
         throw Exception('Failed to increase quantity: ${e.message}');
       }
@@ -66,7 +66,7 @@ class CartService {
           .replaceFirst(':customerId', customerId.toString())
           .replaceFirst(':cartItemId', cartItemId.toString());
 
-      print('DEBUG: Decrease quantity URL: $updateUrl');
+      // print('DEBUG: Decrease quantity URL: $updateUrl');
 
       // Gọi API decrease (chỉ để update)
       await _apiService.post(updateUrl);
@@ -74,7 +74,7 @@ class CartService {
       // Sau đó fetch lại full cart
       return await getCartByCustomerId(customerId);
     } catch (e) {
-      print('DEBUG: Decrease quantity error: $e');
+      // print('DEBUG: Decrease quantity error: $e');
       if (e is ApiError) {
         throw Exception('Failed to decrease quantity: ${e.message}');
       }
@@ -89,7 +89,7 @@ class CartService {
           .replaceFirst(':customerId', customerId.toString())
           .replaceFirst(':cartItemId', cartItemId.toString());
       
-      print('DEBUG: Remove from cart URL: $url');
+      // print('DEBUG: Remove from cart URL: $url');
       
       await _apiService.delete(url);
       
@@ -127,8 +127,8 @@ class CartService {
         customerId.toString(),
       );
       
-      print('DEBUG: Add to cart URL: $url');
-      print('DEBUG: Add to cart data: $data');
+      // print('DEBUG: Add to cart URL: $url');
+      // print('DEBUG: Add to cart data: $data');
       
       // Gọi API add (chỉ để thêm)
       await _apiService.post(url, body: data);
@@ -136,7 +136,7 @@ class CartService {
       // Sau đó fetch lại full cart
       return await getCartByCustomerId(customerId);
     } catch (e) {
-      print('DEBUG: Add to cart error: $e');
+      // print('DEBUG: Add to cart error: $e');
       if (e is ApiError) {
         throw Exception('Failed to add meal to cart: ${e.message}');
       }

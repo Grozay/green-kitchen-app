@@ -91,7 +91,7 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
                 color: AppColors.textPrimary,
               ),
               onPressed: () {
-                GoRouter.of(context).pop();
+                context.go('/menu');
               },
             ),
             title: Text(
@@ -149,44 +149,46 @@ class _MenuMealScreenState extends State<MenuMealScreen> with SingleTickerProvid
               const SizedBox(width: 8),
             ],
           ),
-          body: Container(
-            color: AppColors.background,
-            child: CustomScrollView(
-              slivers: [
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _TabMenuDelegate(tabController: _tabController),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 32),
-                        Text(
-                          '$selectedFilter PROTEIN',
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 28,
-                            letterSpacing: 1,
+          body: SafeArea(
+            child: Container(
+              color: AppColors.background,
+              child: CustomScrollView(
+                slivers: [
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _TabMenuDelegate(tabController: _tabController),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 32),
+                          Text(
+                            '$selectedFilter PROTEIN',
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 28,
+                              letterSpacing: 1,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                        MenuList(
-                          meals: filteredMeals,
-                          loading: loading,
-                          onTap: (meal) {
-                            context.go('/menu-meal/${meal.slug}');
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                      ],
+                          const SizedBox(height: 24),
+                          MenuList(
+                            meals: filteredMeals,
+                            loading: loading,
+                            onTap: (meal) {
+                              context.go('/menu-meal/${meal.slug}');
+                            },
+                          ),
+                          SizedBox(height: 24 + MediaQuery.of(context).padding.bottom),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -205,21 +207,16 @@ class _TabMenuDelegate extends SliverPersistentHeaderDelegate {
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
       color: AppColors.background,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: [
-          const SizedBox(height: 15),
-          tab_menu(tabController: tabController),
-        ],
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      child: tab_menu(tabController: tabController),
     );
   }
 
   @override
-  double get maxExtent => 80;
+  double get maxExtent => 60;
 
   @override
-  double get minExtent => 80;
+  double get minExtent => 60;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;

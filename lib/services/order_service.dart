@@ -110,7 +110,7 @@ class OrderService {
     } catch (e) {
       // If payment processing fails, don't throw error - just log it
       // The order was already created successfully
-      print('Warning: COD payment processing failed: $e');
+      // print('Warning: COD payment processing failed: $e');
       return {
         'orderId': orderId,
         'amount': amount,
@@ -151,7 +151,7 @@ class OrderService {
     } catch (e) {
       // If payment processing fails, don't throw error - just log it
       // The order was already created successfully
-      print('Warning: PayPal payment processing failed: $e');
+      // print('Warning: PayPal payment processing failed: $e');
       return {
         'orderId': orderId,
         'amount': amount,

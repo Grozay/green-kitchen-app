@@ -48,22 +48,22 @@ class ChatWebSocketService {
   }
 
   void _onConnect(StompFrame frame) {
-    print('🔌 WebSocket connected successfully');
+    // print('🔌 WebSocket connected successfully');
     // Re-subscribe tất cả topic khi reconnect
     final existing = Map<int, StompUnsubscribe>.from(_subscriptions);
     _subscriptions.clear();
     for (final entry in existing.entries) {
-      print('🔄 Re-subscribing to conversation ${entry.key}');
+      // print('🔄 Re-subscribing to conversation ${entry.key}');
       subscribeConversation(entry.key);
     }
   }
 
   void _onStompError(StompFrame frame) {
-    print('❌ STOMP Error: ${frame.body}');
+    // print('❌ STOMP Error: ${frame.body}');
   }
 
   void _onWebSocketError(dynamic error) {
-    print('❌ WebSocket Error: $error');
+    // print('❌ WebSocket Error: $error');
   }
 
   void _onDisconnect(StompFrame frame) {
@@ -73,43 +73,43 @@ class ChatWebSocketService {
   // Subscribe vào conversation topic
   void subscribeConversation(int conversationId) {
     if (_client == null || _client!.connected != true) {
-      print('❌ Cannot subscribe: WebSocket not connected');
+      // print('❌ Cannot subscribe: WebSocket not connected');
       return;
     }
     if (_subscriptions.containsKey(conversationId)) {
-      print('⚠️ Already subscribed to conversation $conversationId');
+      // print('⚠️ Already subscribed to conversation $conversationId');
       return;
     }
 
-    print('📡 Subscribing to conversation $conversationId');
+    // print('📡 Subscribing to conversation $conversationId');
     final unsub = _client!.subscribe(
       destination: '/topic/conversations/$conversationId',
       callback: (StompFrame frame) {
         try {
           final body = frame.body;
           if (body == null || body.isEmpty) {
-            print('⚠️ Empty message received');
+            // print('⚠️ Empty message received');
             return;
           }
-          print('📨 Raw message received: $body');
+          // print('📨 Raw message received: $body');
           final Map<String, dynamic> data = jsonDecode(body) as Map<String, dynamic>;
           final message = ChatResponse.fromJson(data);
-          print('📨 Parsed message: ${message.content} from ${message.senderRole}');
+          // print('📨 Parsed message: ${message.content} from ${message.senderRole}');
           
           // Kiểm tra stream chưa bị đóng trước khi add
           if (!_messageStreamController.isClosed) {
             _messageStreamController.add(message);
           } else {
-            print('⚠️ Cannot add message: Stream is closed');
+            // print('⚠️ Cannot add message: Stream is closed');
           }
         } catch (e) {
-          print('❌ Error parsing message: $e');
+          // print('❌ Error parsing message: $e');
         }
       },
     );
 
     _subscriptions[conversationId] = unsub;
-    print('✅ Subscribed to conversation $conversationId');
+    // print('✅ Subscribed to conversation $conversationId');
   }
 
   void unsubscribeConversation(int conversationId) {

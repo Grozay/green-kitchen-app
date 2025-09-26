@@ -88,18 +88,19 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
       fetchedReviews.sort((a, b) {
         if (customerId != null) {
           if (a.customerId == int.parse(customerId) &&
-              b.customerId != int.parse(customerId))
+              b.customerId != int.parse(customerId)) {
             return -1;
+          }
           if (b.customerId == int.parse(customerId) &&
-              a.customerId != int.parse(customerId))
+              a.customerId != int.parse(customerId)) {
             return 1;
+          }
         }
         return DateTime.parse(
           b.createdAt ?? '',
         ).compareTo(DateTime.parse(a.createdAt ?? ''));
       });
       setState(() => reviews = fetchedReviews);
-    } catch (e) {
     } finally {
       setState(() => reviewsLoading = false);
     }
@@ -637,7 +638,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                             reviewsLoading: reviewsLoading,
                             onEdit: _handleEditReview, // Sử dụng method mới
                           ),
-                          const SizedBox(height: 100),
+                          const SizedBox(height: 32),
                         ],
                       ),
                     ),
@@ -646,10 +647,12 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
               ],
             ),
           ),
-          bottomNavigationBar: BottomBarWidget(
-            menuMeal: menuMeal!,
-            quantity: quantity,
-            onQuantityChanged: (q) => setState(() => quantity = q),
+          bottomNavigationBar: SafeArea(
+            child: BottomBarWidget(
+              menuMeal: menuMeal!,
+              quantity: quantity,
+              onQuantityChanged: (q) => setState(() => quantity = q),
+            ),
           ),
         );
       },

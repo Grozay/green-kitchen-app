@@ -25,7 +25,7 @@ class ReviewMenuMealService {
       // Assuming response is List<Map<String, dynamic>>
       return (response as List).map((json) => MenuMealReview.fromJson(json)).toList();
     } catch (e) {
-      print('Error in getMenuMealReviews: $e');
+      // print('Error in getMenuMealReviews: $e');
       if (e is ApiError) {
         throw Exception('Failed to load reviews: ${e.message}');
       }
@@ -40,7 +40,7 @@ class ReviewMenuMealService {
       final response = await _apiService.post(endpoints.createMenuMealReview, body: data);
       return MenuMealReview.fromJson(response);
     } catch (e) {
-      print('Error in createMenuMealReview: $e');
+      // print('Error in createMenuMealReview: $e');
       if (e is ApiError) {
         throw Exception('Failed to create review: ${e.message}');
       }
@@ -56,7 +56,7 @@ class ReviewMenuMealService {
       final response = await _apiService.put(url, body: data);
       return MenuMealReview.fromJson(response);
     } catch (e) {
-      print('Error in updateMenuMealReview: $e');
+      // print('Error in updateMenuMealReview: $e');
       if (e is ApiError) {
         throw Exception('Failed to update review: ${e.message}');
       }
@@ -72,7 +72,7 @@ class ReviewMenuMealService {
       final response = await _apiService.get(url);
       return Customer.fromJson(response);  // Parse response thành Customer
     } catch (e) {
-      print('Error in fetchCustomerDetails: $e');
+      // print('Error in fetchCustomerDetails: $e');
       if (e is ApiError) {
         throw Exception('Failed to fetch customer details: ${e.message}');
       }

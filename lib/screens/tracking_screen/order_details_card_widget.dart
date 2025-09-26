@@ -115,7 +115,7 @@ class OrderDetailsCardWidget extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Code: #${order.id}',
+                      'Code: ${order.orderCode}',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
@@ -138,7 +138,7 @@ class OrderDetailsCardWidget extends StatelessWidget {
               _buildInfoRow('Phone', order.recipientPhone),
               _buildInfoRow(
                 'Address',
-                '${order.street}'
+                order.street
               ),
             ],
           ),

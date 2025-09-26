@@ -65,22 +65,24 @@ class _CustomMealReviewScreenState extends State<CustomMealReviewScreen> {
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Total: ${NumberFormat('#,###', 'vi_VN').format(provider.totalPrice)} VND',
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => _showOrderModal(context, provider),
-                        child: const Text('Order'),
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Total: ${NumberFormat('#,###', 'vi_VN').format(provider.totalPrice)} VND',
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => _showOrderModal(context, provider),
+                          child: const Text('Order'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -110,175 +110,177 @@ class _CustomMealScreenState extends State<CustomMealScreen>
               const SizedBox(width: 8),
             ],
           ),
-          body: Container(
-            color: AppColors.background,
-            child: Column(
-              children: [
-                const SizedBox(height: 24),
-                // Add TabBar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: tab_ingredient(
-                    tabController: _tabController!,
-                  ), // Use the tab widget
-                ),
-                const SizedBox(height: 16),
-                // TabBarView with grids
-                Expanded(
-                  child: customMealProvider.isLoadingIngredients
-                      ? const Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : customMealProvider.ingredientsError != null
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.error_outline,
-                                      size: 48,
-                                      color: Colors.red,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Failed to load ingredients',
-                                      style: Theme.of(context).textTheme.headlineSmall,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      customMealProvider.ingredientsError!,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(color: Colors.grey),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    ElevatedButton(
-                                      onPressed: () => customMealProvider.loadAvailableItems(),
-                                      child: const Text('Retry'),
-                                    ),
-                                  ],
+          body: SafeArea(
+            child: Container(
+              color: AppColors.background,
+              child: Column(
+                children: [
+                  const SizedBox(height: 12), // Giảm từ 16 xuống 12
+                  // Add TabBar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: tab_ingredient(
+                      tabController: _tabController!,
+                    ), // Use the tab widget
+                  ),
+                  const SizedBox(height: 8), // Giảm từ 12 xuống 8
+                  // TabBarView with grids
+                  Expanded(
+                    child: customMealProvider.isLoadingIngredients
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : customMealProvider.ingredientsError != null
+                            ? Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.error_outline,
+                                        size: 48,
+                                        color: Colors.red,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Failed to load ingredients',
+                                        style: Theme.of(context).textTheme.headlineSmall,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        customMealProvider.ingredientsError!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(color: Colors.grey),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ElevatedButton(
+                                        onPressed: () => customMealProvider.loadAvailableItems(),
+                                        child: const Text('Retry'),
+                                      ),
+                                    ],
+                                  ),
                                 ),
+                              )
+                            : TabBarView(
+                                controller: _tabController,
+                                children: [
+                                  // Protein tab
+                                  _buildIngredientGrid(
+                                    customMealProvider.availableProteins,
+                                    customMealProvider,
+                                  ),
+                                  // Carbs tab
+                                  _buildIngredientGrid(
+                                    customMealProvider.availableCarbs,
+                                    customMealProvider,
+                                  ),
+                                  // Side tab
+                                  _buildIngredientGrid(
+                                    customMealProvider.availableSides,
+                                    customMealProvider,
+                                  ),
+                                  // Sauce tab
+                                  _buildIngredientGrid(
+                                    customMealProvider.availableSauces,
+                                    customMealProvider,
+                                  ),
+                                ],
                               ),
-                            )
-                          : TabBarView(
-                              controller: _tabController,
-                              children: [
-                                // Protein tab
-                                _buildIngredientGrid(
-                                  customMealProvider.availableProteins,
-                                  customMealProvider,
-                                ),
-                                // Carbs tab
-                                _buildIngredientGrid(
-                                  customMealProvider.availableCarbs,
-                                  customMealProvider,
-                                ),
-                                // Side tab
-                                _buildIngredientGrid(
-                                  customMealProvider.availableSides,
-                                  customMealProvider,
-                                ),
-                                // Sauce tab
-                                _buildIngredientGrid(
-                                  customMealProvider.availableSauces,
-                                  customMealProvider,
-                                ),
-                              ],
-                            ),
-                ),
-                // Nutrition info and button
-                Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            nutrition_info(
-                              value: customMealProvider.totalCalories
-                                  .toStringAsFixed(0),
-                              label: 'Cal',
-                            ),
-                            const SizedBox(
-                              width: 40,
-                            ), // Increased spacing from 12 to 16
-                            nutrition_info(
-                              value:
-                                  '${customMealProvider.totalProtein.toStringAsFixed(1)}g',
-                              label: 'Protein',
-                            ),
-                            const SizedBox(
-                              width: 40,
-                            ), // Increased spacing from 12 to 16
-                            nutrition_info(
-                              value:
-                                  '${customMealProvider.totalCarbs.toStringAsFixed(1)}g',
-                              label: 'Carbs',
-                            ),
-                            const SizedBox(
-                              width: 40,
-                            ), // Increased spacing from 12 to 16
-                            nutrition_info(
-                              value:
-                                  '${customMealProvider.totalFat.toStringAsFixed(1)}g',
-                              label: 'Fat',
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF1CC29F),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                  // Nutrition info and button
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6, // Giảm từ 8 xuống 6
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(vertical: 4), // Giảm từ 6 xuống 4
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              nutrition_info(
+                                value: customMealProvider.totalCalories
+                                    .toStringAsFixed(0),
+                                label: 'Cal',
+                              ),
+                              const SizedBox(
+                                width: 40,
+                              ), // Increased spacing from 12 to 16
+                              nutrition_info(
+                                value:
+                                    '${customMealProvider.totalProtein.toStringAsFixed(1)}g',
+                                label: 'Protein',
+                              ),
+                              const SizedBox(
+                                width: 40,
+                              ), // Increased spacing from 12 to 16
+                              nutrition_info(
+                                value:
+                                    '${customMealProvider.totalCarbs.toStringAsFixed(1)}g',
+                                label: 'Carbs',
+                              ),
+                              const SizedBox(
+                                width: 40,
+                              ), // Increased spacing from 12 to 16
+                              nutrition_info(
+                                value:
+                                    '${customMealProvider.totalFat.toStringAsFixed(1)}g',
+                                label: 'Fat',
+                              ),
+                            ],
                           ),
-                          onPressed:
-                              customMealProvider.selection.protein != null
-                              ? () {
-                                  // Check if user is logged in
-                                  final authProvider =
-                                      Provider.of<AuthProvider>(
+                        ),
+                        const SizedBox(height: 6), // Giảm từ 8 xuống 6
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF1CC29F),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10), // Giảm từ 12 xuống 10
+                            ),
+                            onPressed:
+                                customMealProvider.selection.protein != null
+                                ? () {
+                                    // Check if user is logged in
+                                    final authProvider =
+                                        Provider.of<AuthProvider>(
+                                          context,
+                                          listen: false,
+                                        );
+                                    if (!authProvider.isAuthenticated) {
+                                      _showLoginPrompt(context);
+                                    } else {
+                                      GoRouter.of(
                                         context,
-                                        listen: false,
-                                      );
-                                  if (!authProvider.isAuthenticated) {
-                                    _showLoginPrompt(context);
-                                  } else {
-                                    GoRouter.of(
-                                      context,
-                                    ).push('/custom-meal/review');
+                                      ).push('/custom-meal/review');
+                                    }
                                   }
-                                }
-                              : null,
-                          child: const Text(
-                            'Order Now',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                                : null,
+                            child: const Text(
+                              'Order Now',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -312,7 +314,7 @@ class _CustomMealScreenState extends State<CustomMealScreen>
         crossAxisCount: 2,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
-        childAspectRatio: 0.70,
+        childAspectRatio: 0.7, // Tăng từ 0.70 lên 0.85 để làm item nhỏ gọn hơn
       ),
       itemCount: ingredients.length,
       itemBuilder: (context, index) {
